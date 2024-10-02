@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initTables } from '../config/database'
+import { getRootUser } from '../config/user'
 
 function createWindow() {
   // Create the browser window.
@@ -65,10 +66,17 @@ app.whenReady().then(() => {
 
   initTables()
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   let win = createWindow()
+
+  ipcMain.on('init-page', () => {
+    const res = getRootUser()
+
+    if (res) {
+      win.webContents.send('init-page', { pageKey: 'main' })
+    } else {
+      win.webContents.send('init-page', { pageKey: 'get-started' })
+    }
+  })
 
   // Window buttons action
   ipcMain.on('minimize', () => {

@@ -9,17 +9,24 @@ const dbPath =
 const db = new Database(dbPath)
 db.pragma('journal_mode = WAL')
 
-export const initTables = () => {
-  db.exec(`CREATE TABLE
-    IF NOT EXISTS users (
+export const initTables = (isForce) => {
+  if (isForce) {
+    console.log('force init table')
+    db.exec(`DROP TABLE IF EXISTS users`)
+  }
+
+  db.exec(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
+        displayName TEXT NOT NULL,
+        role TEXT NOT NULL,
+        type TEXT,
         password TEXT NOT NULL
-    );
+    );`)
 
-INSERT INTO
-    users (username, password)
-VALUES
-    ('system_root', '1234') ON CONFLICT (username) DO NOTHING;`)
+  // INSERT INTO
+  //     users (username, password)
+  // VALUES
+  //     ('system_root', '1234') ON CONFLICT (username) DO NOTHING;
 }
 export default db
