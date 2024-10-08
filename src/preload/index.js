@@ -1,51 +1,16 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import db from '../config/database'
-import { hashPassword } from '../config/password'
-import { getRootUser } from '../config/user'
+import { getAllUsers, getRootUser } from '../config/user'
+import { checkToken, login, registerAndLogin, registerUser } from '../config/auth'
 
 // Custom APIs for renderer
 const api = {
-  getAllUsers: () => {
-    const select = db.prepare('SELECT username FROM users')
-    const users = select.all()
-    return users
-  },
+  getAllUsers: getAllUsers,
   getRootUser: getRootUser,
-  registerAndLogin: async ({ password, isRoot, ...other }) => {
-    try {
-      const stmt = db.prepare(
-        'INSERT INTO users (username, displayName, role, password, type) VALUES (@username, @displayName, @role, @password, @type)'
-      )
-      const hp = await hashPassword(password)
-      stmt.run({
-        ...other,
-        password: hp,
-        type: isRoot ? 'root' : 'normal'
-      })
-
-      // login hiihiin
-      return true
-    } catch (err) {
-      console.log('ERROR::: ', err)
-    }
-  },
-  registerUser: async ({ password, isRoot, ...other }) => {
-    try {
-      const stmt = db.prepare(
-        'INSERT INTO users (username, displayName, role, password, type) VALUES (@username, @displayName, @role, @password, @type)'
-      )
-      const hp = await hashPassword(password)
-      stmt.run({
-        ...other,
-        password: hp,
-        type: isRoot ? 'root' : 'normal'
-      })
-      return true
-    } catch (err) {
-      console.log('ERROR::: ', err)
-    }
-  }
+  checkToken: checkToken,
+  login: login,
+  registerAndLogin: registerAndLogin,
+  registerUser: registerUser
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

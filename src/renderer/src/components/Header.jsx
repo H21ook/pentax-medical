@@ -4,6 +4,7 @@ import closeIcon from '../assets/icons/close.png'
 import restoreIcon from '../assets/icons/resize.png'
 import maximizeIcon from '../assets/icons/maximize.png'
 import minimizeIcon from '../assets/icons/minimize.png'
+import styles from './style.module.css'
 
 const Header = () => {
   const [isMaximized, setIsMaximized] = useState(false)
@@ -19,13 +20,8 @@ const Header = () => {
   }, [])
 
   return (
-    <div className="w-full bg-slate-200 flex justify-between items-start">
-      <div
-        className="p-2 flex-1"
-        style={{
-          '-webkit-app-region': 'drag'
-        }}
-      >
+    <div className="w-full bg-slate-200 flex justify-between items-start select-none">
+      <div className={`p-2 flex-1 ${styles.header}`}>
         <img src={logoImage} alt="pentax medical logo" className="h-6" />
       </div>
       <div className="flex items-center h-10">

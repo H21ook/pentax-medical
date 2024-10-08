@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initTables } from '../config/database'
 import { getRootUser } from '../config/user'
+import { checkToken } from '../config/auth'
 
 function createWindow() {
   // Create the browser window.
@@ -68,14 +69,19 @@ app.whenReady().then(() => {
 
   let win = createWindow()
 
-  ipcMain.on('init-page', () => {
+  ipcMain.on('init-page', (_e, data) => {
     const res = getRootUser()
-
-    if (res) {
-      win.webContents.send('init-page', { pageKey: 'main' })
-    } else {
+    if (!res) {
       win.webContents.send('init-page', { pageKey: 'get-started' })
+      return
     }
+    const res2 = checkToken(data.token)
+    if (res2.result && res2.data?.isLogged) {
+      win.webContents.send('init-page', { pageKey: 'main' })
+      return
+    }
+    win.webContents.send('init-page', { pageKey: 'login' })
+    return
   })
 
   // Window buttons action

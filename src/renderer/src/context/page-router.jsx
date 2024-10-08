@@ -3,7 +3,9 @@ import React, { useContext, useEffect, useState } from 'react'
 const PageRouterContext = React.createContext({
   push: () => {},
   back: () => {},
-  params: undefined
+  restart: () => {},
+  params: undefined,
+  currentPageKey: ''
 })
 
 export const useRouter = () => {
@@ -26,7 +28,9 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
 
   useEffect(() => {
     if (pages.length < 2) {
-      window.electron.ipcRenderer.send('init-page')
+      window.electron.ipcRenderer.send('init-page', {
+        token: localStorage.getItem('token')
+      })
     }
   }, [pages])
 
@@ -67,6 +71,12 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
     setCurrentPageKey(path)
   }
 
+  const restart = () => {
+    setPages([defaultPageKey])
+    setPageParams({})
+    setCurrentPageKey(defaultPageKey)
+  }
+
   const currentPage = routes.find((r) => r.key === currentPageKey)
 
   return (
@@ -74,6 +84,7 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
       value={{
         push,
         back,
+        restart,
         currentPageKey,
         params: pageParams?.[currentPageKey]
       }}

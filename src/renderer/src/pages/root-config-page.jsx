@@ -13,10 +13,16 @@ import {
 import { RxEyeClosed, RxEyeOpen } from 'react-icons/rx'
 import { useState } from 'react'
 import dashboardImage from '../assets/dashboard.svg'
+import { useRouter } from '../context/page-router'
+import { useAuth } from '../context/auth-context'
 
 const RootConfigPage = () => {
   const [showPass, setShowPass] = useState(false)
+  const [mainError, setMainError] = useState()
   const [showConfirmPass, setShowConfirmPass] = useState(false)
+
+  const router = useRouter()
+  const { checkLogged } = useAuth()
   const { control, handleSubmit, watch } = useForm({
     defaultValues: {
       username: '',
@@ -35,6 +41,15 @@ const RootConfigPage = () => {
       displayName,
       isRoot: true
     })
+
+    if (!res.result) {
+      setMainError(res.message)
+      return
+    }
+
+    localStorage.setItem('token', res.data?.token)
+    checkLogged()
+    router.push('main')
   }
 
   const password = watch('password')
@@ -214,6 +229,12 @@ const RootConfigPage = () => {
             <div className="col-span-2 flex justify-end">
               <Button type="submit">Үүсгэх</Button>
             </div>
+
+            {mainError && (
+              <div className="col-span-2 flex justify-end">
+                <p className="text-sm text-destructive">{mainError}</p>
+              </div>
+            )}
           </form>
         </div>
       </div>
