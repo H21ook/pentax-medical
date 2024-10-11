@@ -31,7 +31,7 @@ const GetStartedPage = () => {
       <Button
         className="animate-bounce"
         onClick={() => {
-          router.push('root-config')
+          router.change('root-config')
         }}
       >
         Эхлэх

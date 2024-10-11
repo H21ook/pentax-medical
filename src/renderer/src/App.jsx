@@ -5,6 +5,7 @@ import MainPage from './pages/main-page'
 import RootConfigPage from './pages/root-config-page'
 import { LoginPage } from './pages/login-page'
 import AuthProvider from './context/auth-context'
+import HospitalSettingsPage from './pages/hospital-settings-page'
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
             {
               key: 'login',
               page: <LoginPage />
+            },
+            {
+              key: 'hospital-settings',
+              page: <HospitalSettingsPage />
             }
           ]}
         />

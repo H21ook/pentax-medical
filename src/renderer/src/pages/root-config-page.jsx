@@ -28,15 +28,17 @@ const RootConfigPage = () => {
       username: '',
       displayName: '',
       role: 'admin',
+      position: '',
       password: '',
       confirmPassword: ''
     }
   })
 
-  const onSubmit = async ({ username, password, role, displayName }) => {
-    const res = await window.api.registerUser({
+  const onSubmit = async ({ username, password, role, displayName, position }) => {
+    const res = await window.api.registerAndLogin({
       username,
       password,
+      position,
       role,
       displayName,
       isRoot: true
@@ -46,7 +48,6 @@ const RootConfigPage = () => {
       setMainError(res.message)
       return
     }
-
     localStorage.setItem('token', res.data?.token)
     checkLogged()
     router.push('main')
@@ -70,12 +71,13 @@ const RootConfigPage = () => {
             <Controller
               control={control}
               name={'username'}
+              key={'username'}
               rules={{
                 required: 'Нэвтрэх нэр оруулна уу'
               }}
               render={({ field: { value, onChange, name }, fieldState: { error } }) => {
                 return (
-                  <div className="col-span-2 flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
                     <Label htmlFor={name} className="pb-1">
                       Нэвтрэх нэр
                     </Label>
@@ -95,33 +97,8 @@ const RootConfigPage = () => {
             />
             <Controller
               control={control}
-              name={'displayName'}
-              rules={{
-                required: 'Нэрээ оруулна уу'
-              }}
-              render={({ field: { value, onChange, name }, fieldState: { error } }) => {
-                return (
-                  <div className="flex-1 flex flex-col gap-1">
-                    <Label htmlFor={name} className="pb-1">
-                      Нэр
-                    </Label>
-                    <Input
-                      id={name}
-                      name={name}
-                      value={value}
-                      placeholder="Жишээ: А.Бат"
-                      onChange={(e) => {
-                        onChange(e.target.value)
-                      }}
-                    />
-                    {error && <p className="text-sm text-destructive">{error.message}</p>}
-                  </div>
-                )
-              }}
-            />
-            <Controller
-              control={control}
               name={'role'}
+              key={'role'}
               rules={{
                 required: 'Үүрэг сонгоно уу'
               }}
@@ -147,7 +124,62 @@ const RootConfigPage = () => {
             />
             <Controller
               control={control}
+              name={'displayName'}
+              key={'displayName'}
+              rules={{
+                required: 'Нэрээ оруулна уу'
+              }}
+              render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+                return (
+                  <div className="flex-1 flex flex-col gap-1">
+                    <Label htmlFor={name} className="pb-1">
+                      Нэр
+                    </Label>
+                    <Input
+                      id={name}
+                      name={name}
+                      value={value}
+                      placeholder="Жишээ: А.Бат"
+                      onChange={(e) => {
+                        onChange(e.target.value)
+                      }}
+                    />
+                    {error && <p className="text-sm text-destructive">{error.message}</p>}
+                  </div>
+                )
+              }}
+            />
+            <Controller
+              control={control}
+              name={'position'}
+              key={'position'}
+              rules={{
+                required: 'Албан тушаал оруулна уу'
+              }}
+              render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+                return (
+                  <div className="flex-1 flex flex-col gap-1">
+                    <Label htmlFor={name} className="pb-1">
+                      Албан тушаал
+                    </Label>
+                    <Input
+                      id={name}
+                      name={name}
+                      value={value}
+                      placeholder="Жишээ: Их эмч"
+                      onChange={(e) => {
+                        onChange(e.target.value)
+                      }}
+                    />
+                    {error && <p className="text-sm text-destructive">{error.message}</p>}
+                  </div>
+                )
+              }}
+            />
+            <Controller
+              control={control}
               name={'password'}
+              key={'password'}
               rules={{
                 required: 'Нууц үг оруулна уу'
               }}
@@ -186,6 +218,7 @@ const RootConfigPage = () => {
             <Controller
               control={control}
               name={'confirmPassword'}
+              key={'confirmPassword'}
               rules={{
                 required: 'Нууц үг давтаж оруулна уу',
                 validate: (val) => {

@@ -1,10 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initTables } from '../config/database'
 import { getRootUser } from '../config/user'
 import { checkToken } from '../config/auth'
+import { createMenu } from './menu'
 
 function createWindow() {
   // Create the browser window.
@@ -23,6 +24,10 @@ function createWindow() {
       sandbox: false
     }
   })
+
+  const menu = createMenu(mainWindow)
+
+  mainWindow.setMenu(menu)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -82,6 +87,25 @@ app.whenReady().then(() => {
     }
     win.webContents.send('init-page', { pageKey: 'login' })
     return
+  })
+
+  ipcMain.on('showAbout', () => {
+    if (win) {
+      dialog.showMessageBox(win, {
+        title: 'Програмын тухай',
+        type: 'info',
+        message: 'Pentax',
+        detail: `Энэхүү програм нь дурангийн эмч нарт зориулагдсан болно.
+      
+Хувилбар:
+    Node: v${process.versions.node}
+    Chrome: v${process.versions.chrome}
+    Electron: v${process.versions.electron}
+
+Copyright © ${new Date().getFullYear()}
+      `
+      })
+    }
   })
 
   // Window buttons action

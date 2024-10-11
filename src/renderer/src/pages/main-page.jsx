@@ -1,23 +1,18 @@
-import Header from '../components/Header'
-import MenuHeader from '../components/MenuHeader'
+import WorkerLayout from '../components/layouts/worker-layout'
 import Versions from '../components/Versions'
-import Footer from '../components/Footer'
 
 const MainPage = () => {
   const users = window.api.getAllUsers()
 
   return (
-    <div className="select-none h-full w-full flex flex-col">
-      <Header />
-      <MenuHeader />
+    <WorkerLayout>
       {users.map((item) => {
         return item.username
       })}
-      <div className="flex-1">
+      <div className="">
         <Versions></Versions>
       </div>
-      <Footer />
-    </div>
+    </WorkerLayout>
   )
 }
 

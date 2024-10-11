@@ -7,7 +7,9 @@ export const getRootUser = () => {
 }
 
 export const getAllUsers = () => {
-  const stmt = db.prepare('SELECT username FROM users type != ?')
+  const stmt = db.prepare(
+    'SELECT username, role, createdAt, position, displayName, type FROM users WHERE type != ?'
+  )
   const users = stmt.all('system-root')
   return users
 }

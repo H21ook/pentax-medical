@@ -1,9 +1,11 @@
 import { format } from 'date-fns'
+import { mn } from 'date-fns/locale'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from './ui/Button'
 import { RxExit } from 'react-icons/rx'
 import { useRouter } from '../context/page-router'
 import { useAuth } from '../context/auth-context'
+import { firstCharUpper } from '../lib/utils'
 
 const Footer = () => {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -29,7 +31,13 @@ const Footer = () => {
   return (
     <div className=" w-full border-t p-2 flex justify-between select-none items-center">
       <div className="flex flex-col items-start w-fit">
-        <div className="text-xs font-semibold">{format(currentDate, 'EEEE ')}</div>
+        <div className="text-xs font-semibold">
+          {firstCharUpper(
+            format(currentDate, 'EEEE ', {
+              locale: mn
+            })
+          )}
+        </div>
         <div className="text-xs text-muted-foreground">
           {format(currentDate, 'yyyy-MM-dd HH:mm:ss')}
         </div>
@@ -39,9 +47,7 @@ const Footer = () => {
           <div className="flex items-center border rounded-md">
             <div className="px-2.5 rounded-md flex items-center gap-2">
               <div>
-                <div className="text-xs leading-3 text-muted-foreground">
-                  {user.role === 'admin' ? 'Админ' : 'Эмч'}
-                </div>
+                <div className="text-xs leading-3 text-muted-foreground">{user.position}</div>
                 <div className="text-sm font-semibold">{user.displayName}</div>
               </div>
             </div>

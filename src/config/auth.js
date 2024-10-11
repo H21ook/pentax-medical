@@ -96,13 +96,14 @@ export const registerUser = async ({ password, isRoot, username, ...other }) => 
     }
 
     const stmt = db.prepare(
-      'INSERT INTO users (username, displayName, role, password, type) VALUES (@username, @displayName, @role, @password, @type)'
+      'INSERT INTO users (username, displayName, role, password, position, type, createdAt) VALUES (@username, @displayName, @role, @password, @position, @type, @createdAt)'
     )
     const hp = await hashPassword(password)
     const userData = {
       ...other,
       username: username?.toLowerCase(),
-      type: isRoot ? 'root' : 'normal'
+      type: isRoot ? 'root' : 'normal',
+      createdAt: new Date().toISOString()
     }
     stmt.run({
       ...userData,

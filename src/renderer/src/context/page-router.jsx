@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 const PageRouterContext = React.createContext({
-  push: () => {},
-  back: () => {},
+  change: () => {},
   restart: () => {},
   params: undefined,
   currentPageKey: ''
@@ -11,15 +10,16 @@ const PageRouterContext = React.createContext({
 export const useRouter = () => {
   return useContext(PageRouterContext)
 }
+
 const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
-  const [pages, setPages] = useState([defaultPageKey])
-  const [pageParams, setPageParams] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [pageParams, setPageParams] = useState()
   const [currentPageKey, setCurrentPageKey] = useState(defaultPageKey)
 
   useEffect(() => {
     window.electron.ipcRenderer.on('init-page', (_e, data) => {
-      setPages([defaultPageKey, data.pageKey])
       setCurrentPageKey(data.pageKey)
+      setLoading(false)
     })
     return () => {
       window.electron.ipcRenderer.removeAllListeners('init-page')
@@ -27,52 +27,27 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   }, [])
 
   useEffect(() => {
-    if (pages.length < 2) {
+    if (loading) {
       window.electron.ipcRenderer.send('init-page', {
         token: localStorage.getItem('token')
       })
     }
-  }, [pages])
+  }, [loading])
 
-  const back = () => {
-    if (pages.length > 0) {
-      const lastPage = pages[pages.length - 1]
-      if (pageParams?.[lastPage]) {
-        setPageParams((prev) => {
-          return {
-            ...prev,
-            [lastPage]: undefined
-          }
-        })
-      }
-
-      const prevPage = pages[pages.length - 2]
-      setPages((prev) => {
-        const temp = [...prev]
-        temp.splice(temp.length - 1, 1)
-        return temp
+  const change = (path, params) => {
+    if (path !== currentPageKey) {
+      setCurrentPageKey(path)
+      setPageParams((prev) => {
+        return {
+          ...prev,
+          [path]: params
+        }
       })
-      setCurrentPageKey(prevPage)
     }
   }
 
-  const push = (path, params) => {
-    setPages((prev) => {
-      const temp = [...prev]
-      temp.push(path)
-      return temp
-    })
-    setPageParams((prev) => {
-      return {
-        ...prev,
-        [path]: params
-      }
-    })
-    setCurrentPageKey(path)
-  }
-
   const restart = () => {
-    setPages([defaultPageKey])
+    setLoading(true)
     setPageParams({})
     setCurrentPageKey(defaultPageKey)
   }
@@ -82,8 +57,7 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   return (
     <PageRouterContext.Provider
       value={{
-        push,
-        back,
+        change,
         restart,
         currentPageKey,
         params: pageParams?.[currentPageKey]
