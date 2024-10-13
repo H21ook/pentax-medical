@@ -47,8 +47,8 @@ const Footer = () => {
           <div className="flex items-center border rounded-md">
             <div className="px-2.5 rounded-md flex items-center gap-2">
               <div>
-                <div className="text-xs leading-3 text-muted-foreground">{user.position}</div>
-                <div className="text-sm font-semibold">{user.displayName}</div>
+                <div className="text-xs leading-3 text-muted-foreground">{user?.position}</div>
+                <div className="text-sm font-semibold">{user?.displayName}</div>
               </div>
             </div>
           </div>

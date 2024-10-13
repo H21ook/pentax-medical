@@ -18,7 +18,7 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
 
   useEffect(() => {
     window.electron.ipcRenderer.on('init-page', (_e, data) => {
-      setCurrentPageKey(data.pageKey)
+      setCurrentPageKey(data?.pageKey)
       setLoading(false)
     })
     return () => {

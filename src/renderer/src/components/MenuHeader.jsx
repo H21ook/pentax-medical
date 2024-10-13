@@ -59,7 +59,7 @@ const MenuHeader = () => {
 
   const WORKER_MENU = [WORKSHEET_MENU, HELP_MENU]
 
-  const menu = user.role === 'admin' ? ADMIN_MENU : WORKER_MENU
+  const menu = user?.role === 'admin' ? ADMIN_MENU : WORKER_MENU
 
   useEffect(() => {
     // main-с мессеж хүлээн авах
@@ -72,7 +72,7 @@ const MenuHeader = () => {
       router.change('main')
     })
 
-    if (user.role === 'admin') {
+    if (user?.role === 'admin') {
       window.electron.ipcRenderer.on('stepHospitalSettings', () => {
         router.change('hospital-settings')
       })

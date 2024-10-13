@@ -4,3 +4,5 @@ out
 .DS_Store
 *.log*
 build
+demo_table.*
+pentax_store.*

@@ -1,6 +1,8 @@
-import db from './database'
-import { comparePassword, hashPassword } from './password'
-import { getAccessToken, verifyToken } from './token'
+import { ipcMain } from 'electron'
+import db from '../config/database'
+import { comparePassword, hashPassword } from '../config/password'
+import { getAccessToken, verifyToken } from '../config/token'
+import { log } from '../config/log'
 
 export const login = async ({ username, password }) => {
   const stmt = db.prepare('SELECT * FROM users WHERE username = ?')
@@ -75,7 +77,12 @@ export const registerAndLogin = async (data) => {
 
     return loginResult
   } catch (err) {
-    console.log('Register with login ERROR::: ', err)
+    log.info('Register with login ERROR:::START ')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    log.info('Register with login ERROR:::END ')
     return {
       result: false,
       message: 'Бүртгэл үүсгэхэд алдаа гарлаа.'
@@ -115,10 +122,35 @@ export const registerUser = async ({ password, isRoot, username, ...other }) => 
       data: userData
     }
   } catch (err) {
-    console.log('REGISTER ERROR::: ', err)
+    log.info('REGISTER ERROR:::START ')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    log.info('REGISTER ERROR:::END ')
     return {
       result: false,
       message: 'Бүртгэл үүсгэхэд алдаа гарлаа.'
     }
   }
 }
+
+ipcMain.handle('auth:checkToken', (event, token) => {
+  const result = checkToken(token) // Call the checkToken function
+  return result // Return validation result to the renderer
+})
+
+ipcMain.handle('auth:login', (event, data) => {
+  const result = login(data) // Call the checkToken function
+  return result // Return validation result to the renderer
+})
+
+ipcMain.handle('auth:registerAndLogin', (event, data) => {
+  const result = registerAndLogin(data) // Call the checkToken function
+  return result // Return validation result to the renderer
+})
+
+ipcMain.handle('auth:registerUser', (event, data) => {
+  const result = registerUser(data) // Call the checkToken function
+  return result // Return validation result to the renderer
+})

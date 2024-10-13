@@ -1,16 +1,17 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { getAllUsers, getRootUser } from '../config/user'
-import { checkToken, login, registerAndLogin, registerUser } from '../config/auth'
+import { checkToken, login, registerAndLogin, registerUser } from './routes/auth'
+import { getAllUsers } from './routes/users'
 
 // Custom APIs for renderer
 const api = {
-  getAllUsers: getAllUsers,
-  getRootUser: getRootUser,
+  // AUTH
   checkToken: checkToken,
   login: login,
   registerAndLogin: registerAndLogin,
-  registerUser: registerUser
+  registerUser: registerUser,
+  // USERS
+  getAllUsers: getAllUsers
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

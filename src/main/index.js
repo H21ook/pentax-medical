@@ -2,10 +2,11 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initTables } from '../config/database'
-import { getRootUser } from '../config/user'
-import { checkToken } from '../config/auth'
-import { createMenu } from './menu'
+import { initTables } from './config/database'
+import { checkToken } from './services/auth'
+import { createMenu } from './services/menu'
+import { log } from './config/log'
+import { getRootUser } from './services/user'
 
 function createWindow() {
   // Create the browser window.
@@ -21,6 +22,7 @@ function createWindow() {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
       sandbox: false
     }
   })
@@ -72,19 +74,25 @@ app.whenReady().then(() => {
 
   initTables()
 
+  log.info('initialized database')
   let win = createWindow()
 
   ipcMain.on('init-page', (_e, data) => {
     const res = getRootUser()
+    log.info(`Root user ${res ? 'already created.' : 'not found'}`)
     if (!res) {
+      log.info(`Go to Get Started page`)
       win.webContents.send('init-page', { pageKey: 'get-started' })
       return
     }
-    const res2 = checkToken(data.token)
+    const res2 = checkToken(data?.token)
     if (res2.result && res2.data?.isLogged) {
+      log.info(`Logged user: ${res2.data?.username}`)
+      log.info(`Go to Main page`)
       win.webContents.send('init-page', { pageKey: 'main' })
       return
     }
+    log.info(`Go to Login page`)
     win.webContents.send('init-page', { pageKey: 'login' })
     return
   })
@@ -96,16 +104,23 @@ app.whenReady().then(() => {
         type: 'info',
         message: 'Pentax',
         detail: `Энэхүү програм нь дурангийн эмч нарт зориулагдсан болно.
-      
-Хувилбар:
-    Node: v${process.versions.node}
-    Chrome: v${process.versions.chrome}
-    Electron: v${process.versions.electron}
 
-Copyright © ${new Date().getFullYear()}
-      `
+  Хувилбар:
+      Node: v${process.versions.node}
+      Chrome: v${process.versions.chrome}
+      Electron: v${process.versions.electron}
+
+  Copyright © ${new Date().getFullYear()}
+        `
       })
     }
+  })
+
+  win.webContents.openDevTools()
+
+  // renderer log
+  ipcMain.on('log-error', (_e, data) => {
+    log.info(`Renderer: ${data}`)
   })
 
   // Window buttons action

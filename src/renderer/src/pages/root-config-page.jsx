@@ -50,7 +50,7 @@ const RootConfigPage = () => {
     }
     localStorage.setItem('token', res.data?.token)
     checkLogged()
-    router.push('main')
+    router.change('main')
   }
 
   const password = watch('password')

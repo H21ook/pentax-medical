@@ -1,8 +1,17 @@
+import { useEffect, useCallback, useState } from 'react'
 import WorkerLayout from '../components/layouts/worker-layout'
 import Versions from '../components/Versions'
 
 const MainPage = () => {
-  const users = window.api.getAllUsers()
+  const [users, setUsers] = useState([])
+  const getUsers = useCallback(async () => {
+    const res = await window.api.getAllUsers()
+    setUsers(res || [])
+  }, [])
+
+  useEffect(() => {
+    getUsers()
+  }, [getUsers])
 
   return (
     <WorkerLayout>

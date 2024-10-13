@@ -1,17 +1,20 @@
 import Database from 'better-sqlite3'
+import { app } from 'electron'
 import path from 'path'
+import { log } from './log'
 
 const dbPath =
   process.env.NODE_ENV === 'development'
-    ? './demo_table.db'
-    : path.join(process.resourcesPath, './demo_table.db')
+    ? './pentax_store.db'
+    : path.join(app.getPath('userData'), 'pentax_store.db')
 
 const db = new Database(dbPath)
-db.pragma('journal_mode = WAL')
 
 export const initTables = (isForce) => {
+  db.pragma('journal_mode = WAL')
+
   if (isForce) {
-    console.log('force init table')
+    log.info('Force init database')
     db.exec(`DROP TABLE IF EXISTS users`)
   }
 
@@ -33,4 +36,5 @@ export const initTables = (isForce) => {
           ('root', 'Khishigbayar', 'admin', 'Developer', 'system-root', '${nowDate}', '$2b$10$pohw5PGO4WDO5i3ooVLwZ.hEVhZCk.xfsvyZzbb4UcF8OgNhnVzqi') ON CONFLICT (username) DO NOTHING;
 `)
 }
+
 export default db

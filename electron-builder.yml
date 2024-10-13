@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: pentax
+appId: com.khishigbayar.app
+productName: Pentax
 directories:
   buildResources: build
 files:
@@ -11,12 +11,16 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: pentax
+  executableName: Pentax
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  allowToChangeInstallationDirectory: true
+  oneClick: false
+  perMachine: true
+  allowElevation: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -41,4 +45,4 @@ publish:
   provider: generic
   url: https://example.com/auto-updates
 extraResources:
-  - 'demo_table.db'
+  - 'pentax_store.db'

@@ -13,12 +13,16 @@ const AuthProvider = ({ children }) => {
   const [isLogged, setLogged] = useState(false)
   const [user, setUser] = useState()
 
-  const checkLogged = useCallback(() => {
+  const checkLogged = useCallback(async () => {
     const token = localStorage.getItem('token')
-    const tokenResult = window.api.checkToken(token)
-    const { isLogged, ...user } = tokenResult.data
-    setLogged(isLogged)
-    setUser(user)
+
+    const tokenResult = await window.api.checkToken(token)
+    if (tokenResult?.data) {
+      const { isLogged, ...user } = tokenResult.data
+      setLogged(isLogged)
+      setUser(user)
+    }
+    setLogged(false)
   }, [])
 
   useEffect(() => {
