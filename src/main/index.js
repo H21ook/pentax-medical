@@ -116,8 +116,6 @@ app.whenReady().then(() => {
     }
   })
 
-  win.webContents.openDevTools()
-
   // renderer log
   ipcMain.on('log-error', (_e, data) => {
     log.info(`Renderer: ${data}`)

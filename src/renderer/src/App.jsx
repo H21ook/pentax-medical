@@ -6,6 +6,7 @@ import RootConfigPage from './pages/root-config-page'
 import { LoginPage } from './pages/login-page'
 import AuthProvider from './context/auth-context'
 import HospitalSettingsPage from './pages/hospital-settings-page'
+import { Toaster } from './components/ui/Toaster'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           ]}
         />
       </AuthProvider>
+      <Toaster />
     </div>
   )
 }

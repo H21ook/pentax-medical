@@ -7,7 +7,7 @@ const WorkerLayout = ({ children }) => {
     <div className="select-none h-full w-full flex flex-col">
       <Header />
       <MenuHeader />
-      <div className="flex-1 p-2">{children}</div>
+      <div className="h-[calc(100vh-129px)] p-2 overflow-y-auto">{children}</div>
       <Footer />
     </div>
   )
