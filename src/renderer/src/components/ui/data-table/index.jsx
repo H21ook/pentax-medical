@@ -46,7 +46,6 @@ const DataTable = ({ columns, data, actions }) => {
     }
   })
 
-  console.log(pagination)
   return (
     <div>
       <DataTableHeader table={table} actions={actions} />

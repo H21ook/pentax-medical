@@ -7,12 +7,14 @@ import minimizeIcon from '../assets/icons/minimize.png'
 import styles from './style.module.css'
 
 const Header = () => {
-  const [isMaximized, setIsMaximized] = useState(false)
+  const defaultMaximize = localStorage.getItem('maximize') === 'true'
+  const [isMaximized, setIsMaximized] = useState(defaultMaximize)
 
   useEffect(() => {
     // main-с мессеж хүлээн авах
     window.electron.ipcRenderer.on('setMaximize', (_e, data) => {
       setIsMaximized(data)
+      localStorage.setItem('maximize', data)
     })
     return () => {
       window.electron.ipcRenderer.removeAllListeners('setMaximize')
