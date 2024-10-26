@@ -8,7 +8,7 @@ import { Input } from '../components/ui/Input'
 import { RxEyeClosed, RxEyeOpen } from 'react-icons/rx'
 import { useAuth } from '../context/auth-context'
 
-export const LoginPage = () => {
+const Login = () => {
   const router = useRouter()
   const { checkLogged } = useAuth()
   const { control, handleSubmit } = useForm({
@@ -114,3 +114,5 @@ export const LoginPage = () => {
     </div>
   )
 }
+
+export default Login

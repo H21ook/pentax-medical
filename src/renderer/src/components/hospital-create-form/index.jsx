@@ -3,20 +3,41 @@ import { Label } from '../ui/Label'
 import { Input } from '../ui/Input'
 import { Textarea } from '../ui/Textarea'
 import { Button } from '../ui/Button'
+import { toast } from 'sonner'
+import { useState } from 'react'
+import { useAuth } from '../../context/auth-context'
 
 const HospitalCreateForm = ({ onSuccess = () => {} }) => {
+  const { token } = useAuth()
+  const [loading, setLoading] = useState(false)
   const { handleSubmit, control } = useForm({
     defaultValues: {
-      hospitalName: '',
+      name: '',
       tasagName: '',
       phoneNumber: '',
       address: ''
     }
   })
 
-  const onSubmit = (values) => {
-    console.log('Emnelgiin medeelel hadgalah ', values)
+  const onSubmit = async (values) => {
+    setLoading(true)
+    const res = await window.api.createHospitalData(values, token)
+
+    if (!res.result) {
+      toast.error('Амжилтгүй', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: res.message
+      })
+      setLoading(false)
+      return
+    }
     onSuccess()
+    setLoading(false)
   }
 
   return (
@@ -25,8 +46,8 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
         <div className="col-span-2">
           <Controller
             control={control}
-            name={'hospitalName'}
-            key={'hospitalName'}
+            name={'name'}
+            key={'name'}
             rules={{
               required: 'Эмнэлгийн нэр оруулна уу'
             }}
@@ -138,7 +159,9 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
         </div>
 
         <div className="col-span-2 w-full flex justify-end mt-12">
-          <Button type="submit">Хадгалах</Button>
+          <Button type="submit" disabled={loading}>
+            Хадгалах
+          </Button>
         </div>
       </form>
     </div>

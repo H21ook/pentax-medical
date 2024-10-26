@@ -60,6 +60,9 @@ module.exports = {
       },
       backgroundImage: {
         'vite-bg': "url('./wavy-lines.svg')"
+      },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif']
       }
     }
   },

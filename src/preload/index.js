@@ -1,19 +1,26 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { checkToken, login, registerAndLogin, registerUser } from './routes/auth'
-import { getAllUsers } from './routes/users'
+import { getAllUsers, getProfile, updateProfile } from './routes/users'
 import { saveDataDirectory } from './routes/system'
+import { createHospitalData, getHospitalData, updateHospitalData } from './routes/hospital'
 
 // Custom APIs for renderer
 const api = {
   // AUTH
-  checkToken: checkToken,
-  login: login,
-  registerAndLogin: registerAndLogin,
-  registerUser: registerUser,
+  checkToken,
+  login,
+  registerAndLogin,
+  registerUser,
+  getProfile,
+  updateProfile,
   // USERS
-  getAllUsers: getAllUsers,
-  saveDataDirectory: saveDataDirectory
+  getAllUsers,
+  saveDataDirectory,
+  // HOSPITAL
+  createHospitalData,
+  getHospitalData,
+  updateHospitalData
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

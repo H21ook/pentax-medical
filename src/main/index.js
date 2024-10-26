@@ -4,11 +4,12 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeDb, initTables } from './config/database'
+import { log } from './config/log'
 import { checkToken } from './services/auth'
 import { createMenu } from './services/menu'
-import { log } from './config/log'
 import { getRootUser } from './services/user'
 import { getDataConfig } from './services/system'
+import './services/hospital'
 
 function createWindow() {
   // Create the browser window.

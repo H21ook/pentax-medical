@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react'
-import WorkerLayout from '../components/layouts/worker-layout'
+import MainLayout from '../components/layouts/main-layout'
 
 const MainPage = () => {
   const [users, setUsers] = useState([])
@@ -13,7 +13,7 @@ const MainPage = () => {
     getUsers()
   }, [getUsers])
 
-  return <WorkerLayout>{JSON.stringify(users, null, 4)}</WorkerLayout>
+  return <MainLayout>{JSON.stringify(users, null, 4)}</MainLayout>
 }
 
 export default MainPage

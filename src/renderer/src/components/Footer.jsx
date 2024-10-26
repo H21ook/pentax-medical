@@ -44,7 +44,7 @@ const Footer = () => {
       </div>
       {user && (
         <div className="flex gap-2">
-          <div className="flex items-center border rounded-md min-w-[120px]">
+          <div className="flex items-center border rounded-md min-w-[120px] cursor-pointer transition-all duration-300 hover:bg-black/[0.04]">
             <div className="px-2.5 rounded-md flex items-center gap-2">
               <div>
                 <div className="text-xs leading-3 text-muted-foreground">{user?.position}</div>

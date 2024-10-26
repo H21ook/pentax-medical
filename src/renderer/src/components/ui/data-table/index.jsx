@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '../Button'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '../Table'
 import {
   flexRender,
@@ -11,13 +10,8 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import {
-  RxChevronLeft,
-  RxChevronRight,
-  RxDoubleArrowLeft,
-  RxDoubleArrowRight
-} from 'react-icons/rx'
 import DataTableHeader from './DataTableHeader'
+import { DataTablePagination } from './DataTablePagination'
 
 const DataTable = ({ columns, data, actions }) => {
   const [sorting, setSorting] = useState([])
@@ -49,7 +43,7 @@ const DataTable = ({ columns, data, actions }) => {
   return (
     <div>
       <DataTableHeader table={table} actions={actions} />
-      <div className="rounded-md border">
+      <div className="rounded-md border my-4">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -87,7 +81,8 @@ const DataTable = ({ columns, data, actions }) => {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
+      <DataTablePagination table={table} />
+      {/* <div className="flex items-center justify-between space-x-2 p-2 border rounded-md">
         <div className="text-sm font-medium">Нийт: {data.length}</div>
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium">
@@ -128,7 +123,7 @@ const DataTable = ({ columns, data, actions }) => {
             </Button>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

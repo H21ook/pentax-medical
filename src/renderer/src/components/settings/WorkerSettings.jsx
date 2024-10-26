@@ -1,15 +1,13 @@
-import WorkerLayout from '../components/layouts/worker-layout'
-import { Button } from '../components/ui/Button'
-import DataTable from '../components/ui/data-table'
-import { LuArrowUpDown } from 'react-icons/lu'
 import { useCallback, useEffect, useState } from 'react'
+import { Button } from '../ui/Button'
+import { LuArrowUpDown } from 'react-icons/lu'
 import { format } from 'date-fns'
+import DataTable from '../ui/data-table'
 import { RxPlus } from 'react-icons/rx'
-import HospitalForm from '../components/hospital-form'
-import WorkerCreateModal from '../components/worker-create-modal'
+import WorkerCreateModal from '../worker-create-modal'
 import { toast } from 'sonner'
 
-const HospitalSettingsPage = () => {
+const WorkerSettings = () => {
   const [users, setUsers] = useState([])
   const [isOpenModal, setIsOpenModal] = useState(false)
 
@@ -77,10 +75,9 @@ const HospitalSettingsPage = () => {
   ]
 
   return (
-    <WorkerLayout>
-      <HospitalForm />
+    <>
       <div>
-        <h1 className="text-lg font-semibold mt-4">Ажилчдын жагсаалт</h1>
+        <h1 className="font-semibold mb-4 mt-2">Ажилчдын жагсаалт</h1>
         <DataTable
           columns={columns}
           data={users}
@@ -114,8 +111,8 @@ const HospitalSettingsPage = () => {
           getUsers()
         }}
       />
-    </WorkerLayout>
+    </>
   )
 }
 
-export default HospitalSettingsPage
+export default WorkerSettings

@@ -9,12 +9,12 @@ import { Button } from '../Button'
 
 const DataTableHeader = ({ table, actions }) => {
   return (
-    <div className="flex items-center py-4 justify-between">
+    <div className="flex items-center justify-between">
       <Input
         placeholder="Нэвтрэх нэр"
         value={table.getColumn('username')?.getFilterValue() ?? ''}
         onChange={(event) => table.getColumn('username')?.setFilterValue(event.target.value)}
-        className="max-w-[425px]"
+        className="max-w-[300px]"
       />
       <div className="flex items-center gap-2">
         {actions}

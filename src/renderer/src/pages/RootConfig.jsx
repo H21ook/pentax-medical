@@ -6,7 +6,7 @@ import logoImage from '../assets/logo.svg'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
-import './main-page.css'
+import './root-config.css'
 import HospitalRegistration from '../components/root-config/HospitalRegistration'
 import DataRootRegistration from '../components/root-config/DataRootRegistration'
 

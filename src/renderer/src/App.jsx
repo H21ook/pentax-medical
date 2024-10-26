@@ -1,46 +1,49 @@
 import PageRouterProvider from './context/page-router'
 import LoaderPage from './pages/loader-page'
-import GetStartedPage from './pages/get-started-page'
+import GetStarted from './pages/GetStarted'
 import MainPage from './pages/main-page'
-import RootConfigPage from './pages/root-config-page'
-import { LoginPage } from './pages/login-page'
+import RootConfig from './pages/RootConfig'
+import Login from './pages/Login'
 import AuthProvider from './context/auth-context'
-import HospitalSettingsPage from './pages/hospital-settings-page'
 import { Toaster } from './components/ui/Toaster'
+import Settings from './pages/Settings'
+import HospitalProvider from './context/hospital-context'
 
 function App() {
   return (
     <div className="h-screen w-full">
       <AuthProvider>
-        <PageRouterProvider
-          defaultPageKey="loader"
-          routes={[
-            {
-              key: 'loader',
-              page: <LoaderPage />
-            },
-            {
-              key: 'get-started',
-              page: <GetStartedPage />
-            },
-            {
-              key: 'main',
-              page: <MainPage />
-            },
-            {
-              key: 'root-config',
-              page: <RootConfigPage />
-            },
-            {
-              key: 'login',
-              page: <LoginPage />
-            },
-            {
-              key: 'hospital-settings',
-              page: <HospitalSettingsPage />
-            }
-          ]}
-        />
+        <HospitalProvider>
+          <PageRouterProvider
+            defaultPageKey="loader"
+            routes={[
+              {
+                key: 'loader',
+                page: <LoaderPage />
+              },
+              {
+                key: 'get-started',
+                page: <GetStarted />
+              },
+              {
+                key: 'main',
+                page: <MainPage />
+              },
+              {
+                key: 'root-config',
+                page: <RootConfig />
+              },
+              {
+                key: 'login',
+                page: <Login />
+              },
+              {
+                key: 'settings',
+                page: <Settings />
+              }
+            ]}
+          />
+        </HospitalProvider>
       </AuthProvider>
       <Toaster />
     </div>

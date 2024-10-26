@@ -6,9 +6,9 @@ export const createMenu = (win) => {
   settingsSubMenu.append(
     new MenuItem({
       accelerator: process.platform === 'darwin' ? 'Alt+H' : 'Alt+H',
-      label: 'Hospital Settings',
+      label: 'Settings',
       click: () => {
-        win.webContents.send('stepHospitalSettings')
+        win.webContents.send('stepSettings')
       }
     })
   )

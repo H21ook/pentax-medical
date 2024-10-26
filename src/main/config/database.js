@@ -55,6 +55,18 @@ export const initTables = (isForce) => {
         createdAt TEXT NOT NULL,
         password TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS hospital (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        tasagName TEXT NOT NULL,
+        address TEXT NOT NULL,
+        phoneNumber TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        createdUserId INTEGER NOT NULL,
+        updatedAt TEXT NOT NULL,
+        updatedUserId INTEGER NOT NULL
+    );
     `)
 
   const insertUser = db.prepare(`INSERT INTO

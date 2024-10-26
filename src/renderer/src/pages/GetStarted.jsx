@@ -4,10 +4,10 @@ import deviceImage from '../assets/device_front.webp'
 import closeIcon from '../assets/icons/close.png'
 import { useRouter } from '../context/page-router'
 
-const GetStartedPage = () => {
+const GetStarted = () => {
   const router = useRouter()
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-vite-bg bg-no-repeat bg-cover">
+    <div className="h-full flex flex-col items-center justify-center bg-vite-bg bg-no-repeat bg-cover select-none">
       <div className="absolute w-full top-0 p-8 flex items-start justify-between">
         <img src={logoImage} alt="pentax medical logo" className="h-12" />
         <div
@@ -40,4 +40,4 @@ const GetStartedPage = () => {
   )
 }
 
-export default GetStartedPage
+export default GetStarted

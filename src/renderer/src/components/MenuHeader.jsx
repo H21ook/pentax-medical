@@ -45,7 +45,7 @@ const MenuHeader = () => {
           label: 'Эмнэлэг',
           shortcut: <MenubarShortcut>Alt+H</MenubarShortcut>,
           onClick: () => {
-            router.change('hospital-settings')
+            router.change('settings')
           }
         },
         {
@@ -73,13 +73,13 @@ const MenuHeader = () => {
     })
 
     if (user?.role === 'admin') {
-      window.electron.ipcRenderer.on('stepHospitalSettings', () => {
-        router.change('hospital-settings')
+      window.electron.ipcRenderer.on('stepSettings', () => {
+        router.change('settings')
       })
     }
 
     return () => {
-      window.electron.ipcRenderer.removeAllListeners('stepHospitalSettings')
+      window.electron.ipcRenderer.removeAllListeners('stepSettings')
       window.electron.ipcRenderer.removeAllListeners('showAbout')
     }
   }, [user])
