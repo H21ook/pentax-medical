@@ -23,6 +23,11 @@ const deleteAllTables = () => {
     }
   })
 }
+
+export const closeDb = () => {
+  db.close()
+}
+
 export const initTables = (isForce) => {
   if (isForce) {
     log.info('Force init database')

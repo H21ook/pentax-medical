@@ -3,7 +3,7 @@ import fs from 'fs'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initTables } from './config/database'
+import { closeDb, initTables } from './config/database'
 import { checkToken } from './services/auth'
 import { createMenu } from './services/menu'
 import { log } from './config/log'
@@ -176,6 +176,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    closeDb()
     app.quit()
   }
 })
