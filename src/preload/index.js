@@ -2,6 +2,7 @@ import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { checkToken, login, registerAndLogin, registerUser } from './routes/auth'
 import { getAllUsers } from './routes/users'
+import { saveDataDirectory } from './routes/system'
 
 // Custom APIs for renderer
 const api = {
@@ -11,7 +12,8 @@ const api = {
   registerAndLogin: registerAndLogin,
   registerUser: registerUser,
   // USERS
-  getAllUsers: getAllUsers
+  getAllUsers: getAllUsers,
+  saveDataDirectory: saveDataDirectory
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

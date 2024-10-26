@@ -2,6 +2,7 @@ import Database from 'better-sqlite3'
 import { app } from 'electron'
 import path from 'path'
 import { log } from './log'
+import { getDataConfig } from '../services/system'
 
 const dbPath =
   process.env.NODE_ENV === 'development'
@@ -9,17 +10,37 @@ const dbPath =
     : path.join(app.getPath('userData'), 'pentax_store.db')
 
 const db = new Database(dbPath)
+db.pragma('journal_mode = WAL')
+db.prepare("PRAGMA encoding = 'UTF-8';").run()
 
+const deleteAllTables = () => {
+  const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all()
+  tables.forEach((table) => {
+    const tableName = table.name
+    if (tableName !== 'sqlite_sequence') {
+      db.prepare(`DROP TABLE IF EXISTS ${tableName}`).run()
+      log.info(`Dropped table: ${tableName}`)
+    }
+  })
+}
 export const initTables = (isForce) => {
-  db.pragma('journal_mode = WAL')
-
   if (isForce) {
     log.info('Force init database')
-    db.exec(`DROP TABLE IF EXISTS users`)
+    deleteAllTables()
+  } else {
+    const config = getDataConfig()
+    if (config?.status === 'init') {
+      log.info('Re-force init database')
+      deleteAllTables()
+    }
   }
 
+  const documentsPath = app.getPath('documents')
+  const folderPath = path.join(documentsPath, app.getName())
+
   const nowDate = new Date().toISOString()
-  db.exec(`CREATE TABLE IF NOT EXISTS users (
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         displayName TEXT NOT NULL,
@@ -29,12 +50,41 @@ export const initTables = (isForce) => {
         createdAt TEXT NOT NULL,
         password TEXT NOT NULL
     );
-    
-    INSERT INTO
+    `)
+
+  const insertUser = db.prepare(`INSERT INTO
         users (username, displayName, role, position, type, createdAt, password)
       VALUES
-          ('root', 'Khishigbayar', 'admin', 'Developer', 'system-root', '${nowDate}', '$2b$10$pohw5PGO4WDO5i3ooVLwZ.hEVhZCk.xfsvyZzbb4UcF8OgNhnVzqi') ON CONFLICT (username) DO NOTHING;
-`)
+          (@username, @displayName, @role, @position, @type, @createdAt, @password) ON CONFLICT (username) DO NOTHING;`)
+
+  const info = insertUser.run({
+    username: 'root',
+    displayName: 'Khishigbayar',
+    role: 'admin',
+    position: 'Developer',
+    type: 'system-root',
+    createdAt: nowDate,
+    password: '$2b$10$pohw5PGO4WDO5i3ooVLwZ.hEVhZCk.xfsvyZzbb4UcF8OgNhnVzqi'
+  })
+
+  log.info(`SYSTEM_USER_ID: ${info.lastInsertRowid}`)
+  const systemUserId = info.lastInsertRowid
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS data_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        directory TEXT NOT NULL,
+        status TEXT UNIQUE NOT NULL,
+        createdAt TEXT NOT NULL,
+        createdUserId INTEGER NOT NULL,
+        updatedAt TEXT NOT NULL,
+        updatedUserId INTEGER NOT NULL
+    );
+    INSERT INTO
+        data_config (directory, status, createdAt, createdUserId, updatedAt, updatedUserId)
+      VALUES
+          ('${folderPath}', 'init', '${nowDate}', ${systemUserId}, '${nowDate}', ${systemUserId}) ON CONFLICT (status) DO NOTHING;
+  `)
 }
 
 export default db

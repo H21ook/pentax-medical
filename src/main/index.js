@@ -1,4 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import fs from 'fs'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -7,6 +8,7 @@ import { checkToken } from './services/auth'
 import { createMenu } from './services/menu'
 import { log } from './config/log'
 import { getRootUser } from './services/user'
+import { getDataConfig } from './services/system'
 
 function createWindow() {
   // Create the browser window.
@@ -114,6 +116,29 @@ app.whenReady().then(() => {
         `
       })
     }
+  })
+
+  ipcMain.handle('create-documents-path', async () => {
+    const configData = getDataConfig()
+    if (configData.status === 'init') {
+      // Check if the folder exists
+      if (!fs.existsSync(configData.directory)) {
+        // Create the folder if it doesn't exist
+        fs.mkdirSync(configData.directory)
+      }
+    }
+
+    return configData.directory
+  })
+
+  ipcMain.handle('select-directory', async (event, directory) => {
+    const documentsPath = app.getPath('documents')
+    const result = await dialog.showOpenDialog({
+      defaultPath: directory || documentsPath,
+      properties: ['openDirectory']
+    })
+
+    return result.filePaths
   })
 
   // renderer log

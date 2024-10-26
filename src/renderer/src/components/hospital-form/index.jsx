@@ -15,7 +15,7 @@ const HospitalForm = () => {
   })
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 w-full">
       <h1 className="text-lg font-semibold my-4">Эмнэлэгийн тохиргоо</h1>
       <form className="grid grid-cols-2 gap-4 max-w-[867px]">
         <Controller
@@ -27,7 +27,7 @@ const HospitalForm = () => {
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
-              <div className="flex flex-col gap-1 ">
+              <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
                   Эмнэлэгийн нэр
                 </Label>
@@ -54,7 +54,7 @@ const HospitalForm = () => {
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
                   Тасгийн нэр
                 </Label>
@@ -81,7 +81,7 @@ const HospitalForm = () => {
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
                   Утасны дугаар
                 </Label>
@@ -108,7 +108,7 @@ const HospitalForm = () => {
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
                   Хаяг
                 </Label>
