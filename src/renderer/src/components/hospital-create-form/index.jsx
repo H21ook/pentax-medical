@@ -5,11 +5,11 @@ import { Textarea } from '../ui/Textarea'
 import { Button } from '../ui/Button'
 import { toast } from 'sonner'
 import { useState } from 'react'
-import { useAuth } from '../../context/auth-context'
+import { useHospital } from '../../context/hospital-context'
 
 const HospitalCreateForm = ({ onSuccess = () => {} }) => {
-  const { token } = useAuth()
   const [loading, setLoading] = useState(false)
+  const { getHospitalData } = useHospital()
   const { handleSubmit, control } = useForm({
     defaultValues: {
       name: '',
@@ -21,6 +21,7 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
 
   const onSubmit = async (values) => {
     setLoading(true)
+    const token = localStorage.getItem('token')
     const res = await window.api.createHospitalData(values, token)
 
     if (!res.result) {
@@ -36,6 +37,7 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
       setLoading(false)
       return
     }
+    getHospitalData()
     onSuccess()
     setLoading(false)
   }

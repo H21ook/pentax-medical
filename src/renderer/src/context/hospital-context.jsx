@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 const HospitalContext = createContext({
-  hospitalData: undefined
+  hospitalData: undefined,
+  getHospitalData: () => {}
 })
 
 export const useHospital = () => {
@@ -17,10 +18,12 @@ const HospitalProvider = ({ children }) => {
   useEffect(() => {
     getHospitalData()
   }, [getHospitalData])
+
   return (
     <HospitalContext.Provider
       value={{
-        hospitalData: data
+        hospitalData: data,
+        getHospitalData
       }}
     >
       {children}

@@ -81,6 +81,8 @@ app.whenReady().then(() => {
   log.info('initialized database')
   let win = createWindow()
 
+  // win.webContents.openDevTools()
+
   ipcMain.on('init-page', (_e, data) => {
     const res = getRootUser()
     log.info(`Root user ${res ? 'already created.' : 'not found'}`)

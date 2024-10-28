@@ -5,6 +5,7 @@ import { verifyToken } from '../config/token'
 
 const create = (data, token) => {
   try {
+    log.info(`token ::: ${token}`)
     const user = verifyToken(token)
     const nowDate = new Date().toISOString()
 
