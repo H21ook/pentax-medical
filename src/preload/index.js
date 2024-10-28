@@ -4,6 +4,7 @@ import { checkToken, login, registerAndLogin, registerUser } from './routes/auth
 import { getAllUsers, getProfile, updateProfile } from './routes/users'
 import { saveDataDirectory } from './routes/system'
 import { createHospitalData, getHospitalData, updateHospitalData } from './routes/hospital'
+import { deleteAddress, getAllAddress, saveAddress } from './routes/address'
 
 // Custom APIs for renderer
 const api = {
@@ -20,7 +21,11 @@ const api = {
   // HOSPITAL
   createHospitalData,
   getHospitalData,
-  updateHospitalData
+  updateHospitalData,
+  // ADDRESS
+  saveAddress,
+  deleteAddress,
+  getAllAddress
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

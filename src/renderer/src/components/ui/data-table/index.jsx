@@ -10,10 +10,9 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import DataTableHeader from './DataTableHeader'
 import { DataTablePagination } from './DataTablePagination'
 
-const DataTable = ({ columns, data, actions }) => {
+const DataTable = ({ columns, data, header = () => {} }) => {
   const [sorting, setSorting] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [pagination, setPagination] = useState({
@@ -42,7 +41,7 @@ const DataTable = ({ columns, data, actions }) => {
 
   return (
     <div>
-      <DataTableHeader table={table} actions={actions} />
+      {header(table)}
       <div className="rounded-md border my-4">
         <Table>
           <TableHeader>

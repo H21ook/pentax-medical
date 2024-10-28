@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { Fragment, useEffect } from 'react'
 import { useAuth } from '../context/auth-context'
 import { useRouter } from '../context/page-router'
 import {
@@ -6,6 +6,7 @@ import {
   MenubarContent,
   MenubarItem,
   MenubarMenu,
+  MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger
 } from './ui/Menubar'
@@ -42,24 +43,58 @@ const MenuHeader = () => {
       trigger: 'Тохиргоо',
       children: [
         {
+          label: 'Хувийн мэдээлэл',
+          shortcut: <MenubarShortcut>Alt+P</MenubarShortcut>,
+          onClick: () => {
+            router.change('settings', {
+              tabKey: 'profile'
+            })
+          },
+          seperator: true
+        },
+        {
           label: 'Эмнэлэг',
           shortcut: <MenubarShortcut>Alt+H</MenubarShortcut>,
           onClick: () => {
-            router.change('settings')
+            router.change('settings', {
+              tabKey: 'hospital'
+            })
           }
         },
         {
-          label: 'Дата, өгөгдөл',
-          shortcut: <MenubarShortcut>Alt+D</MenubarShortcut>
+          label: 'Ажилчид',
+          shortcut: <MenubarShortcut>Alt+D</MenubarShortcut>,
+          onClick: () => {
+            router.change('settings', {
+              tabKey: 'workers'
+            })
+          }
+        },
+        {
+          label: 'Хаяг',
+          shortcut: <MenubarShortcut>Alt+M</MenubarShortcut>,
+          onClick: () => {
+            router.change('settings', {
+              tabKey: 'address'
+            })
+          },
+          seperator: true
+        },
+        {
+          label: 'Дата хадгалалт',
+          shortcut: <MenubarShortcut>Alt+C</MenubarShortcut>,
+          onClick: () => {
+            router.change('settings', {
+              tabKey: 'data-store'
+            })
+          }
         }
       ]
     },
     HELP_MENU
   ]
 
-  const WORKER_MENU = [WORKSHEET_MENU, HELP_MENU]
-
-  const menu = user?.role === 'admin' ? ADMIN_MENU : WORKER_MENU
+  const menu = ADMIN_MENU
 
   useEffect(() => {
     // main-с мессеж хүлээн авах
@@ -68,18 +103,12 @@ const MenuHeader = () => {
       window.electron.ipcRenderer.send('showAbout')
     })
 
-    window.electron.ipcRenderer.on('stepWorksheet', () => {
-      router.change('main')
+    window.electron.ipcRenderer.on('stepMenu', (_, { path, params }) => {
+      router.change(path, params)
     })
 
-    if (user?.role === 'admin') {
-      window.electron.ipcRenderer.on('stepSettings', () => {
-        router.change('settings')
-      })
-    }
-
     return () => {
-      window.electron.ipcRenderer.removeAllListeners('stepSettings')
+      window.electron.ipcRenderer.removeAllListeners('stepMenu')
       window.electron.ipcRenderer.removeAllListeners('showAbout')
     }
   }, [user])
@@ -94,9 +123,12 @@ const MenuHeader = () => {
               {group?.children?.length > 0 && (
                 <MenubarContent>
                   {group.children.map((item, index) => (
-                    <MenubarItem key={`group_${gIndex}_item_${index}`} onClick={item?.onClick}>
-                      {item.label} {item.shortcut}
-                    </MenubarItem>
+                    <Fragment key={`group_${gIndex}_item_${index}`}>
+                      <MenubarItem onClick={item?.onClick}>
+                        {item.label} {item.shortcut}
+                      </MenubarItem>
+                      {item.seperator && <MenubarSeparator />}
+                    </Fragment>
                   ))}
                 </MenubarContent>
               )}

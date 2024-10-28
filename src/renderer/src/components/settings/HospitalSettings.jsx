@@ -75,7 +75,7 @@ const HospitalSettings = () => {
                   id={name}
                   name={name}
                   value={value}
-                  disabled={isRead}
+                  readonly={isRead}
                   placeholder="Эмнэлэгийн нэр"
                   onChange={(e) => {
                     onChange(e.target.value)
@@ -103,7 +103,7 @@ const HospitalSettings = () => {
                   id={name}
                   name={name}
                   value={value}
-                  disabled={isRead}
+                  readonly={isRead}
                   placeholder="Тасгийн нэр"
                   onChange={(e) => {
                     onChange(e.target.value)
@@ -131,7 +131,7 @@ const HospitalSettings = () => {
                   id={name}
                   name={name}
                   value={value}
-                  disabled={isRead}
+                  readonly={isRead}
                   placeholder="Утасны дугаар"
                   onChange={(e) => {
                     onChange(e.target.value)
@@ -160,7 +160,7 @@ const HospitalSettings = () => {
                   name={name}
                   value={value}
                   rows={3}
-                  disabled={isRead}
+                  readonly={isRead}
                   placeholder="Хаяг"
                   className="resize-none"
                   onChange={(e) => {

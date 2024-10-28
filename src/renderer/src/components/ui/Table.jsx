@@ -1,15 +1,19 @@
 import * as React from 'react'
 import { cn } from '../../lib/utils'
+import { ScrollArea, ScrollBar } from './ScrollArea'
 
 const Table = React.forwardRef(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-  </div>
+  <ScrollArea className="whitespace-nowrap w-full">
+    <div className="relative">
+      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+    </div>
+    <ScrollBar orientation="horizontal" />
+  </ScrollArea>
 ))
 Table.displayName = 'Table'
 
 const TableHeader = React.forwardRef(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead ref={ref} className={cn('[&_tr]:border-b bg-slate-200/50', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -43,7 +47,7 @@ const TableHead = React.forwardRef(({ className, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
-      'h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'h-10 px-2 text-left align-middle font-semibold text-black [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] border-x',
       className
     )}
     {...props}
@@ -55,7 +59,7 @@ const TableCell = React.forwardRef(({ className, ...props }, ref) => (
   <td
     ref={ref}
     className={cn(
-      'p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] border-x',
       className
     )}
     {...props}

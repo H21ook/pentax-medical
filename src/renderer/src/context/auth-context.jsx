@@ -19,7 +19,6 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token')
     const res = await window.api.getProfile(_token || token)
     if (res?.result) {
-      console.log('getProfile ', res.data)
       setUser(res.data)
     }
   }, [])
@@ -30,7 +29,6 @@ const AuthProvider = ({ children }) => {
     const tokenResult = await window.api.checkToken(token)
     if (tokenResult.data?.isLogged) {
       setLogged(isLogged)
-      console.log(tokenResult)
       getUserData(token)
     }
     setLogged(false)

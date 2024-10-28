@@ -29,7 +29,7 @@ const Footer = () => {
   }
 
   return (
-    <div className=" w-full border-t p-2 flex justify-between select-none items-center">
+    <div className=" w-full border-t p-2 px-4 flex justify-between select-none items-center">
       <div className="flex flex-col items-start w-fit">
         <div className="text-xs font-semibold">
           {firstCharUpper(

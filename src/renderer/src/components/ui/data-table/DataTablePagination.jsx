@@ -12,7 +12,7 @@ export function DataTablePagination({ table }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex w-fit items-center text-sm font-medium whitespace-nowrap">
-        Нийт: {table.getTotalSize()} мөр
+        Нийт: {table.getCoreRowModel().rows.length} мөр
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">

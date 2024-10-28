@@ -23,7 +23,6 @@ const DataRootRegistration = () => {
   useEffect(() => {
     const getDocumentPath = async () => {
       const path = await window.electron.ipcRenderer.invoke('create-documents-path')
-      console.log('path', path)
       setValue('path', path)
     }
     getDocumentPath()

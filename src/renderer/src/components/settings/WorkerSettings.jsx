@@ -1,11 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '../ui/Button'
-import { LuArrowUpDown } from 'react-icons/lu'
 import { format } from 'date-fns'
 import DataTable from '../ui/data-table'
 import { RxPlus } from 'react-icons/rx'
 import WorkerCreateModal from '../worker-create-modal'
 import { toast } from 'sonner'
+import { Input } from '../ui/Input'
+import ColumnVisible from '../ui/data-table/ColumnVisible'
+import ColumnHeader from '../ui/data-table/ColumnHeader'
+
+const WorkerTableHeader = ({ table, actions }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <Input
+        placeholder="Нэвтрэх нэр"
+        value={table.getColumn('username')?.getFilterValue() ?? ''}
+        onChange={(event) => table.getColumn('username')?.setFilterValue(event.target.value)}
+        className="h-8 max-w-[300px]"
+      />
+      <div className="flex items-center gap-2">
+        {actions}
+        <ColumnVisible table={table} />
+      </div>
+    </div>
+  )
+}
 
 const WorkerSettings = () => {
   const [users, setUsers] = useState([])
@@ -24,16 +43,7 @@ const WorkerSettings = () => {
     {
       accessorKey: 'username',
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="p-0 hover:bg-transparent"
-          >
-            Нэвтрэх нэр
-            <LuArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
+        return <ColumnHeader column={column} title="Нэвтрэх нэр" />
       }
     },
     {
@@ -56,14 +66,7 @@ const WorkerSettings = () => {
       accessorKey: 'createdAt',
       header: ({ column }) => (
         <div className="flex-1 flex justify-end">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="p-0 hover:bg-transparent text-end"
-          >
-            Бүртгүүлсэн огноо
-            <LuArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          <ColumnHeader column={column} title="Бүртгүүлсэн огноо" />
         </div>
       ),
       cell: ({ row }) => {
@@ -81,16 +84,24 @@ const WorkerSettings = () => {
         <DataTable
           columns={columns}
           data={users}
-          actions={
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsOpenModal(true)
-              }}
-            >
-              <RxPlus className="me-2" /> Ажилтан нэмэх
-            </Button>
-          }
+          header={(table) => {
+            return (
+              <WorkerTableHeader
+                table={table}
+                actions={
+                  <Button
+                    variant="outline"
+                    className="h-8 px-2 lg:px-3"
+                    onClick={() => {
+                      setIsOpenModal(true)
+                    }}
+                  >
+                    <RxPlus className="me-2" /> Ажилтан нэмэх
+                  </Button>
+                }
+              />
+            )
+          }}
         />
       </div>
       <WorkerCreateModal

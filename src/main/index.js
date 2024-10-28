@@ -10,6 +10,7 @@ import { createMenu } from './services/menu'
 import { getRootUser } from './services/user'
 import { getDataConfig } from './services/system'
 import './services/hospital'
+import './services/address'
 
 function createWindow() {
   // Create the browser window.

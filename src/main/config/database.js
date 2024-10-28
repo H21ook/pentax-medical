@@ -67,6 +67,14 @@ export const initTables = (isForce) => {
         updatedAt TEXT NOT NULL,
         updatedUserId INTEGER NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS address (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        parentId INTEGER,
+        isParent INTEGER NOT NULL DEFAULT 0,
+        createdAt TEXT NOT NULL
+    );
     `)
 
   const insertUser = db.prepare(`INSERT INTO

@@ -5,10 +5,72 @@ export const createMenu = (win) => {
   const settingsSubMenu = new Menu()
   settingsSubMenu.append(
     new MenuItem({
-      accelerator: process.platform === 'darwin' ? 'Alt+H' : 'Alt+H',
-      label: 'Settings',
+      accelerator: process.platform === 'darwin' ? 'Alt+P' : 'Alt+P',
+      label: 'Profile Settings',
       click: () => {
-        win.webContents.send('stepSettings')
+        win.webContents.send('stepMenu', {
+          path: 'settings',
+          params: {
+            tabKey: 'profile'
+          }
+        })
+      }
+    })
+  )
+  settingsSubMenu.append(
+    new MenuItem({
+      accelerator: process.platform === 'darwin' ? 'Alt+H' : 'Alt+H',
+      label: 'Hospital Settings',
+      click: () => {
+        win.webContents.send('stepMenu', {
+          path: 'settings',
+          params: {
+            tabKey: 'hospital'
+          }
+        })
+      }
+    })
+  )
+  settingsSubMenu.append(
+    new MenuItem({
+      accelerator: process.platform === 'darwin' ? 'Alt+D' : 'Alt+D',
+      label: 'Workers Settings',
+      click: () => {
+        win.webContents.send('stepMenu', {
+          path: 'settings',
+          params: {
+            tabKey: 'workers'
+          }
+        })
+      }
+    })
+  )
+
+  settingsSubMenu.append(
+    new MenuItem({
+      accelerator: process.platform === 'darwin' ? 'Alt+M' : 'Alt+M',
+      label: 'Address Settings',
+      click: () => {
+        win.webContents.send('stepMenu', {
+          path: 'settings',
+          params: {
+            tabKey: 'address'
+          }
+        })
+      }
+    })
+  )
+  settingsSubMenu.append(
+    new MenuItem({
+      accelerator: process.platform === 'darwin' ? 'Alt+C' : 'Alt+C',
+      label: 'Data Settings',
+      click: () => {
+        win.webContents.send('stepMenu', {
+          path: 'settings',
+          params: {
+            tabKey: 'data-store'
+          }
+        })
       }
     })
   )
@@ -29,7 +91,9 @@ export const createMenu = (win) => {
       accelerator: process.platform === 'darwin' ? 'Alt+W' : 'Alt+W',
       label: 'Worksheet',
       click: () => {
-        win.webContents.send('stepWorksheet')
+        win.webContents.send('stepMenu', {
+          path: 'main'
+        })
       }
     })
   )

@@ -37,13 +37,13 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   const change = (path, params) => {
     if (path !== currentPageKey) {
       setCurrentPageKey(path)
-      setPageParams((prev) => {
-        return {
-          ...prev,
-          [path]: params
-        }
-      })
     }
+    setPageParams((prev) => {
+      return {
+        ...prev,
+        [path]: params
+      }
+    })
   }
 
   const restart = () => {

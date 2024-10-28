@@ -77,7 +77,7 @@ const ProfileForm = () => {
                 id={name}
                 name={name}
                 value={value}
-                disabled
+                readonly
                 placeholder="Нэвтрэх нэр"
                 onChange={(e) => {
                   onChange(e.target.value)
@@ -101,8 +101,8 @@ const ProfileForm = () => {
               <Label htmlFor={name} className="pb-1">
                 Үүрэг
               </Label>
-              <Select id={name} name={name} value={value} onValueChange={onChange} disabled>
-                <SelectTrigger>
+              <Select id={name} name={name} value={value} onValueChange={onChange}>
+                <SelectTrigger readonly>
                   <SelectValue placeholder="Үүрэг" />
                 </SelectTrigger>
                 <SelectContent>

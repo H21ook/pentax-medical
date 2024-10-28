@@ -48,12 +48,12 @@ const Header = () => {
           />
         </button>
         <button
-          className="h-full w-10 flex items-center justify-center hover:bg-red-500"
+          className="group h-full w-10 flex items-center justify-center hover:bg-primary"
           onClick={() => {
             window.electron.ipcRenderer.send('close')
           }}
         >
-          <img alt="close" src={closeIcon} className="h-6 w-6" />
+          <img alt="close" src={closeIcon} className="h-6 w-6 group-hover:invert" />
         </button>
       </div>
     </div>
