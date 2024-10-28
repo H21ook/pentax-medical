@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useState } from 'react'
 import MainLayout from '../components/layouts/main-layout'
 import DataTable from '../components/ui/data-table'
 import { Button } from '../components/ui/Button'
@@ -14,6 +14,9 @@ import {
   SelectValue
 } from '../components/ui/Select'
 import ColumnHeader from '../components/ui/data-table/ColumnHeader'
+import NewTab from '../components/main/NewTab'
+import { ScrollArea, ScrollBar } from '../components/ui/ScrollArea'
+import DetailTab from '../components/main/DetailTab'
 
 const PatiantsTableHeader = ({ table, actions }) => {
   const isFiltered = table.getState().columnFilters.length > 0
@@ -209,16 +212,8 @@ const MainPage = () => {
       createdDate: '2024-10-26 15:46:24'
     }
   ]
-  // const [users, setUsers] = useState([])
-
-  // const getUsers = useCallback(async () => {
-  //   const res = await window.api.getAllUsers()
-  //   setUsers(res || [])
-  // }, [])
-
-  // useEffect(() => {
-  //   getUsers()
-  // }, [getUsers])
+  const [tabs, setTabs] = useState([{ name: 'Жагсаалт', type: 'base' }])
+  const [selectedTab, setSelectedTab] = useState(0)
 
   const columns = [
     {
@@ -295,25 +290,146 @@ const MainPage = () => {
     }
   ]
 
+  const removeTab = (index) => {
+    const tempTab = tabs[index]
+    setTabs((prev) => {
+      const temp = [...prev]
+      temp.splice(index, 1)
+      return temp
+    })
+    if (tempTab.type === 'detail') {
+      console.log(tempTab.data)
+      tempTab.data.toggleSelected(false)
+    }
+    if (selectedTab !== 0 && index <= selectedTab) {
+      setSelectedTab((prev) => prev - 1)
+    }
+  }
+
+  const addNewTab = () => {
+    setTabs((prev) => {
+      const newTabs = prev.filter((item) => item.type === 'new')
+      if (newTabs.length === 0) {
+        const newT = {
+          name: 'Шинэ үзлэг',
+          index: 0,
+          type: 'new'
+        }
+        return [...prev, newT]
+      }
+      newTabs.sort((a, b) => b.index - a.index)
+      const newIndex = newTabs[0].index + 1
+      const newT = {
+        name: `Шинэ үзлэг (${newIndex})`,
+        index: newIndex,
+        type: 'new'
+      }
+      return [...prev, newT]
+    })
+  }
+
+  const addDetailTab = (rowData) => {
+    const foundIndex = tabs.findIndex((item) => item?.id === rowData?.original?.id)
+    if (foundIndex > -1) {
+      setSelectedTab(foundIndex)
+      return
+    }
+    rowData.toggleSelected(true)
+    setTabs((prev) => {
+      const newT = {
+        name: `${rowData.original?.id}|${rowData.original.lastName}`,
+        id: rowData.original?.id,
+        data: rowData,
+        type: 'detail'
+      }
+      return [...prev, newT]
+    })
+  }
+
   return (
     <MainLayout>
       <div className="p-2">
-        <DataTable
-          columns={columns}
-          data={fakeData}
-          header={(table) => {
+        <ScrollArea className="w-full whitespace-nowrap border-b mb-4">
+          <div className="flex gap-1 mb-2">
+            {tabs.map((item, index) => {
+              return (
+                <div
+                  key={`tab_${index}`}
+                  onClick={() => {
+                    setSelectedTab(index)
+                  }}
+                  className={`w-fit cursor-pointer px-2 py-1 text-sm rounded-md flex items-center gap-1 ${index === selectedTab ? 'bg-gray-200 hover:bg-gray-200' : 'hover:bg-gray-100'}`}
+                >
+                  {item.name}
+                  {index > 0 ? (
+                    <div
+                      className="group hover:bg-white rounded-full p-[2px]"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeTab(index)
+                      }}
+                    >
+                      <RxCross2 className="transition-all duration-300 text-gray-500 group-hover:text-black" />
+                    </div>
+                  ) : null}
+                </div>
+              )
+            })}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        {tabs.map((item, index) => {
+          if (item.type === 'base') {
             return (
-              <PatiantsTableHeader
-                table={table}
-                actions={
-                  <Button variant="outline" className="h-8 px-2 lg:px-3" onClick={() => {}}>
-                    <RxPlus className="mr-2" /> Үзлэг хийх
-                  </Button>
-                }
-              />
+              <div
+                key={`tabData_${index}`}
+                className={`${index === selectedTab ? 'block' : 'hidden'}`}
+              >
+                <DataTable
+                  columns={columns}
+                  data={fakeData}
+                  onRowDoubleClick={(row) => {
+                    addDetailTab(row)
+                  }}
+                  header={(table) => {
+                    return (
+                      <PatiantsTableHeader
+                        table={table}
+                        actions={
+                          <Button
+                            variant="outline"
+                            className="h-8 px-2 lg:px-3"
+                            onClick={addNewTab}
+                          >
+                            <RxPlus className="mr-2" /> Шинэ үзлэг
+                          </Button>
+                        }
+                      />
+                    )
+                  }}
+                />
+              </div>
             )
-          }}
-        />
+          }
+          if (item.type === 'detail') {
+            return (
+              <div
+                className={`${index === selectedTab ? 'block' : 'hidden'}`}
+                key={`tabData_${index}`}
+              >
+                <DetailTab key={item.name} />
+              </div>
+            )
+          }
+          return (
+            <div
+              className={`${index === selectedTab ? 'block' : 'hidden'}`}
+              key={`tabData_${index}`}
+            >
+              <NewTab key={item.name} />
+            </div>
+          )
+        })}
       </div>
     </MainLayout>
   )

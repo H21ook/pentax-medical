@@ -12,7 +12,13 @@ import {
 } from '@tanstack/react-table'
 import { DataTablePagination } from './DataTablePagination'
 
-const DataTable = ({ columns, data, header = () => {} }) => {
+const DataTable = ({
+  columns,
+  data,
+  header = () => {},
+  onRowDoubleClick = () => {},
+  selectedRowClassname = () => {}
+}) => {
   const [sorting, setSorting] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [pagination, setPagination] = useState({
@@ -62,7 +68,14 @@ const DataTable = ({ columns, data, header = () => {} }) => {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onDoubleClick={() => {
+                    onRowDoubleClick(row)
+                  }}
+                  className={selectedRowClassname(row)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -73,7 +86,7 @@ const DataTable = ({ columns, data, header = () => {} }) => {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Мэдээлэл олдсонгүй
                 </TableCell>
               </TableRow>
             )}
@@ -81,48 +94,6 @@ const DataTable = ({ columns, data, header = () => {} }) => {
         </Table>
       </div>
       <DataTablePagination table={table} />
-      {/* <div className="flex items-center justify-between space-x-2 p-2 border rounded-md">
-        <div className="text-sm font-medium">Нийт: {data.length}</div>
-        <div className="flex items-center gap-2">
-          <div className="text-sm font-medium">
-            Хуудас: {`${pagination.pageIndex + 1}/${table.getPageCount()}`}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <RxDoubleArrowLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <RxChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <RxChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <RxDoubleArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div> */}
     </div>
   )
 }
