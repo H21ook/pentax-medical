@@ -8,7 +8,7 @@ const HospitalForm = () => {
   const { control } = useForm({
     defaultValues: {
       hospitalName: '',
-      tasagName: '',
+      departmentName: '',
       phoneNumber: '',
       address: ''
     }
@@ -47,8 +47,8 @@ const HospitalForm = () => {
         />
         <Controller
           control={control}
-          name={'tasagName'}
-          key={'tasagName'}
+          name={'departmentName'}
+          key={'departmentName'}
           rules={{
             required: 'Тасгийн нэр оруулна уу'
           }}

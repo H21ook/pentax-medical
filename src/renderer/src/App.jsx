@@ -8,41 +8,44 @@ import AuthProvider from './context/auth-context'
 import { Toaster } from './components/ui/Toaster'
 import Settings from './pages/Settings'
 import HospitalProvider from './context/hospital-context'
+import AddressProvider from './context/address-context'
 
 function App() {
   return (
     <div className="h-screen w-full">
       <AuthProvider>
         <HospitalProvider>
-          <PageRouterProvider
-            defaultPageKey="loader"
-            routes={[
-              {
-                key: 'loader',
-                page: <LoaderPage />
-              },
-              {
-                key: 'get-started',
-                page: <GetStarted />
-              },
-              {
-                key: 'main',
-                page: <MainPage />
-              },
-              {
-                key: 'root-config',
-                page: <RootConfig />
-              },
-              {
-                key: 'login',
-                page: <Login />
-              },
-              {
-                key: 'settings',
-                page: <Settings />
-              }
-            ]}
-          />
+          <AddressProvider>
+            <PageRouterProvider
+              defaultPageKey="loader"
+              routes={[
+                {
+                  key: 'loader',
+                  page: <LoaderPage />
+                },
+                {
+                  key: 'get-started',
+                  page: <GetStarted />
+                },
+                {
+                  key: 'main',
+                  page: <MainPage />
+                },
+                {
+                  key: 'root-config',
+                  page: <RootConfig />
+                },
+                {
+                  key: 'login',
+                  page: <Login />
+                },
+                {
+                  key: 'settings',
+                  page: <Settings />
+                }
+              ]}
+            />
+          </AddressProvider>
         </HospitalProvider>
       </AuthProvider>
       <Toaster />

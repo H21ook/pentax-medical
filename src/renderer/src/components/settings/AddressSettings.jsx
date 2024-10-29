@@ -1,25 +1,16 @@
 import { RxPlus } from 'react-icons/rx'
 import { Button } from '../ui/Button'
 import { ScrollArea } from '../ui/ScrollArea'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import AddressRegisterModal from '../address-register-modal'
+import { useAddress } from '../../context/address-context'
 
 const AddressSettings = () => {
   const [isOpenModal, setIsOpenModal] = useState(false)
-  const [allAddress, setAllAddress] = useState([])
   const [selectedParent, setSelectedParent] = useState()
+  const { allAddressData, parentAddress, getAllAddress } = useAddress()
 
-  const getAllAddress = useCallback(async () => {
-    const res = await window.api.getAllAddress()
-    setAllAddress(res)
-  }, [])
-
-  useEffect(() => {
-    getAllAddress()
-  }, [getAllAddress])
-
-  const parentAddress = allAddress?.filter((item) => item?.isParent === 1) || []
-  const childAddress = allAddress?.filter((item) => item?.parentId === selectedParent?.id) || []
+  const childAddress = allAddressData?.filter((item) => item?.parentId === selectedParent?.id) || []
 
   return (
     <div>

@@ -10,9 +10,9 @@ const create = (data, token) => {
     const nowDate = new Date().toISOString()
 
     const insertHospital = db.prepare(`INSERT INTO
-        hospital (name, tasagName, address, phoneNumber, createdAt, createdUserId, updatedAt, updatedUserId)
+        hospital (name, departmentName, address, phoneNumber, createdAt, createdUserId, updatedAt, updatedUserId)
       VALUES
-          (@name, @tasagName, @address, @phoneNumber, @createdAt, @createdUserId, @updatedAt, @updatedUserId);`)
+          (@name, @departmentName, @address, @phoneNumber, @createdAt, @createdUserId, @updatedAt, @updatedUserId);`)
 
     insertHospital.run({
       ...data,
@@ -44,7 +44,7 @@ const update = (data, token) => {
     const oldData = getHospitalData()
 
     const insertHospital = db.prepare(`UPDATE
-        hospital SET name = @name, tasagName = @tasagName, address = @address, phoneNumber = @phoneNumber, updatedAt = @updatedAt, updatedUserId = @updatedUserId WHERE id = @id`)
+        hospital SET name = @name, departmentName = @departmentName, address = @address, phoneNumber = @phoneNumber, updatedAt = @updatedAt, updatedUserId = @updatedUserId WHERE id = @id`)
 
     insertHospital.run({
       ...data,

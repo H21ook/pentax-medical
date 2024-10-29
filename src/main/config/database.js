@@ -59,7 +59,7 @@ export const initTables = (isForce) => {
     CREATE TABLE IF NOT EXISTS hospital (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
-        tasagName TEXT NOT NULL,
+        departmentName TEXT NOT NULL,
         address TEXT NOT NULL,
         phoneNumber TEXT NOT NULL,
         createdAt TEXT NOT NULL,

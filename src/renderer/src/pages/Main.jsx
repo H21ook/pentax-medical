@@ -298,7 +298,6 @@ const MainPage = () => {
       return temp
     })
     if (tempTab.type === 'detail') {
-      console.log(tempTab.data)
       tempTab.data.toggleSelected(false)
     }
     if (selectedTab !== 0 && index <= selectedTab) {
@@ -326,6 +325,7 @@ const MainPage = () => {
       }
       return [...prev, newT]
     })
+    setSelectedTab(tabs.length)
   }
 
   const addDetailTab = (rowData) => {
@@ -344,92 +344,99 @@ const MainPage = () => {
       }
       return [...prev, newT]
     })
+    setSelectedTab(tabs.length)
   }
 
   return (
     <MainLayout>
-      <div className="p-2">
-        <ScrollArea className="w-full whitespace-nowrap border-b mb-4">
-          <div className="flex gap-1 mb-2">
+      <div>
+        <div className="py-2 pb-0 border-b">
+          <ScrollArea className="w-full whitespace-nowrap ">
+            <div className="flex gap-1 mb-2 px-4">
+              {tabs.map((item, index) => {
+                return (
+                  <div
+                    key={`tab_${index}`}
+                    onClick={() => {
+                      setSelectedTab(index)
+                    }}
+                    className={`w-fit cursor-pointer px-2 py-1 text-sm rounded-md flex items-center gap-1 ${index === selectedTab ? 'bg-gray-200 hover:bg-gray-200' : 'hover:bg-gray-100'}`}
+                  >
+                    {item.name}
+                    {index > 0 ? (
+                      <div
+                        className="group hover:bg-white rounded-full p-[2px]"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removeTab(index)
+                        }}
+                      >
+                        <RxCross2 className="transition-all duration-300 text-gray-500 group-hover:text-black" />
+                      </div>
+                    ) : null}
+                  </div>
+                )
+              })}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+        <ScrollArea className="w-full px-2 h-[calc(100vh-174px)]">
+          <div className="py-6">
             {tabs.map((item, index) => {
+              if (item.type === 'base') {
+                return (
+                  <div
+                    key={`tabData_${index}`}
+                    className={`px-2 ${index === selectedTab ? 'block' : 'hidden'}`}
+                  >
+                    <DataTable
+                      columns={columns}
+                      data={fakeData}
+                      onRowDoubleClick={(row) => {
+                        addDetailTab(row)
+                      }}
+                      header={(table) => {
+                        return (
+                          <PatiantsTableHeader
+                            table={table}
+                            actions={
+                              <Button
+                                variant="outline"
+                                className="h-8 px-2 lg:px-3"
+                                onClick={addNewTab}
+                              >
+                                <RxPlus className="mr-2" /> Шинэ үзлэг
+                              </Button>
+                            }
+                          />
+                        )
+                      }}
+                    />
+                  </div>
+                )
+              }
+              if (item.type === 'detail') {
+                return (
+                  <div
+                    className={`${index === selectedTab ? 'block' : 'hidden'}`}
+                    key={`tabData_${index}`}
+                  >
+                    <DetailTab key={item.name} />
+                  </div>
+                )
+              }
               return (
                 <div
-                  key={`tab_${index}`}
-                  onClick={() => {
-                    setSelectedTab(index)
-                  }}
-                  className={`w-fit cursor-pointer px-2 py-1 text-sm rounded-md flex items-center gap-1 ${index === selectedTab ? 'bg-gray-200 hover:bg-gray-200' : 'hover:bg-gray-100'}`}
+                  className={`${index === selectedTab ? 'block' : 'hidden'}`}
+                  key={`tabData_${index}`}
                 >
-                  {item.name}
-                  {index > 0 ? (
-                    <div
-                      className="group hover:bg-white rounded-full p-[2px]"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        removeTab(index)
-                      }}
-                    >
-                      <RxCross2 className="transition-all duration-300 text-gray-500 group-hover:text-black" />
-                    </div>
-                  ) : null}
+                  <NewTab key={item.name} />
                 </div>
               )
             })}
           </div>
-          <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        {tabs.map((item, index) => {
-          if (item.type === 'base') {
-            return (
-              <div
-                key={`tabData_${index}`}
-                className={`${index === selectedTab ? 'block' : 'hidden'}`}
-              >
-                <DataTable
-                  columns={columns}
-                  data={fakeData}
-                  onRowDoubleClick={(row) => {
-                    addDetailTab(row)
-                  }}
-                  header={(table) => {
-                    return (
-                      <PatiantsTableHeader
-                        table={table}
-                        actions={
-                          <Button
-                            variant="outline"
-                            className="h-8 px-2 lg:px-3"
-                            onClick={addNewTab}
-                          >
-                            <RxPlus className="mr-2" /> Шинэ үзлэг
-                          </Button>
-                        }
-                      />
-                    )
-                  }}
-                />
-              </div>
-            )
-          }
-          if (item.type === 'detail') {
-            return (
-              <div
-                className={`${index === selectedTab ? 'block' : 'hidden'}`}
-                key={`tabData_${index}`}
-              >
-                <DetailTab key={item.name} />
-              </div>
-            )
-          }
-          return (
-            <div
-              className={`${index === selectedTab ? 'block' : 'hidden'}`}
-              key={`tabData_${index}`}
-            >
-              <NewTab key={item.name} />
-            </div>
-          )
-        })}
       </div>
     </MainLayout>
   )

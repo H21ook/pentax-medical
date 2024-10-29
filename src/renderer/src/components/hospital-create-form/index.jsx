@@ -13,7 +13,7 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
   const { handleSubmit, control } = useForm({
     defaultValues: {
       name: '',
-      tasagName: '',
+      departmentName: '',
       phoneNumber: '',
       address: ''
     }
@@ -76,8 +76,8 @@ const HospitalCreateForm = ({ onSuccess = () => {} }) => {
         </div>
         <Controller
           control={control}
-          name={'tasagName'}
-          key={'tasagName'}
+          name={'departmentName'}
+          key={'departmentName'}
           rules={{
             required: 'Тасгийн нэр оруулна уу'
           }}

@@ -21,7 +21,7 @@ const HospitalSettings = () => {
   } = useForm({
     defaultValues: {
       name: hospitalData.name,
-      tasagName: hospitalData.tasagName,
+      departmentName: hospitalData.departmentName,
       phoneNumber: hospitalData.phoneNumber,
       address: hospitalData.address
     }
@@ -88,8 +88,8 @@ const HospitalSettings = () => {
         />
         <Controller
           control={control}
-          name={'tasagName'}
-          key={'tasagName'}
+          name={'departmentName'}
+          key={'departmentName'}
           rules={{
             required: 'Тасгийн нэр оруулна уу'
           }}
