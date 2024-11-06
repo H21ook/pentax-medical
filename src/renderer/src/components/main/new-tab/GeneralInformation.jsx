@@ -11,10 +11,12 @@ import { TreeDatePicker } from '../../ui/tree-date-picker'
 import { useAddress } from '../../../context/address-context'
 import { useEffect, useMemo } from 'react'
 import { useNewData } from '../../../context/new-data-context'
+import { useUsers } from '../../../context/users-context'
 import { useHospital } from '../../../context/hospital-context'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
   const { hospitalData } = useHospital()
+  const { users } = useUsers()
   const { parentAddress, allAddressData } = useAddress()
   const { generalInformationForm } = useNewData()
 
@@ -22,6 +24,9 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
 
   const watchFields = watch()
   const cityId = watchFields.cityId
+
+  const doctors = users.filter((u) => u.role === 'doctor')
+  const nurses = users.filter((u) => u.role === 'nurse')
 
   const subAddress = useMemo(() => {
     return allAddressData.filter((item) => item.parentId === cityId)
@@ -603,7 +608,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                     <SelectValue placeholder="Эмч сонгох" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[].map((item) => {
+                    {doctors.map((item) => {
                       return (
                         <SelectItem key={`doctor_${item.id}`} value={item.id}>
                           {item.displayName}
@@ -640,7 +645,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                     <SelectValue placeholder="Сувилагч сонгох" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[].map((item) => {
+                    {nurses.map((item) => {
                       return (
                         <SelectItem key={`nurse_${item.id}`} value={item.id}>
                           {item.displayName}

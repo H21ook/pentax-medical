@@ -10,6 +10,7 @@ export const useHospital = () => {
 }
 const HospitalProvider = ({ children }) => {
   const [data, setData] = useState()
+
   const getHospitalData = useCallback(async () => {
     const res = await window.api.getHospitalData()
     setData(res.data)

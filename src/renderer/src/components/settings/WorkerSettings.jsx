@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../ui/Button'
 import { format } from 'date-fns'
 import DataTable from '../ui/data-table'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Input } from '../ui/Input'
 import ColumnVisible from '../ui/data-table/ColumnVisible'
 import ColumnHeader from '../ui/data-table/ColumnHeader'
+import { useUsers } from '../../context/users-context'
 
 const WorkerTableHeader = ({ table, actions }) => {
   return (
@@ -27,17 +28,8 @@ const WorkerTableHeader = ({ table, actions }) => {
 }
 
 const WorkerSettings = () => {
-  const [users, setUsers] = useState([])
+  const { users, getUsers } = useUsers()
   const [isOpenModal, setIsOpenModal] = useState(false)
-
-  const getUsers = useCallback(async () => {
-    const res = await window.api.getAllUsers()
-    setUsers(res)
-  }, [])
-
-  useEffect(() => {
-    getUsers()
-  }, [getUsers])
 
   const columns = [
     {

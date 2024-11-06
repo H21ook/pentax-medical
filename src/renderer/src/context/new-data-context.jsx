@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import LoaderPage from '../pages/Loader'
 import { useForm } from 'react-hook-form'
 import { useHospital } from './hospital-context'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,8 +14,26 @@ const NewDataContext = createContext({
   addDetailTab: () => {}
 })
 
-export const useNewData = () => {
-  return useContext(NewDataContext)
+const formDefaultValues = {
+  uuid: '',
+  hospitalName: '',
+  departmentName: '',
+  date: '',
+  patientCondition: '',
+  diseaseIndication: '',
+  anesthesia: '',
+  // Patient
+  firstName: '',
+  lastName: '',
+  regNo: '',
+  birthDate: '',
+  age: '',
+  gender: 'male',
+  phoneNumber: '',
+  profession: '',
+  cityId: '',
+  districtId: '',
+  address: ''
 }
 
 const NewDataProvider = ({ children }) => {
@@ -26,30 +43,7 @@ const NewDataProvider = ({ children }) => {
   const [newData, setNewData] = useState()
   const [isLoadData, setIsLoadData] = useState(false)
 
-  const formDefaultValues = {
-    uuid: '',
-    hospitalName: hospitalData?.name,
-    departmentName: hospitalData?.departmentName,
-    date: '',
-    patientCondition: '',
-    diseaseIndication: '',
-    anesthesia: '',
-    // Patient
-    firstName: '',
-    lastName: '',
-    regNo: '',
-    birthDate: '',
-    age: '',
-    gender: 'male',
-    phoneNumber: '',
-    profession: '',
-    cityId: '',
-    districtId: '',
-    address: ''
-  }
   const generalInformationForm = useForm({
-    mode: 'onChange', // Validate on change
-    reValidateMode: 'onChange',
     defaultValues: formDefaultValues
   })
   const { reset } = generalInformationForm
@@ -87,9 +81,10 @@ const NewDataProvider = ({ children }) => {
       })
     } else {
       reset({
+        ...formDefaultValues,
         uuid: uuidv4(),
-        hospitalName: hospitalData.name,
-        departmentName: hospitalData.departmentName,
+        hospitalName: hospitalData?.name,
+        departmentName: hospitalData?.departmentName,
         date: format(new Date(), 'yyyy-MM-dd')
       })
     }
@@ -98,7 +93,7 @@ const NewDataProvider = ({ children }) => {
       setTabs(JSON.parse(tabsDataStorage))
     }
     setIsLoadData(true)
-  }, [])
+  }, [hospitalData, reset])
 
   const changeNewData = useCallback((data) => {
     localStorage.setItem('newData', JSON.stringify(data))
@@ -110,7 +105,7 @@ const NewDataProvider = ({ children }) => {
     })
   }, [])
 
-  const removeTab = (index) => {
+  const removeTab = async (index) => {
     const tempTab = tabs[index]
     setTabs((prev) => {
       const temp = [...prev]
@@ -119,11 +114,10 @@ const NewDataProvider = ({ children }) => {
       return temp
     })
     if (tempTab.type === 'new') {
+      await window.api.removeTempFiles(newData.uuid)
       setNewData(undefined)
-      reset(formDefaultValues)
+      reset({ ...formDefaultValues, uuid: uuidv4() })
       localStorage.removeItem('newData')
-
-      // zurag bichleg orson bol ustgah
     }
     if (selectedTab !== 0 && index <= selectedTab) {
       setSelectedTab((prev) => prev - 1)
@@ -167,7 +161,7 @@ const NewDataProvider = ({ children }) => {
   }
 
   if (!isLoadData) {
-    return <LoaderPage />
+    return null
   }
 
   return (
@@ -190,3 +184,7 @@ const NewDataProvider = ({ children }) => {
 }
 
 export default NewDataProvider
+
+export const useNewData = () => {
+  return useContext(NewDataContext)
+}

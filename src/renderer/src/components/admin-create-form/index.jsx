@@ -12,9 +12,11 @@ import {
 import { RxEyeClosed, RxEyeOpen } from 'react-icons/rx'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useUsers } from '../../context/users-context'
 
 const AdminCreateForm = ({ onSuccess = () => {} }) => {
   const [showPass, setShowPass] = useState(false)
+  const { getUsers } = useUsers()
   const [showConfirmPass, setShowConfirmPass] = useState(false)
 
   const { control, handleSubmit, watch } = useForm({
@@ -52,6 +54,7 @@ const AdminCreateForm = ({ onSuccess = () => {} }) => {
       })
       return
     }
+    getUsers()
     localStorage.setItem('token', res.data?.token)
     onSuccess()
   }

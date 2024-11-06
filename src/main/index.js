@@ -1,5 +1,4 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
-import fs from 'fs'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -8,9 +7,10 @@ import { log } from './config/log'
 import { checkToken } from './services/auth'
 import { createMenu } from './services/menu'
 import { getRootUser } from './services/user'
-import { getDataConfig } from './services/system'
+import './services/system'
 import './services/hospital'
 import './services/address'
+import { getDataDirectory } from './services/file'
 
 function createWindow() {
   // Create the browser window.
@@ -27,7 +27,9 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
-      sandbox: false
+      sandbox: false,
+      webSecurity: false,
+      enableRemoteModule: false
     }
   })
 
@@ -80,7 +82,6 @@ app.whenReady().then(() => {
 
   log.info('initialized database')
   let win = createWindow()
-
   // win.webContents.openDevTools()
 
   ipcMain.on('init-page', (_e, data) => {
@@ -123,16 +124,7 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('create-documents-path', async () => {
-    const configData = getDataConfig()
-    if (configData.status === 'init') {
-      // Check if the folder exists
-      if (!fs.existsSync(configData.directory)) {
-        // Create the folder if it doesn't exist
-        fs.mkdirSync(configData.directory)
-      }
-    }
-
-    return configData.directory
+    return getDataDirectory()
   })
 
   ipcMain.handle('select-directory', async (event, directory) => {
@@ -143,6 +135,17 @@ app.whenReady().then(() => {
     })
 
     return result.filePaths
+  })
+
+  ipcMain.handle('dialog:openFile', async (_, filters) => {
+    const documentsPath = app.getPath('documents')
+    const result = await dialog.showOpenDialog({
+      defaultPath: documentsPath,
+      properties: ['openFile'],
+      filters
+    })
+
+    return result.filePaths[0]
   })
 
   // renderer log

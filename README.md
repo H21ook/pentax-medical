@@ -2,12 +2,6 @@
 
 An Electron application with React
 
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-## Project Setup
-
 ### Install
 
 ```bash
@@ -32,3 +26,17 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+# Dutuu zuils
+
+1. worker list actions (nuuts ug solih, ustgah, medeelel oorchloh)
+2. workers context uusgeh uildluudiig context-ruu oruulah
+3. zurag bichlegiig hadgalah localstorage-ruu (newDataContext)
+4. uzleg duusgawal shine tab-g detail bolgoj oorchloh
+5. uzlegiig date-r erembleh
+6. data config huudas hiih (default camera songoh, data directory songoh) backup, recover
+7. Log bichih ???
+8. online update hiideg baih
+9. nuur jagsaaltaas uur tiish shiljihed table state-g hadgaldag baih. jishee n (huudaslalt, shuultuur geh met)
+10. buh select deer data bhgui bwal data bhgui gej haruulah
+11. excel-s data oruuldag bh?
