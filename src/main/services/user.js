@@ -11,7 +11,7 @@ export const getRootUser = () => {
 
 export const getAllUsers = () => {
   const stmt = db.prepare(
-    'SELECT username, role, createdAt, position, displayName, type FROM users WHERE type != ?'
+    'SELECT username, systemRole, role, createdAt, position, displayName, type FROM users WHERE type != ?'
   )
   const users = stmt.all('system-root')
   return users
@@ -19,7 +19,7 @@ export const getAllUsers = () => {
 
 export const getUser = (userId) => {
   const stmt = db.prepare(
-    'SELECT username, role, createdAt, position, displayName, type FROM users WHERE id = ?'
+    'SELECT username, systemRole, role, createdAt, position, displayName, type FROM users WHERE id = ?'
   )
   return stmt.get(userId)
 }

@@ -21,18 +21,20 @@ const AdminCreateForm = ({ onSuccess = () => {} }) => {
     defaultValues: {
       username: '',
       displayName: '',
-      role: 'admin',
+      systemRole: 'admin',
+      role: 'doctor',
       position: '',
       password: '',
       confirmPassword: ''
     }
   })
 
-  const onSubmit = async ({ username, password, role, displayName, position }) => {
+  const onSubmit = async ({ username, password, systemRole, role, displayName, position }) => {
     const res = await window.api.registerAndLogin({
       username,
       password,
       position,
+      systemRole,
       role,
       displayName,
       isRoot: true
@@ -87,20 +89,20 @@ const AdminCreateForm = ({ onSuccess = () => {} }) => {
       />
       <Controller
         control={control}
-        name={'role'}
-        key={'role'}
+        name={'systemRole'}
+        key={'systemRole'}
         rules={{
-          required: 'Үүрэг сонгоно уу'
+          required: 'Систем үүрэг сонгоно уу'
         }}
         render={({ field: { value, onChange, name }, fieldState: { error } }) => {
           return (
             <div className="flex flex-col items-start gap-1">
               <Label htmlFor={name} className="pb-1">
-                Үүрэг
+                Систем үүрэг
               </Label>
               <Select id={name} name={name} value={value} onValueChange={onChange} disabled>
                 <SelectTrigger>
-                  <SelectValue placeholder="Үүрэг" />
+                  <SelectValue placeholder="Систем үүрэг" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Админ</SelectItem>
@@ -161,6 +163,33 @@ const AdminCreateForm = ({ onSuccess = () => {} }) => {
                   onChange(e.target.value)
                 }}
               />
+              {error && <p className="text-sm text-destructive">{error.message}</p>}
+            </div>
+          )
+        }}
+      />
+      <Controller
+        control={control}
+        name={'role'}
+        key={'role'}
+        rules={{
+          required: 'Үүрэг сонгоно уу'
+        }}
+        render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+          return (
+            <div className="flex flex-col items-start gap-1">
+              <Label htmlFor={name} className="pb-1">
+                Үүрэг
+              </Label>
+              <Select id={name} name={name} value={value} onValueChange={onChange} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Үүрэг" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="doctor">Эмч</SelectItem>
+                  <SelectItem value="nurse">Сувилагч</SelectItem>
+                </SelectContent>
+              </Select>
               {error && <p className="text-sm text-destructive">{error.message}</p>}
             </div>
           )

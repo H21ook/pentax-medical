@@ -24,7 +24,7 @@ ipcMain.handle('system:saveDataDirectory', (_, { path, token }) => {
   try {
     const user = verifyToken(token)
 
-    if (user.role === 'worker') {
+    if (user.systemRole === 'worker') {
       return {
         result: false,
         message: 'Таны эрх хүрэхгүй байна.'

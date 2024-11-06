@@ -49,6 +49,7 @@ export const initTables = (isForce) => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         displayName TEXT NOT NULL,
+        systemRole TEXT NOT NULL,
         role TEXT NOT NULL,
         position TEXT NOT NULL,
         type TEXT,
@@ -78,14 +79,15 @@ export const initTables = (isForce) => {
     `)
 
   const insertUser = db.prepare(`INSERT INTO
-        users (username, displayName, role, position, type, createdAt, password)
+        users (username, displayName, systemRole, role, position, type, createdAt, password)
       VALUES
-          (@username, @displayName, @role, @position, @type, @createdAt, @password) ON CONFLICT (username) DO NOTHING;`)
+          (@username, @displayName, @systemRole, @role, @position, @type, @createdAt, @password) ON CONFLICT (username) DO NOTHING;`)
 
   const info = insertUser.run({
     username: 'root',
     displayName: 'Khishigbayar',
-    role: 'admin',
+    systemRole: 'admin',
+    role: 'nurse',
     position: 'Developer',
     type: 'system-root',
     createdAt: nowDate,

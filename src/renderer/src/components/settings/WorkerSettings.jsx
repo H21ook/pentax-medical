@@ -51,6 +51,14 @@ const WorkerSettings = () => {
       header: 'Нэр'
     },
     {
+      accessorKey: 'systemRole',
+      header: () => <div className="text-center">Систем үүрэг</div>,
+      cell: ({ row }) => {
+        const formatted = row.getValue('systemRole') === 'admin' ? 'Админ' : 'Ажилтан'
+        return <div className="text-center">{formatted}</div>
+      }
+    },
+    {
       accessorKey: 'position',
       header: 'Албан тушаал'
     },
@@ -58,7 +66,7 @@ const WorkerSettings = () => {
       accessorKey: 'role',
       header: () => <div className="text-center">Үүрэг</div>,
       cell: ({ row }) => {
-        const formatted = row.getValue('role') === 'admin' ? 'Админ' : 'Ажилтан'
+        const formatted = row.getValue('role') === 'doctor' ? 'Эмч' : 'Сувилагч'
         return <div className="text-center">{formatted}</div>
       }
     },

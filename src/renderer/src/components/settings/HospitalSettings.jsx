@@ -11,7 +11,7 @@ const HospitalSettings = () => {
   const { token, user } = useAuth()
   const { hospitalData } = useHospital()
 
-  const isRead = user.role === 'worker'
+  const isRead = user.systemRole === 'worker'
 
   const {
     control,

@@ -103,7 +103,7 @@ export const registerUser = async ({ password, isRoot, username, ...other }) => 
     }
 
     const stmt = db.prepare(
-      'INSERT INTO users (username, displayName, role, password, position, type, createdAt) VALUES (@username, @displayName, @role, @password, @position, @type, @createdAt)'
+      'INSERT INTO users (username, displayName, systemRole, role, password, position, type, createdAt) VALUES (@username, @displayName, @systemRole, @role, @password, @position, @type, @createdAt)'
     )
     const hp = await hashPassword(password)
     const userData = {
