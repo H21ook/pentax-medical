@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '../Table'
 import {
   flexRender,
@@ -16,6 +16,7 @@ const DataTable = ({
   columns,
   data,
   header = () => {},
+  selectedRows,
   onRowDoubleClick = () => {},
   selectedRowClassname = () => {}
 }) => {
@@ -44,6 +45,15 @@ const DataTable = ({
       pagination
     }
   })
+
+  useEffect(() => {
+    table.getRowModel().rows.forEach((row) => {
+      const shouldSelect = selectedRows.has(row.original.id)
+      if (row.getIsSelected() !== shouldSelect) {
+        row.toggleSelected(shouldSelect)
+      }
+    })
+  }, [selectedRows, table])
 
   return (
     <div>

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import MainLayout from '../components/layouts/main-layout'
 import DataTable from '../components/ui/data-table'
 import { Button } from '../components/ui/Button'
@@ -17,6 +16,7 @@ import ColumnHeader from '../components/ui/data-table/ColumnHeader'
 import NewTab from '../components/main/NewTab'
 import { ScrollArea, ScrollBar } from '../components/ui/ScrollArea'
 import DetailTab from '../components/main/DetailTab'
+import { useNewData } from '../context/new-data-context'
 
 const PatiantsTableHeader = ({ table, actions }) => {
   const isFiltered = table.getState().columnFilters.length > 0
@@ -212,8 +212,10 @@ const MainPage = () => {
       createdDate: '2024-10-26 15:46:24'
     }
   ]
-  const [tabs, setTabs] = useState([{ name: 'Жагсаалт', type: 'base' }])
-  const [selectedTab, setSelectedTab] = useState(0)
+
+  const { selectedTab, tabs, setSelectedTab, removeTab, addDetailTab, addNewTab } = useNewData()
+
+  const selectedRows = tabs?.filter((item) => item.type === 'detail')?.map((item) => item.id) || []
 
   const columns = [
     {
@@ -290,63 +292,6 @@ const MainPage = () => {
     }
   ]
 
-  const removeTab = (index) => {
-    const tempTab = tabs[index]
-    setTabs((prev) => {
-      const temp = [...prev]
-      temp.splice(index, 1)
-      return temp
-    })
-    if (tempTab.type === 'detail') {
-      tempTab.data.toggleSelected(false)
-    }
-    if (selectedTab !== 0 && index <= selectedTab) {
-      setSelectedTab((prev) => prev - 1)
-    }
-  }
-
-  const addNewTab = () => {
-    setTabs((prev) => {
-      const newTabs = prev.filter((item) => item.type === 'new')
-      if (newTabs.length === 0) {
-        const newT = {
-          name: 'Шинэ үзлэг',
-          index: 0,
-          type: 'new'
-        }
-        return [...prev, newT]
-      }
-      newTabs.sort((a, b) => b.index - a.index)
-      const newIndex = newTabs[0].index + 1
-      const newT = {
-        name: `Шинэ үзлэг (${newIndex})`,
-        index: newIndex,
-        type: 'new'
-      }
-      return [...prev, newT]
-    })
-    setSelectedTab(tabs.length)
-  }
-
-  const addDetailTab = (rowData) => {
-    const foundIndex = tabs.findIndex((item) => item?.id === rowData?.original?.id)
-    if (foundIndex > -1) {
-      setSelectedTab(foundIndex)
-      return
-    }
-    rowData.toggleSelected(true)
-    setTabs((prev) => {
-      const newT = {
-        name: `${rowData.original?.id}|${rowData.original.lastName}`,
-        id: rowData.original?.id,
-        data: rowData,
-        type: 'detail'
-      }
-      return [...prev, newT]
-    })
-    setSelectedTab(tabs.length)
-  }
-
   return (
     <MainLayout>
       <div>
@@ -393,8 +338,9 @@ const MainPage = () => {
                     <DataTable
                       columns={columns}
                       data={fakeData}
+                      selectedRows={new Set(selectedRows)}
                       onRowDoubleClick={(row) => {
-                        addDetailTab(row)
+                        addDetailTab(row.original)
                       }}
                       header={(table) => {
                         return (
