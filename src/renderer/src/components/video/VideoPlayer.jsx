@@ -1,19 +1,20 @@
 import { Button } from '../ui/Button'
 import {
   TbCaptureFilled,
+  TbLoader,
   TbPlayerPauseFilled,
   TbPlayerPlayFilled,
   TbPlayerStopFilled,
   TbReload
 } from 'react-icons/tb'
 import { useRef, useState } from 'react'
-import { useNewData } from '../../context/new-data-context'
+import { toast } from 'sonner'
 
-const VideoPlayer = ({ src, reRecord = () => {} }) => {
+const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) => {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
+  const [loadingCapture, setLoadingCapure] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
-  const { newData } = useNewData()
   const [duration, setDuration] = useState()
   const [currentTime, setCurrentTime] = useState(0)
   const [isEnded, setIsEnded] = useState(false)
@@ -71,21 +72,35 @@ const VideoPlayer = ({ src, reRecord = () => {} }) => {
   }
 
   const captureImage = async () => {
-    const video = videoRef.current
-    const canvas = canvasRef.current
-    const context = canvas.getContext('2d')
+    try {
+      setLoadingCapure(true)
+      const video = videoRef.current
+      const canvas = canvasRef.current
+      const context = canvas.getContext('2d')
 
-    // Set canvas size to match the video
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+      // Set canvas size to match the video
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
 
-    // Draw the current video frame to the canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+      // Draw the current video frame to the canvas
+      context.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-    // Optionally, you can convert the canvas to a data URL to use the image
-    const imageURL = canvas.toDataURL('image/png')
-    const res = await window.api.saveImageFile(imageURL, newData.uuid)
-    console.log('image ', res)
+      // Optionally, you can convert the canvas to a data URL to use the image
+      const imageURL = canvas.toDataURL('image/png')
+      await onCaptureImage(imageURL)
+    } catch (err) {
+      toast.error('Амжилтгүй', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: 'Алдаа гарлаа'
+      })
+    } finally {
+      setLoadingCapure(false)
+    }
   }
 
   return (
@@ -150,8 +165,18 @@ const VideoPlayer = ({ src, reRecord = () => {} }) => {
             <Button size="icon" variant="outline" className="rounded-full" onClick={handleStop}>
               <TbPlayerStopFilled className="text-[#333]" size={20} />
             </Button>
-            <Button size="icon" variant="outline" className="rounded-full" onClick={captureImage}>
-              <TbCaptureFilled className="text-[#333]" size={20} />
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full"
+              disabled={loadingCapture}
+              onClick={captureImage}
+            >
+              {loadingCapture ? (
+                <TbLoader className="text-[#333] animate-spin" size={20} />
+              ) : (
+                <TbCaptureFilled className="text-[#333]" size={20} />
+              )}
             </Button>
           </div>
           <div></div>

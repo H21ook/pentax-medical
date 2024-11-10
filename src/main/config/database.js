@@ -69,6 +69,49 @@ export const initTables = (isForce) => {
         updatedUserId INTEGER NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS employee (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT UNIQUE NOT NULL,
+        hospitalName TEXT NOT NULL,
+        departmentName TEXT NOT NULL,
+        date TEXT NOT NULL,
+        patientCondition TEXT NOT NULL,
+        diseaseIndication TEXT NOT NULL,
+        anesthesia TEXT NOT NULL,
+        firstName TEXT NOT NULL,
+        lastName TEXT NOT NULL,
+        birthDate TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        cityId INTEGER NOT NULL,
+        districtId INTEGER NOT NULL,
+        regNo TEXT,
+        age TEXT,
+        phoneNumber TEXT,
+        profession TEXT,
+        address TEXT,
+        folderPath TEXT NOT NULL,
+        videoPath TEXT NOT NULL,
+        diagnosis TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        doctorId INTEGER NOT NULL,
+        nurseId INTEGER NOT NULL,
+        sourceType TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        createdUserId INTEGER NOT NULL,
+        updatedAt TEXT NOT NULL,
+        updatedUserId INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS employeeImages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT,
+        employeeId INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        path TEXT NOT NULL,
+        orderIndex INTEGER,
+        createdDate TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS address (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,

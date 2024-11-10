@@ -1,9 +1,64 @@
-import { useState } from 'react'
 import { Separator } from '../../ui/seperator'
 import { BsCameraReelsFill } from 'react-icons/bs'
 import { FaFileVideo } from 'react-icons/fa6'
 import VideoPlayer from '../../video/VideoPlayer'
 import VideoRecorder from '../../video/VideoRecorder'
+import { useNewData } from '../../../context/new-data-context'
+import { toast } from 'sonner'
+import { RxArrowLeft, RxReload } from 'react-icons/rx'
+import { Button } from '../../ui/Button'
+import ImagesComponent from './ImagesComponent'
+
+const defaultSlotsData = [
+  {
+    orderIndex: 1,
+    name: 'Image 1'
+  },
+  {
+    orderIndex: 2,
+    name: 'Image 2'
+  },
+  {
+    orderIndex: 3,
+    name: 'Image 3'
+  },
+  {
+    orderIndex: 4,
+    name: 'Image 4'
+  },
+  {
+    orderIndex: 5,
+    name: 'Image 5'
+  },
+  {
+    orderIndex: 6,
+    name: 'Image 6'
+  },
+  {
+    orderIndex: 7,
+    name: 'Image 7'
+  },
+  {
+    orderIndex: 8,
+    name: 'Image 8'
+  },
+  {
+    orderIndex: 9,
+    name: 'Image 9'
+  },
+  {
+    orderIndex: 10,
+    name: 'Image 10'
+  },
+  {
+    orderIndex: 11,
+    name: 'Image 11'
+  },
+  {
+    orderIndex: 12,
+    name: 'Image 12'
+  }
+]
 
 const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => {
   return (
@@ -40,63 +95,159 @@ const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => 
   )
 }
 
-const MediaInformation = () => {
-  const [selectedType, setSelectedType] = useState()
-  const [videoPath, setVideoPath] = useState()
+const MediaInformation = ({ prevStep = () => {} }) => {
+  const { changeNewData, newData } = useNewData()
+  const slots = (newData?.tempImages || defaultSlotsData).sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  )
 
   const onEnd = (filePath) => {
-    setVideoPath(filePath)
+    changeNewData({
+      tempVideoPath: filePath
+    })
   }
 
   const selectVideoFile = async () => {
-    const selectedFile = await window.electron.ipcRenderer.invoke('dialog:openFile', [
-      { name: 'Videos', extensions: ['mp4', 'avi', 'mkv', 'mov'] }
-    ])
-    console.log(selectedFile)
-    setVideoPath(selectedFile)
-    setSelectedType('chooseFile')
+    const latestSelectPath = localStorage.getItem('latestFilePath')
+    const selectedFile = await window.electron.ipcRenderer.invoke('dialog:openFile', {
+      path: latestSelectPath,
+      filters: [{ name: 'Videos', extensions: ['mp4', 'avi', 'mkv', 'mov'] }]
+    })
+
+    localStorage.setItem('latestFilePath', selectedFile.folder)
+
+    changeNewData({
+      tempVideoPath: selectedFile.path
+    })
   }
 
+  const onCaptureImage = async (imageURL) => {
+    const res = await window.api.saveImageFile(imageURL, newData.uuid)
+    if (res?.result) {
+      const foundIndex = slots?.findIndex((item) => !item?.path)
+      updateItem(foundIndex, res?.data?.path)
+    } else {
+      toast.error('Амжилтгүй', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: res?.message || 'Алдаа гарлаа'
+      })
+    }
+  }
+
+  const resetVideo = async () => {
+    changeNewData({
+      tempImages: [],
+      tempVideoPath: undefined,
+      sourceType: undefined
+    })
+    await window.api.removeTempFiles(newData.uuid)
+  }
+
+  const removeItem = async (slotIndex) => {
+    let images = [...slots]
+    images[slotIndex].path = undefined
+
+    changeNewData({
+      tempImages: images
+    })
+
+    await window.api.removeImageFile()
+  }
+
+  // Update an item in a specific slot
+  const updateItem = (slotIndex, newPath) => {
+    let images = [...slots]
+    images[slotIndex].path = newPath
+    changeNewData({
+      tempImages: images
+    })
+  }
+
+  // Swap items between two slots
+  const swapItems = (slotIndex1, slotIndex2) => {
+    let images = [...slots]
+    let temp = images[slotIndex1]
+    images[slotIndex1].path = images[slotIndex2].path
+    images[slotIndex2].path = temp.path
+    changeNewData({
+      tempImages: images
+    })
+  }
+
+  const videoPath = newData?.tempVideoPath
+  const selectedType = newData?.sourceType
+
   return (
-    <form className="w-full bg-red-300 flex gap-10">
-      <div className="w-[70%] lg:w-[40%]">
-        <div className="relative bg-black w-full">
-          {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
-            <ChooseVideoSrcType
-              onChange={(type) => {
-                setSelectedType(type)
-              }}
-              setVideoSrc={selectVideoFile}
-            />
-          )}
-          {videoPath && (
-            <VideoPlayer
-              src={videoPath}
-              reRecord={async () => {
-                setVideoPath(undefined)
-                setSelectedType(undefined)
-              }}
-              type={selectedType}
-            />
-          )}
-          {!videoPath && selectedType === 'record' && <VideoRecorder onEnd={onEnd} />}
+    <div>
+      <div className="mb-4 flex gap-4 justify-between">
+        <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
+          <RxReload className="me-2" />
+          Шинээр эхлэх
+        </Button>
+        <div className="flex gap-4">
+          <Button variant="secondary" onClick={prevStep}>
+            <RxArrowLeft className="me-2" />
+            Буцах
+          </Button>
+          <Button
+            disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
+            onClick={prevStep}
+          >
+            Хадгалах
+          </Button>
         </div>
       </div>
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="w-full aspect-video bg-black/50 rounded-md">1</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">2</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">3</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">4</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">5</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">6</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">7</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">8</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">9</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">10</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">11</div>
-        <div className="w-full aspect-video bg-black/50 rounded-md">12</div>
-      </div>
-    </form>
+      <form className="w-full flex gap-4 items-start">
+        <div className="w-[70%] lg:w-[40%]">
+          <div className="relative bg-black w-full">
+            {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
+              <ChooseVideoSrcType
+                onChange={(type) => {
+                  changeNewData({
+                    sourceType: type
+                  })
+                }}
+                setVideoSrc={selectVideoFile}
+              />
+            )}
+            {videoPath && (
+              <VideoPlayer
+                src={videoPath}
+                reRecord={async () => {
+                  changeNewData({
+                    tempVideoPath: undefined,
+                    sourceType: undefined
+                  })
+                }}
+                onCaptureImage={onCaptureImage}
+                type={selectedType}
+              />
+            )}
+            {!videoPath && selectedType === 'record' && (
+              <VideoRecorder
+                onEnd={onEnd}
+                back={() => {
+                  changeNewData({
+                    sourceType: undefined
+                  })
+                }}
+              />
+            )}
+          </div>
+        </div>
+        <ImagesComponent
+          images={slots}
+          removeItem={removeItem}
+          updateItem={updateItem}
+          swapItems={swapItems}
+        />
+      </form>
+    </div>
   )
 }
 

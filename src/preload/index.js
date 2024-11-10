@@ -5,7 +5,14 @@ import { getAllUsers, getProfile, updateProfile } from './routes/users'
 import { saveDataDirectory } from './routes/system'
 import { createHospitalData, getHospitalData, updateHospitalData } from './routes/hospital'
 import { deleteAddress, getAllAddress, saveAddress } from './routes/address'
-import { getVideoDeviceList, saveImageFile, saveVideoFile, removeTempFiles } from './routes/file'
+import {
+  getVideoDeviceList,
+  saveImageFile,
+  saveVideoFile,
+  removeTempFiles,
+  removeImageFile
+} from './routes/file'
+import { createEmployee, getEmployeeList } from './routes/employee'
 
 // Custom APIs for renderer
 const api = {
@@ -32,7 +39,12 @@ const api = {
   saveVideoFile,
   getVideoDeviceList,
   saveImageFile,
-  removeTempFiles
+  removeTempFiles,
+  removeImageFile,
+
+  //EMPLOYEE
+  createEmployee,
+  getEmployeeList
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

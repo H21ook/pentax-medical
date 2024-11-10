@@ -2,7 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 const UsersContext = createContext({
   users: [],
-  getUsers: () => {}
+  employees: [],
+  getUsers: () => {},
+  getEmployeeList: () => {}
 })
 
 export const useUsers = () => {
@@ -11,20 +13,29 @@ export const useUsers = () => {
 
 const UsersProvider = ({ children }) => {
   const [users, setUsers] = useState([])
+  const [employees, setEmployees] = useState([])
   const getUsers = useCallback(async () => {
     const res = await window.api.getAllUsers()
     setUsers(res)
   }, [])
 
+  const getEmployeeList = useCallback(async () => {
+    const res = await window.api.getEmployeeList()
+    setEmployees(res)
+  }, [])
+
   useEffect(() => {
     getUsers()
-  }, [getUsers])
+    getEmployeeList()
+  }, [getUsers, getEmployeeList])
 
   return (
     <UsersContext.Provider
       value={{
         users,
-        getUsers
+        employees,
+        getUsers,
+        getEmployeeList
       }}
     >
       {children}

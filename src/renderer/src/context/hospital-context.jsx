@@ -20,6 +20,10 @@ const HospitalProvider = ({ children }) => {
     getHospitalData()
   }, [getHospitalData])
 
+  if (!data) {
+    return null
+  }
+
   return (
     <HospitalContext.Provider
       value={{

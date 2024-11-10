@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHospital } from './hospital-context'
 import { v4 as uuidv4 } from 'uuid'
@@ -11,7 +11,8 @@ const NewDataContext = createContext({
   changeNewData: () => {},
   removeTab: () => {},
   addNewTab: () => {},
-  addDetailTab: () => {}
+  addDetailTab: () => {},
+  complete: () => {}
 })
 
 const formDefaultValues = {
@@ -37,67 +38,42 @@ const formDefaultValues = {
 }
 
 const NewDataProvider = ({ children }) => {
-  const { hospitalData } = useHospital()
-  const [tabs, setTabs] = useState([{ name: 'Жагсаалт', type: 'base' }])
   const [selectedTab, setSelectedTab] = useState(0)
-  const [newData, setNewData] = useState()
-  const [isLoadData, setIsLoadData] = useState(false)
+  const tabsDataStorage = localStorage.getItem('tabs')
 
+  let tabsStorage = [{ name: 'Жагсаалт', type: 'base' }]
+  if (tabsDataStorage) {
+    tabsStorage = JSON.parse(tabsDataStorage)
+  }
+
+  const [tabs, setTabs] = useState(tabsStorage)
+  const { hospitalData } = useHospital()
+
+  const newDataStorage = localStorage.getItem('newData')
+  let storageNewData = {
+    uuid: uuidv4(),
+    hospitalName: hospitalData?.name,
+    departmentName: hospitalData?.departmentName,
+    date: format(new Date(), 'yyyy-MM-dd')
+  }
+
+  if (newDataStorage) {
+    const convertedData = JSON.parse(newDataStorage)
+    if (convertedData?.uuid) {
+      storageNewData = convertedData
+    }
+  }
+
+  const [newData, setNewData] = useState(storageNewData)
   const generalInformationForm = useForm({
-    defaultValues: formDefaultValues
+    defaultValues: { ...formDefaultValues, ...storageNewData }
   })
+
   const { reset } = generalInformationForm
 
-  useEffect(() => {
-    const newDataStorage = localStorage.getItem('newData')
-    const tabsDataStorage = localStorage.getItem('tabs')
-
-    if (newDataStorage) {
-      const _newData = JSON.parse(newDataStorage)
-      setNewData(_newData)
-      reset({
-        uuid: _newData.uuid,
-        hospitalName: _newData?.hospitalName,
-        departmentName: _newData?.departmentName,
-        date: _newData?.date,
-        patientCondition: _newData?.patientCondition,
-        diseaseIndication: _newData?.diseaseIndication,
-        anesthesia: _newData?.anesthesia,
-        firstName: _newData?.firstName,
-        lastName: _newData?.lastName,
-        regNo: _newData?.regNo,
-        birthDate: _newData?.birthDate,
-        age: _newData?.age,
-        gender: _newData?.gender,
-        phoneNumber: _newData?.phoneNumber,
-        profession: _newData?.profession,
-        cityId: _newData?.cityId,
-        districtId: _newData?.districtId,
-        address: _newData?.address,
-        nurseId: _newData?.nurseId,
-        doctorId: _newData?.doctorId,
-        diagnosis: _newData?.diagnosis,
-        summary: _newData?.summary
-      })
-    } else {
-      reset({
-        ...formDefaultValues,
-        uuid: uuidv4(),
-        hospitalName: hospitalData?.name,
-        departmentName: hospitalData?.departmentName,
-        date: format(new Date(), 'yyyy-MM-dd')
-      })
-    }
-
-    if (tabsDataStorage) {
-      setTabs(JSON.parse(tabsDataStorage))
-    }
-    setIsLoadData(true)
-  }, [hospitalData, reset])
-
   const changeNewData = useCallback((data) => {
-    localStorage.setItem('newData', JSON.stringify(data))
     setNewData((prev) => {
+      localStorage.setItem('newData', JSON.stringify({ ...prev, ...data }))
       return {
         ...prev,
         ...data
@@ -116,7 +92,13 @@ const NewDataProvider = ({ children }) => {
     if (tempTab.type === 'new') {
       await window.api.removeTempFiles(newData.uuid)
       setNewData(undefined)
-      reset({ ...formDefaultValues, uuid: uuidv4() })
+      reset({
+        ...formDefaultValues,
+        uuid: uuidv4(),
+        hospitalName: hospitalData?.name,
+        departmentName: hospitalData?.departmentName,
+        date: format(new Date(), 'yyyy-MM-dd')
+      })
       localStorage.removeItem('newData')
     }
     if (selectedTab !== 0 && index <= selectedTab) {
@@ -160,8 +142,8 @@ const NewDataProvider = ({ children }) => {
     setSelectedTab(tabs.length)
   }
 
-  if (!isLoadData) {
-    return null
+  const complete = (index) => {
+    removeTab(index)
   }
 
   return (
@@ -175,7 +157,8 @@ const NewDataProvider = ({ children }) => {
         changeNewData,
         removeTab,
         addNewTab,
-        addDetailTab
+        addDetailTab,
+        complete
       }}
     >
       {children}

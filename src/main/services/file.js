@@ -1,5 +1,5 @@
 import { app, ipcMain } from 'electron'
-import { join } from 'path'
+import { join, extname } from 'path'
 import fs from 'fs'
 import os from 'os'
 import { getDataConfig } from './system'
@@ -7,7 +7,7 @@ import { log } from '../config/log'
 import { exec } from 'child_process'
 import ffmpegPath from 'ffmpeg-static'
 
-const createTempFolder = (uuid) => {
+export const createTempFolder = (uuid) => {
   const tempDir = os.tmpdir()
 
   const appFolder = join(tempDir, app.getName())
@@ -50,12 +50,23 @@ ipcMain.handle('file:saveImage', async (_, { uuid, imageData }) => {
   const base64Data = imageData.replace(/^data:image\/png;base64,/, '')
   const filePath = join(tempDir, `captured-image-${Date.now()}.png`)
 
-  fs.writeFile(filePath, base64Data, 'base64', (err) => {
-    if (err) {
-      console.error('Error saving the image:', err)
-      return
-    }
-    console.log(`Image saved at: ${filePath}`)
+  return new Promise((resolve) => {
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
+      if (err) {
+        log.info('Error saving the image:', err)
+        return resolve({
+          result: false,
+          message: 'Зураг хадгалахад алдаа гарлаа'
+        })
+      }
+      log.info(`Image saved at: ${filePath}`)
+      return resolve({
+        result: true,
+        data: {
+          path: filePath
+        }
+      })
+    })
   })
 })
 
@@ -131,3 +142,88 @@ ipcMain.handle('file:removeTempFiles', async (_, uuid) => {
     })
   })
 })
+
+ipcMain.handle('file:removeImageFile', async (_, path) => {
+  return new Promise((resolve) => {
+    fs.unlink(path, (err) => {
+      if (err) {
+        log.info('Error deleting image file:', err)
+        return resolve({
+          result: false,
+          message: err
+        })
+      } else {
+        log.info('File deleted successfully: ', path)
+        return resolve({
+          result: true,
+          data: true
+        })
+      }
+    })
+  })
+})
+
+export const moveFilesToFolder = async (filesArray, destinationFolder, sourceFolder) => {
+  try {
+    // Ensure the destination folder exists
+    if (!fs.existsSync(destinationFolder)) {
+      fs.mkdirSync(destinationFolder, { recursive: true })
+    }
+
+    // Loop through each file in the array
+    const moveFilesRequest = []
+    const movedFiles = filesArray.map((item) => {
+      const { name, path: filePath } = item
+      const fileExtension = extname(filePath)
+      const destinationPath = join(
+        destinationFolder,
+        `${name.replaceAll(' ', '_')}${fileExtension}`
+      )
+      moveFilesRequest.push(fs.promises.copyFile(filePath, destinationPath))
+      return {
+        ...item,
+        path: destinationPath
+      }
+    })
+
+    await Promise.all(moveFilesRequest)
+    await fs.promises.rm(sourceFolder, { recursive: true })
+
+    log.info(`Moved: ${destinationFolder}`)
+
+    log.info(`All files moved to ${destinationFolder} successfully.`)
+    return {
+      result: true,
+      files: movedFiles
+    }
+  } catch (error) {
+    log.info('Error moving files:', error)
+    return {
+      result: false
+    }
+  }
+}
+
+export const moveVideoFileToFolder = async (filePath, destinationFolder) => {
+  try {
+    // Ensure the destination folder exists
+    if (!fs.existsSync(destinationFolder)) {
+      fs.mkdirSync(destinationFolder, { recursive: true })
+    }
+
+    const fileExtension = extname(filePath)
+    const destinationPath = join(destinationFolder, `record${fileExtension}`)
+
+    await fs.promises.copyFile(filePath, destinationPath)
+
+    return {
+      result: true,
+      path: destinationPath
+    }
+  } catch (error) {
+    log.info('Error moving video file:', error)
+    return {
+      result: false
+    }
+  }
+}

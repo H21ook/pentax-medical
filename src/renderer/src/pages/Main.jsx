@@ -2,7 +2,6 @@ import MainLayout from '../components/layouts/main-layout'
 import DataTable from '../components/ui/data-table'
 import { Button } from '../components/ui/Button'
 import { RxCross2, RxPlus } from 'react-icons/rx'
-import { format } from 'date-fns'
 import ColumnVisible from '../components/ui/data-table/ColumnVisible'
 import { Input } from '../components/ui/Input'
 import {
@@ -17,8 +16,11 @@ import NewTab from '../components/main/NewTab'
 import { ScrollArea, ScrollBar } from '../components/ui/ScrollArea'
 import DetailTab from '../components/main/DetailTab'
 import { useNewData } from '../context/new-data-context'
+import { useUsers } from '../context/users-context'
+import { useAddress } from '../context/address-context'
 
 const PatiantsTableHeader = ({ table, actions }) => {
+  const { parentAddress } = useAddress()
   const isFiltered = table.getState().columnFilters.length > 0
 
   const clearFilters = () => {
@@ -49,17 +51,22 @@ const PatiantsTableHeader = ({ table, actions }) => {
         <Select
           id={name}
           name={name}
-          value={table.getColumn('city')?.getFilterValue() ?? ''}
+          value={table.getColumn('cityId')?.getFilterValue() ?? ''}
           onValueChange={(value) => {
-            table.getColumn('city')?.setFilterValue(value)
+            table.getColumn('cityId')?.setFilterValue(value)
           }}
         >
           <SelectTrigger className="h-8 max-w-[200px]">
             <SelectValue placeholder="Хот/Аймаг" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Улаанбаатар">Улаанбаатар</SelectItem>
-            <SelectItem value="Архангай">Архангай</SelectItem>
+            {parentAddress.map((item) => {
+              return (
+                <SelectItem key={`city_${item.id}`} value={item.id}>
+                  {item.name}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
         {isFiltered && (
@@ -78,141 +85,8 @@ const PatiantsTableHeader = ({ table, actions }) => {
   )
 }
 const MainPage = () => {
-  const fakeData = [
-    {
-      id: 5256,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5256',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5255,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    },
-    {
-      id: 5254,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5254',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5253,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    },
-    {
-      id: 5252,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5252',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5251,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    },
-    {
-      id: 5250,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5250',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5249,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    },
-    {
-      id: 5248,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5248',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5247,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    },
-    {
-      id: 5246,
-      firstName: 'Өнөрсайхан',
-      lastName: 'Хишигбаяр',
-      birthDate: '1997-04-03',
-      city: 'Архангай',
-      district: 'Тариат',
-      address: 'Гуанз хороолол',
-      dataDirectory: 'D:\\pentax\\2024\\10-27\\5246',
-      createdDate: '2024-10-27 10:24:09'
-    },
-    {
-      id: 5245,
-      firstName: 'Баатар',
-      lastName: 'Сайнзаяа',
-      birthDate: '1986-11-09',
-      city: 'Улаанбаатар',
-      district: 'БЗД',
-      address: '26-р хороо Олимп',
-      dataDirectory: 'D://pentax//2024//10-26//Сайнзаяа',
-      createdDate: '2024-10-26 15:46:24'
-    }
-  ]
-
+  const { employees } = useUsers()
+  const { allAddressData } = useAddress()
   const { selectedTab, tabs, setSelectedTab, removeTab, addDetailTab, addNewTab } = useNewData()
 
   const selectedRows = tabs?.filter((item) => item.type === 'detail')?.map((item) => item.id) || []
@@ -242,24 +116,28 @@ const MainPage = () => {
       accessorKey: 'birthDate',
       header: 'Төрсөн огноо',
       cell: ({ row }) => {
-        const formatted = format(new Date(row.getValue('birthDate')), 'yyyy-MM-dd')
-        return <div className="min-w-[100px] text-start line-clamp-1">{formatted}</div>
+        return (
+          <div className="min-w-[100px] text-start line-clamp-1">{row.getValue('birthDate')}</div>
+        )
       }
     },
     {
-      accessorKey: 'city',
+      accessorKey: 'cityId',
       header: 'Хот/Аймаг',
       cell: ({ row }) => {
-        return <div className="text-start line-clamp-1 min-w-[100px]">{row.getValue('city')}</div>
+        const id = row.getValue('cityId')
+        const address = allAddressData?.find((addr) => addr.id === id)
+
+        return <div className="text-start line-clamp-1 min-w-[100px]">{address?.name}</div>
       }
     },
     {
-      accessorKey: 'district',
+      accessorKey: 'districtId',
       header: 'Дүүрэг/Сум',
       cell: ({ row }) => {
-        return (
-          <div className="text-start line-clamp-1 min-w-[100px]">{row.getValue('district')}</div>
-        )
+        const id = row.getValue('districtId')
+        const address = allAddressData?.find((addr) => addr.id === id)
+        return <div className="text-start line-clamp-1 min-w-[100px]">{address?.name}</div>
       }
     },
     {
@@ -272,22 +150,21 @@ const MainPage = () => {
       }
     },
     {
-      accessorKey: 'dataDirectory',
+      accessorKey: 'folderPath',
       header: 'Файлын байршил',
       cell: ({ row }) => {
         return (
           <div className="text-start truncate whitespace-nowrap hover:underline hover:underline-offset-2 cursor-pointer">
-            {row.getValue('dataDirectory')}
+            {row.getValue('folderPath')}
           </div>
         )
       }
     },
     {
-      accessorKey: 'createdDate',
+      accessorKey: 'date',
       header: 'Үзлэг огноо',
       cell: ({ row }) => {
-        const formatted = format(new Date(row.getValue('createdDate')), 'yyyy-MM-dd HH:mm:ss')
-        return <div className="text-start line-clamp-1 min-w-[140px]">{formatted}</div>
+        return <div className="text-start line-clamp-1 min-w-[140px]">{row.getValue('date')}</div>
       }
     }
   ]
@@ -337,7 +214,7 @@ const MainPage = () => {
                   >
                     <DataTable
                       columns={columns}
-                      data={fakeData}
+                      data={employees}
                       selectedRows={new Set(selectedRows)}
                       onRowDoubleClick={(row) => {
                         addDetailTab(row.original)

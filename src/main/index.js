@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { closeDb, initTables } from './config/database'
@@ -10,6 +10,7 @@ import { getRootUser } from './services/user'
 import './services/system'
 import './services/hospital'
 import './services/address'
+import './services/employee'
 import { getDataDirectory } from './services/file'
 
 function createWindow() {
@@ -137,16 +138,24 @@ app.whenReady().then(() => {
     return result.filePaths
   })
 
-  ipcMain.handle('dialog:openFile', async (_, filters) => {
-    const documentsPath = app.getPath('documents')
-    const result = await dialog.showOpenDialog({
-      defaultPath: documentsPath,
-      properties: ['openFile'],
-      filters
-    })
+  ipcMain.handle(
+    'dialog:openFile',
+    async (_, { title = 'Файл сонгох', buttonLabel = 'Open', path, filters }) => {
+      const documentsPath = app.getPath('documents')
+      const result = await dialog.showOpenDialog({
+        title,
+        buttonLabel,
+        defaultPath: path || documentsPath,
+        properties: ['openFile'],
+        filters
+      })
 
-    return result.filePaths[0]
-  })
+      return {
+        path: result.filePaths[0],
+        folder: dirname(result.filePaths[0])
+      }
+    }
+  )
 
   // renderer log
   ipcMain.on('log-error', (_e, data) => {

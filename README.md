@@ -40,3 +40,4 @@ $ npm run build:linux
 9. nuur jagsaaltaas uur tiish shiljihed table state-g hadgaldag baih. jishee n (huudaslalt, shuultuur geh met)
 10. buh select deer data bhgui bwal data bhgui gej haruulah
 11. excel-s data oruuldag bh?
+12. log file-g udur uduruur uusdeg bolgoh

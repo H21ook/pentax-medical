@@ -1,10 +1,10 @@
-import { TbPlayerRecordFilled, TbPlayerStopFilled } from 'react-icons/tb'
+import { TbArrowLeft, TbPlayerRecordFilled, TbPlayerStopFilled } from 'react-icons/tb'
 import { Button } from '../ui/Button'
 import { useEffect, useRef, useState } from 'react'
 import { Buffer } from 'buffer'
 import { useNewData } from '../../context/new-data-context'
 
-const VideoRecorder = ({ onEnd = () => {} }) => {
+const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
   const { newData } = useNewData()
   const videoRef = useRef(null)
   const [mediaRecorder, setMediaRecorder] = useState(null)
@@ -89,7 +89,6 @@ const VideoRecorder = ({ onEnd = () => {} }) => {
         const arrayBuffer = await blob.arrayBuffer() // Convert Blob to ArrayBuffer
         const buffer = Buffer.from(arrayBuffer)
         const res = await window.api.saveVideoFile(buffer, newData.uuid)
-        console.log(res)
         if (res.result) {
           onEnd(res.data.path, duration)
         }
@@ -106,19 +105,30 @@ const VideoRecorder = ({ onEnd = () => {} }) => {
         </div>
       ) : null}
 
-      <div className="absolute bottom-0 w-full flex gap-2 p-2 justify-center">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="rounded-full border bg-white"
-          disabled={recording}
-          onClick={startRecording}
-        >
-          <TbPlayerRecordFilled className="text-primary" size={20} />
+      <div className="absolute bottom-0 w-full flex gap-2 p-2 justify-between">
+        <Button size="icon" variant="ghost" className="rounded-full border bg-white" onClick={back}>
+          <TbArrowLeft size={20} />
         </Button>
-        <Button size="icon" className="rounded-full" disabled={!recording} onClick={stopRecording}>
-          <TbPlayerStopFilled size={20} />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="rounded-full border bg-white"
+            disabled={recording}
+            onClick={startRecording}
+          >
+            <TbPlayerRecordFilled className="text-primary" size={20} />
+          </Button>
+          <Button
+            size="icon"
+            className="rounded-full"
+            disabled={!recording}
+            onClick={stopRecording}
+          >
+            <TbPlayerStopFilled size={20} />
+          </Button>
+        </div>
+        <div></div>
       </div>
     </div>
   )

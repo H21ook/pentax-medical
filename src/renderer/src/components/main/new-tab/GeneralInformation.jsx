@@ -9,16 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group'
 import { TreeDatePicker } from '../../ui/tree-date-picker'
 import { useAddress } from '../../../context/address-context'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNewData } from '../../../context/new-data-context'
 import { useUsers } from '../../../context/users-context'
 import { useHospital } from '../../../context/hospital-context'
+import { BsCameraReelsFill } from 'react-icons/bs'
+import { useAuth } from '../../../context/auth-context'
+import { toast } from 'sonner'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
   const { hospitalData } = useHospital()
-  const { users } = useUsers()
+  const { token } = useAuth()
+  const { users, getEmployeeList } = useUsers()
+  const [error, setError] = useState('')
   const { parentAddress, allAddressData } = useAddress()
-  const { generalInformationForm } = useNewData()
+  const { generalInformationForm, newData, complete, selectedTab } = useNewData()
 
   const { control, handleSubmit, watch } = generalInformationForm
 
@@ -36,9 +41,49 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
     localStorage.setItem('newData', JSON.stringify(watchFields))
   }, [watchFields])
 
-  const onSubmit = (values) => {
-    console.log(values)
-    nextStep()
+  const onSubmit = async (values) => {
+    if (
+      !newData?.tempVideoPath ||
+      (newData?.tempImages && newData.tempImages?.some((item) => !item?.path))
+    ) {
+      setError('Бичлэг, зураг бүрэн хийгдээгүй байна.')
+      return
+    }
+    const { sourceType, tempVideoPath, tempImages } = newData
+    const res = await window.api.createEmployee({
+      data: {
+        ...values,
+        videoPath: tempVideoPath,
+        sourceType
+      },
+      images: tempImages,
+      token
+    })
+
+    if (res.result) {
+      await complete(selectedTab)
+      await getEmployeeList()
+      toast.success('Амжилттай', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: 'Үзлэг амжилттай бүртгэгдлээ'
+      })
+      return
+    }
+
+    toast.error('Амжилтгүй', {
+      action: {
+        label: 'Хаах',
+        onClick: () => {}
+      },
+      duration: 3000,
+      richColors: true,
+      description: res?.message || 'Алдаа гарлаа'
+    })
   }
 
   return (
@@ -660,7 +705,23 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           }}
         />
       </div>
-      <Button type="submit">Үргэлжлүүлэх</Button>
+      <div>
+        <div className="flex gap-4 items-center">
+          <Button
+            variant="outline"
+            className={error ? 'border-destructive' : ''}
+            onClick={() => {
+              setError('')
+              nextStep()
+            }}
+          >
+            <BsCameraReelsFill className="text-[20px] me-2" />
+            Бичлэг хийх
+          </Button>
+          <Button type="submit">Үзлэг дуусгах</Button>
+        </div>
+        <div className="text-sm text-destructive mt-0.5">{error}</div>
+      </div>
     </form>
   )
 }
