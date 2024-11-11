@@ -3,7 +3,7 @@ import db from '../config/database'
 import { join } from 'path'
 import fs from 'fs'
 import { verifyToken } from '../config/token'
-import { log } from '../config/log'
+import { getTodayName, log } from '../config/log'
 import {
   createTempFolder,
   getDataDirectory,
@@ -11,17 +11,9 @@ import {
   moveVideoFileToFolder
 } from './file'
 
-function getTodayFolderName() {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
-  const day = String(today.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
 const prepareFolder = async (uuid) => {
   const rootPath = await getDataDirectory()
-  const today = getTodayFolderName()
+  const today = getTodayName()
   const todayFolderPath = join(rootPath, today)
 
   if (!fs.existsSync(todayFolderPath)) {

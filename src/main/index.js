@@ -11,7 +11,6 @@ import './services/system'
 import './services/hospital'
 import './services/address'
 import './services/employee'
-// import './config/updater'
 import { getDataDirectory } from './services/file'
 
 function createWindow() {
@@ -84,7 +83,7 @@ app.whenReady().then(() => {
   log.info('initialized database')
   let win = createWindow()
 
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 
   ipcMain.on('init-page', (_e, data) => {
     const res = getRootUser()

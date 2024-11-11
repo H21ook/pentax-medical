@@ -45,7 +45,5 @@ publish:
   provider: 'github'
   owner: 'H21ook'
   repo: 'pentax-medical'
-  releaseType: 'release'
-  private: false
 extraResources:
   - 'pentax_store.db'
