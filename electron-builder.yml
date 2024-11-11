@@ -1,4 +1,4 @@
-appId: com.khishigbayar.app
+appId: com.h21ook.pentax-medical
 productName: Pentax
 directories:
   buildResources: build
@@ -42,7 +42,10 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: 'github'
+  owner: 'H21ook'
+  repo: 'pentax-medical'
+  releaseType: 'release'
+  private: false
 extraResources:
   - 'pentax_store.db'

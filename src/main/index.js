@@ -11,6 +11,7 @@ import './services/system'
 import './services/hospital'
 import './services/address'
 import './services/employee'
+// import './config/updater'
 import { getDataDirectory } from './services/file'
 
 function createWindow() {
@@ -29,7 +30,6 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       sandbox: false,
-      webSecurity: false,
       enableRemoteModule: false
     }
   })
@@ -70,7 +70,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.h21ook.pentax-medical')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -83,7 +83,8 @@ app.whenReady().then(() => {
 
   log.info('initialized database')
   let win = createWindow()
-  // win.webContents.openDevTools()
+
+  win.webContents.openDevTools()
 
   ipcMain.on('init-page', (_e, data) => {
     const res = getRootUser()
@@ -197,5 +198,16 @@ app.on('window-all-closed', () => {
   }
 })
 
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error)
+  log.info(error)
+  // Optionally show a dialog or notification to the user
+})
+
+// Catch unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason)
+  log.info(reason)
+})
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

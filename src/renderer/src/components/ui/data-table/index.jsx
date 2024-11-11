@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '../Table'
 import {
