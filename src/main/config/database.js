@@ -86,6 +86,7 @@ export const initTables = (isForce) => {
         districtId INTEGER NOT NULL,
         regNo TEXT,
         age TEXT,
+        type TEXT,
         phoneNumber TEXT,
         profession TEXT,
         address TEXT,

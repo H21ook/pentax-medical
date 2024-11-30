@@ -76,11 +76,11 @@ const createEmployee = async (employee, images, token) => {
         INSERT INTO employee (
             uuid, hospitalName, departmentName, date, patientCondition, diseaseIndication, anesthesia,
             firstName, lastName, birthDate, gender, cityId, districtId, regNo, age, phoneNumber,
-            profession, address, videoPath, diagnosis, summary, doctorId, nurseId, sourceType, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
+            profession, address, videoPath, type, diagnosis, summary, doctorId, nurseId, sourceType, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
         ) VALUES (
             @uuid, @hospitalName, @departmentName, @date, @patientCondition, @diseaseIndication, @anesthesia,
             @firstName, @lastName, @birthDate, @gender, @cityId, @districtId, @regNo, @age, @phoneNumber,
-            @profession, @address, @videoPath, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
+            @profession, @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
         )
     `)
 

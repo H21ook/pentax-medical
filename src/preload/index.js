@@ -13,6 +13,7 @@ import {
   removeImageFile
 } from './routes/file'
 import { createEmployee, getEmployeeList } from './routes/employee'
+import { getDataConfig } from './routes/dataConfig'
 
 // Custom APIs for renderer
 const api = {
@@ -44,7 +45,10 @@ const api = {
 
   //EMPLOYEE
   createEmployee,
-  getEmployeeList
+  getEmployeeList,
+
+  //DATA-CONFIG
+  getDataConfig
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

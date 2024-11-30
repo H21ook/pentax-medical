@@ -4,13 +4,7 @@ import { Button } from '../components/ui/Button'
 import { RxCross2, RxPlus } from 'react-icons/rx'
 import ColumnVisible from '../components/ui/data-table/ColumnVisible'
 import { Input } from '../components/ui/Input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '../components/ui/Select'
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../components/ui/Select'
 import ColumnHeader from '../components/ui/data-table/ColumnHeader'
 import NewTab from '../components/main/NewTab'
 import { ScrollArea, ScrollBar } from '../components/ui/ScrollArea'
@@ -59,15 +53,12 @@ const PatiantsTableHeader = ({ table, actions }) => {
           <SelectTrigger className="h-8 max-w-[200px]">
             <SelectValue placeholder="Хот/Аймаг" />
           </SelectTrigger>
-          <SelectContent>
-            {parentAddress.map((item) => {
-              return (
-                <SelectItem key={`city_${item.id}`} value={item.id}>
-                  {item.name}
-                </SelectItem>
-              )
-            })}
-          </SelectContent>
+          <SelectContent
+            data={parentAddress?.map((item) => ({
+              value: item?.id,
+              label: item?.name
+            }))}
+          />
         </Select>
         {isFiltered && (
           <Button variant="secondary" onClick={clearFilters} className="h-8 px-2 lg:px-3">
@@ -95,7 +86,7 @@ const MainPage = () => {
     {
       accessorKey: 'id',
       header: ({ column }) => {
-        return <ColumnHeader column={column} title="Д/Д" />
+        return <ColumnHeader column={column} title="ID" />
       }
     },
     {
@@ -113,11 +104,34 @@ const MainPage = () => {
       }
     },
     {
+      accessorKey: 'regNo',
+      header: 'РД',
+      cell: ({ row }) => {
+        return (
+          <div className="min-w-[100px] text-start line-clamp-1 uppercase">
+            {row.getValue('regNo')}
+          </div>
+        )
+      }
+    },
+    {
       accessorKey: 'birthDate',
       header: 'Төрсөн огноо',
       cell: ({ row }) => {
         return (
           <div className="min-w-[100px] text-start line-clamp-1">{row.getValue('birthDate')}</div>
+        )
+      }
+    },
+    {
+      accessorKey: 'gender',
+      header: 'Хүйс',
+      cell: ({ row }) => {
+        const value = row.getValue('gender')
+        return (
+          <div className="text-start truncate whitespace-nowrap">
+            {value === 'male' ? 'Эр' : value === 'female' ? 'Эм' : 'Бусад'}
+          </div>
         )
       }
     },
@@ -141,11 +155,13 @@ const MainPage = () => {
       }
     },
     {
-      accessorKey: 'address',
-      header: 'Хаяг',
+      accessorKey: 'phoneNumber',
+      header: 'Утасны дугаар',
       cell: ({ row }) => {
         return (
-          <div className="text-start truncate whitespace-nowrap">{row.getValue('address')}</div>
+          <div className="min-w-[100px] text-start line-clamp-1 uppercase">
+            {row.getValue('phoneNumber')}
+          </div>
         )
       }
     },
@@ -156,6 +172,18 @@ const MainPage = () => {
         return (
           <div className="text-start truncate whitespace-nowrap hover:underline hover:underline-offset-2 cursor-pointer">
             {row.getValue('folderPath')}
+          </div>
+        )
+      }
+    },
+    {
+      accessorKey: 'type',
+      header: 'Үзлэгийн төрөл',
+      cell: ({ row }) => {
+        const value = row.getValue('type')
+        return (
+          <div className="text-start line-clamp-1 min-w-[140px]">
+            {value === 'lower' ? 'Lower GI' : 'Upper GI'}
           </div>
         )
       }
@@ -182,7 +210,7 @@ const MainPage = () => {
                     onClick={() => {
                       setSelectedTab(index)
                     }}
-                    className={`w-fit cursor-pointer px-2 py-1 text-sm rounded-md flex items-center gap-1 ${index === selectedTab ? 'bg-gray-200 hover:bg-gray-200' : 'hover:bg-gray-100'}`}
+                    className={`w-fit cursor-pointer px-2 py-1 text-sm rounded-md flex items-center gap-2 ${index === selectedTab ? 'bg-gray-200 hover:bg-gray-200 font-semibold' : 'hover:bg-gray-100'}`}
                   >
                     {item.name}
                     {index > 0 ? (

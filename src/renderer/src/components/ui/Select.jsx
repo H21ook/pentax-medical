@@ -15,7 +15,7 @@ const SelectTrigger = React.forwardRef(
     <SelectPrimitive.Trigger
       ref={ref}
       className={cn(
-        `flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-black disabled:bg-[#EFEFEF]/30 disabled:cursor-not-allowed ${readonly ? 'disabled:opacity-100' : 'disabled:opacity-50'} [&>span]:line-clamp-1`,
+        `flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:!text-muted-foreground focus:outline-none focus:ring-1 focus:ring-black disabled:bg-[#EFEFEF]/30 disabled:cursor-not-allowed ${readonly ? 'disabled:opacity-100' : 'disabled:opacity-50'} [&>span]:line-clamp-1`,
         className
       )}
       disabled={readonly || disabled}
@@ -53,7 +53,7 @@ const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) =
 SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName
 
 const SelectContent = React.forwardRef(
-  ({ className, children, position = 'popper', ...props }, ref) => (
+  ({ className, children, data, position = 'popper', ...props }, ref) => (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         ref={ref}
@@ -74,7 +74,19 @@ const SelectContent = React.forwardRef(
               'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
           )}
         >
-          {children}
+          {children ? (
+            children
+          ) : data && data.length > 0 ? (
+            data.map((item) => {
+              return (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              )
+            })
+          ) : (
+            <SelectNoData />
+          )}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
@@ -120,6 +132,14 @@ const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
+const SelectNoData = ({ className, text = 'Дата байхгүй' }) => {
+  return (
+    <div className={cn('p-4 text-sm text-center text-muted-foreground', className)}>{text} </div>
+  )
+}
+
+SelectNoData.displayName = 'SelectNoData'
+
 export {
   Select,
   SelectGroup,
@@ -130,5 +150,6 @@ export {
   SelectItem,
   SelectSeparator,
   SelectScrollUpButton,
-  SelectScrollDownButton
+  SelectScrollDownButton,
+  SelectNoData
 }

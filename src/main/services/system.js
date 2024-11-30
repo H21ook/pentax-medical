@@ -63,3 +63,7 @@ ipcMain.handle('system:saveDataDirectory', (_, { path, token }) => {
     }
   }
 })
+
+ipcMain.handle('system:getDataConfig', () => {
+  return getDataConfig()
+})

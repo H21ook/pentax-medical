@@ -24,9 +24,7 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
           setSelectedDevice(currentDevice)
           const newStream = await navigator.mediaDevices.getUserMedia({
             video: {
-              deviceId: {
-                exact: currentDevice.deviceId
-              }
+              deviceId: { exact: currentDevice.deviceId }
             }
           })
 
@@ -34,10 +32,10 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
             videoRef.current.srcObject = newStream
           }
           stream.current = newStream
+
           const recorder = new MediaRecorder(newStream)
           setMediaRecorder(recorder)
         }
-        // Not found video source
       } catch (err) {
         console.error('Error accessing camera:', err)
       }
@@ -45,12 +43,23 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
 
     startCamera()
 
-    // Clean up the stream when the component unmounts
+    // Cleanup function to stop the camera
     return () => {
+      console.log('useEffect cleanup - Stopping Camera')
       if (stream.current) {
+        console.log('Stopping stream tracks:', stream.current.getTracks())
         stream.current.getTracks().forEach((track) => {
+          console.log('Stopping track:', track)
           track.stop()
         })
+        stream.current = null // Clear reference
+        console.log('Stream cleared:', stream.current)
+      } else {
+        console.warn('No active stream to stop.')
+      }
+
+      if (mediaRecorder?.state === 'recording') {
+        mediaRecorder.stop() // Stops the recorder if running
       }
     }
   }, [])

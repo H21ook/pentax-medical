@@ -118,48 +118,58 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
 })
 
 ipcMain.handle('file:removeTempFiles', async (_, uuid) => {
-  const tempDir = os.tmpdir()
-  const appFolder = join(tempDir, app.getName())
-  const userTempFolder = join(appFolder, uuid)
-
   return new Promise((resolve) => {
-    fs.rm(userTempFolder, { recursive: true, force: true }, (err) => {
-      if (err) {
-        log.info('Error deleting folder:', err)
-        return resolve({
-          result: false,
-          message: err
-        })
-      } else {
-        log.info('Folder deleted successfully: ' + uuid)
-        return resolve({
-          result: true,
-          data: {
-            path: userTempFolder
-          }
-        })
-      }
-    })
+    try {
+      const tempDir = os.tmpdir()
+      const appFolder = join(tempDir, app.getName())
+      const userTempFolder = join(appFolder, uuid)
+
+      fs.rm(userTempFolder, { recursive: true, force: true }, (err) => {
+        if (err) {
+          throw err
+        } else {
+          log.info('Folder deleted successfully: ' + uuid)
+          return resolve({
+            result: true,
+            data: {
+              path: userTempFolder
+            }
+          })
+        }
+      })
+    } catch (err) {
+      return resolve({
+        result: false,
+        message: err
+      })
+    }
   })
 })
 
 ipcMain.handle('file:removeImageFile', async (_, path) => {
   return new Promise((resolve) => {
-    fs.unlink(path, (err) => {
-      if (err) {
-        log.info('Error deleting image file:', err)
-        return resolve({
-          result: false,
-          message: err
-        })
-      } else {
-        log.info('File deleted successfully: ', path)
-        return resolve({
-          result: true,
-          data: true
-        })
-      }
-    })
+    try {
+      fs.unlink(path, (err) => {
+        if (err) {
+          log.info('Error deleting image file:', err)
+          return resolve({
+            result: false,
+            message: err
+          })
+        } else {
+          log.info('File deleted successfully: ', path)
+          return resolve({
+            result: true,
+            data: true
+          })
+        }
+      })
+    } catch (err) {
+      return resolve({
+        result: false,
+        message: err
+      })
+    }
   })
 })
 

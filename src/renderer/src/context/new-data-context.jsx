@@ -34,7 +34,8 @@ const formDefaultValues = {
   profession: '',
   cityId: '',
   districtId: '',
-  address: ''
+  address: '',
+  type: 'upper'
 }
 
 const NewDataProvider = ({ children }) => {
@@ -90,7 +91,11 @@ const NewDataProvider = ({ children }) => {
       return temp
     })
     if (tempTab.type === 'new') {
-      await window.api.removeTempFiles(newData.uuid)
+      try {
+        await window.api.removeTempFiles(newData?.uuid)
+      } catch (err) {
+        /* empty */
+      }
       setNewData(undefined)
       reset({
         ...formDefaultValues,
@@ -131,7 +136,7 @@ const NewDataProvider = ({ children }) => {
     }
     setTabs((prev) => {
       const newT = {
-        name: `${rowData?.id}|${rowData.lastName}`,
+        name: `ID-${rowData?.id}`,
         id: rowData?.id,
         type: 'detail'
       }

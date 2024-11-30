@@ -48,11 +48,10 @@ const DataTable = ({
     table.getRowModel().rows.forEach((row) => {
       if (selectedRows) {
         const shouldSelect = selectedRows?.has(row.original.id)
-        if (row.getIsSelected() !== shouldSelect) {
-          row.toggleSelected(shouldSelect)
-        }
+        row.toggleSelected(shouldSelect)
+      } else {
+        row.toggleSelected(false)
       }
-      row.toggleSelected(false)
     })
   }, [selectedRows, table])
 

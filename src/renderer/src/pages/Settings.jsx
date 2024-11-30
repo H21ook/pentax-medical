@@ -6,6 +6,7 @@ import WorkerSettings from '../components/settings/WorkerSettings'
 import ProfileSettings from '../components/settings/ProfileSettings'
 import { useRouter } from '../context/page-router'
 import AddressSettings from '../components/settings/AddressSettings'
+import DataSettings from '../components/settings/DataSettings'
 
 const Settings = () => {
   const { params } = useRouter()
@@ -38,7 +39,8 @@ const Settings = () => {
     },
     {
       key: 'data-store',
-      name: 'Дата хадгалалт'
+      name: 'Дата, хадгалалт',
+      tab: <DataSettings />
     }
   ]
 

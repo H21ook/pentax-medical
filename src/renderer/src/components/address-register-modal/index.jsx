@@ -150,15 +150,12 @@ const AddressRegisterModal = ({
                         <SelectTrigger>
                           <SelectValue placeholder="Хот/аймаг" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {parentAddress.map((item) => {
-                            return (
-                              <SelectItem key={item.id} value={item.id}>
-                                {item.name}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectContent>
+                        <SelectContent
+                          data={parentAddress?.map((item) => ({
+                            value: item?.id,
+                            label: item?.name
+                          }))}
+                        />
                       </Select>
                       {error && <p className="text-sm text-destructive">{error.message}</p>}
                     </div>

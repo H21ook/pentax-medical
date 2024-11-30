@@ -7,58 +7,11 @@ import { useNewData } from '../../../context/new-data-context'
 import { toast } from 'sonner'
 import { RxArrowLeft, RxReload } from 'react-icons/rx'
 import { Button } from '../../ui/Button'
+import lowerImage from '../../../assets/lower.png'
+import upperImage from '../../../assets/upper.png'
 import ImagesComponent from './ImagesComponent'
-
-const defaultSlotsData = [
-  {
-    orderIndex: 1,
-    name: 'Image 1'
-  },
-  {
-    orderIndex: 2,
-    name: 'Image 2'
-  },
-  {
-    orderIndex: 3,
-    name: 'Image 3'
-  },
-  {
-    orderIndex: 4,
-    name: 'Image 4'
-  },
-  {
-    orderIndex: 5,
-    name: 'Image 5'
-  },
-  {
-    orderIndex: 6,
-    name: 'Image 6'
-  },
-  {
-    orderIndex: 7,
-    name: 'Image 7'
-  },
-  {
-    orderIndex: 8,
-    name: 'Image 8'
-  },
-  {
-    orderIndex: 9,
-    name: 'Image 9'
-  },
-  {
-    orderIndex: 10,
-    name: 'Image 10'
-  },
-  {
-    orderIndex: 11,
-    name: 'Image 11'
-  },
-  {
-    orderIndex: 12,
-    name: 'Image 12'
-  }
-]
+import { v4 as uuidv4 } from 'uuid'
+import { defaultLowerSlotsData, defaultUpperSlotsData } from '../../../lib/staticData'
 
 const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => {
   return (
@@ -95,11 +48,18 @@ const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => 
   )
 }
 
-const MediaInformation = ({ prevStep = () => {} }) => {
+const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   const { changeNewData, newData } = useNewData()
-  const slots = (newData?.tempImages || defaultSlotsData).sort(
-    (a, b) => a.orderIndex - b.orderIndex
-  )
+  let ti = newData?.tempImages
+  if (ti && ti.length > 0) {
+    if (ti[0].type !== type) {
+      ti = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+    }
+  } else {
+    ti = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+  }
+
+  const slots = ti?.sort((a, b) => a.orderIndex - b.orderIndex)
 
   const onEnd = (filePath) => {
     changeNewData({
@@ -183,27 +143,9 @@ const MediaInformation = ({ prevStep = () => {} }) => {
   const selectedType = newData?.sourceType
 
   return (
-    <div>
-      <div className="mb-4 flex gap-4 justify-between">
-        <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
-          <RxReload className="me-2" />
-          Шинээр эхлэх
-        </Button>
-        <div className="flex gap-4">
-          <Button variant="secondary" onClick={prevStep}>
-            <RxArrowLeft className="me-2" />
-            Буцах
-          </Button>
-          <Button
-            disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
-            onClick={prevStep}
-          >
-            Хадгалах
-          </Button>
-        </div>
-      </div>
-      <form className="w-full flex gap-4 items-start">
-        <div className="w-[70%] lg:w-[40%]">
+    <div className="mb-14">
+      <form className="w-full flex gap-0 lg:gap-8 items-center mb-8">
+        <div className="w-[60%] lg:w-[40%]">
           <div className="relative bg-black w-full">
             {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
               <ChooseVideoSrcType
@@ -230,6 +172,7 @@ const MediaInformation = ({ prevStep = () => {} }) => {
             )}
             {!videoPath && selectedType === 'record' && (
               <VideoRecorder
+                key={uuidv4()}
                 onEnd={onEnd}
                 back={() => {
                   changeNewData({
@@ -240,13 +183,40 @@ const MediaInformation = ({ prevStep = () => {} }) => {
             )}
           </div>
         </div>
-        <ImagesComponent
-          images={slots}
-          removeItem={removeItem}
-          updateItem={updateItem}
-          swapItems={swapItems}
-        />
+        <div className="flex-1 lg:flex-auto lg:w-[00px] select-none pointer-events-none">
+          <img
+            src={type === 'upper' ? upperImage : lowerImage}
+            className="w-full lg:w-[500px] object-contain"
+          />
+        </div>
       </form>
+      <ImagesComponent
+        images={slots}
+        removeItem={removeItem}
+        updateItem={updateItem}
+        swapItems={swapItems}
+      />
+      <div className="flex gap-4 justify-between fixed left-0 right-0 bottom-[53px] z-10 bg-background p-4">
+        <div className="flex gap-4">
+          <Button variant="secondary" onClick={prevStep}>
+            <RxArrowLeft className="me-2" />
+            Буцах
+          </Button>
+          <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
+            <RxReload className="me-2" />
+            Шинээр эхлэх
+          </Button>
+        </div>
+
+        <div className="flex gap-4">
+          <Button
+            disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
+            onClick={prevStep}
+          >
+            Хадгалах
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

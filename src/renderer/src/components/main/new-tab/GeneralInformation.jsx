@@ -38,7 +38,13 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   }, [allAddressData, cityId])
 
   useEffect(() => {
-    localStorage.setItem('newData', JSON.stringify(watchFields))
+    localStorage.setItem(
+      'newData',
+      JSON.stringify({
+        ...newData,
+        ...watchFields
+      })
+    )
   }, [watchFields])
 
   const onSubmit = async (values) => {
@@ -368,6 +374,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                       Эм
                     </Label>
                   </div>
+                  <div className="flex items-center">
+                    <RadioGroupItem value="other" id="other" />
+                    <Label htmlFor="other" className="px-2">
+                      Бусад
+                    </Label>
+                  </div>
                 </RadioGroup>
               </div>
             )
@@ -490,15 +502,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Хот/Аймаг сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {parentAddress.map((item) => {
-                      return (
-                        <SelectItem key={`cityAddress_${item.id}`} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
+                  <SelectContent
+                    data={parentAddress?.map((item) => ({
+                      value: item?.id,
+                      label: item?.name
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
@@ -527,15 +536,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Дүүрэг/Сум сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {subAddress.map((item) => {
-                      return (
-                        <SelectItem key={`districtAddress_${item.id}`} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
+                  <SelectContent
+                    data={subAddress?.map((item) => ({
+                      value: item?.id,
+                      label: item?.name
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
@@ -570,6 +576,42 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
       <Separator />
       <div>
         <h3 className="text-lg font-medium">Үзлэгийн мэдээлэл</h3>
+      </div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Controller
+          control={control}
+          name={'type'}
+          key={'type'}
+          rules={{
+            required: 'Үзлэгийн төрөл сонгоно уу'
+          }}
+          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+            return (
+              <div className="flex flex-col gap-1 items-start">
+                <Label htmlFor={name} className="pb-1">
+                  Үзлэгийн төрөл <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  id={name}
+                  name={name}
+                  value={value}
+                  onValueChange={(e) => {
+                    onChange(e)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Үзлэгийн төрөл сонгох" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="upper">Upper Gi</SelectItem>
+                    <SelectItem value="lower">Lower Gi</SelectItem>
+                  </SelectContent>
+                </Select>
+                {error && <p className="text-sm text-destructive">{error.message}</p>}
+              </div>
+            )
+          }}
+        />
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Controller
@@ -652,15 +694,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Эмч сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {doctors.map((item) => {
-                      return (
-                        <SelectItem key={`doctor_${item.id}`} value={item.id}>
-                          {item.displayName}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
+                  <SelectContent
+                    data={doctors?.map((item) => ({
+                      value: item?.id,
+                      label: item?.displayName
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
@@ -689,15 +728,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Сувилагч сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {nurses.map((item) => {
-                      return (
-                        <SelectItem key={`nurse_${item.id}`} value={item.id}>
-                          {item.displayName}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
+                  <SelectContent
+                    data={nurses?.map((item) => ({
+                      value: item?.id,
+                      label: item?.displayName
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
