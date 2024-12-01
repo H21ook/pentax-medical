@@ -144,6 +144,33 @@ const getEmployeeImagesList = () => {
   return employees
 }
 
+const getEmployee = (id) => {
+  const query = db.prepare(`
+        SELECT * FROM employee where id = @id
+    `)
+
+  const employee = query.get({
+    id
+  })
+
+  if (!employee) {
+    return undefined
+  }
+
+  const query2 = db.prepare(`
+        SELECT * FROM employeeImages WHERE employeeId = @employeeId
+    `)
+
+  const images = query2.all({
+    employeeId: id
+  })
+
+  return {
+    ...employee,
+    images: images
+  }
+}
+
 ipcMain.handle('employee:create', (_, { data, images, token }) => {
   return createEmployee(data, images, token)
 })
@@ -154,4 +181,8 @@ ipcMain.handle('employee:employeeList', () => {
 
 ipcMain.handle('employee:employeeImages', () => {
   return getEmployeeImagesList()
+})
+
+ipcMain.handle('employee:getEmployee', (_, id) => {
+  return getEmployee(id)
 })

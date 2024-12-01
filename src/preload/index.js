@@ -10,9 +10,10 @@ import {
   saveImageFile,
   saveVideoFile,
   removeTempFiles,
-  removeImageFile
+  removeImageFile,
+  openFolder
 } from './routes/file'
-import { createEmployee, getEmployeeList } from './routes/employee'
+import { createEmployee, getEmployee, getEmployeeList } from './routes/employee'
 import { getDataConfig } from './routes/dataConfig'
 
 // Custom APIs for renderer
@@ -42,10 +43,12 @@ const api = {
   saveImageFile,
   removeTempFiles,
   removeImageFile,
+  openFolder,
 
   //EMPLOYEE
   createEmployee,
   getEmployeeList,
+  getEmployee,
 
   //DATA-CONFIG
   getDataConfig

@@ -25,6 +25,8 @@ const Footer = () => {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('newData')
+    localStorage.removeItem('tabs')
     router.restart()
   }
 

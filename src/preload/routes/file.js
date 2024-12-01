@@ -19,3 +19,7 @@ export const removeTempFiles = (uuid) => {
 export const removeImageFile = (path) => {
   return ipcRenderer.invoke('file:removeImageFile', path)
 }
+
+export const openFolder = (path) => {
+  return ipcRenderer.invoke('file:openFolder', path)
+}

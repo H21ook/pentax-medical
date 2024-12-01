@@ -166,17 +166,6 @@ const MainPage = () => {
       }
     },
     {
-      accessorKey: 'folderPath',
-      header: 'Файлын байршил',
-      cell: ({ row }) => {
-        return (
-          <div className="text-start truncate whitespace-nowrap hover:underline hover:underline-offset-2 cursor-pointer">
-            {row.getValue('folderPath')}
-          </div>
-        )
-      }
-    },
-    {
       accessorKey: 'type',
       header: 'Үзлэгийн төрөл',
       cell: ({ row }) => {
@@ -193,6 +182,23 @@ const MainPage = () => {
       header: 'Үзлэг огноо',
       cell: ({ row }) => {
         return <div className="text-start line-clamp-1 min-w-[140px]">{row.getValue('date')}</div>
+      }
+    },
+    {
+      accessorKey: 'folderPath',
+      header: 'Файлын байршил',
+      cell: ({ row }) => {
+        const folderPath = row.getValue('folderPath')
+        return (
+          <div
+            className="text-start truncate whitespace-nowrap hover:underline hover:underline-offset-2 cursor-pointer"
+            onClick={async () => {
+              await window.api.openFolder(folderPath)
+            }}
+          >
+            {folderPath}
+          </div>
+        )
       }
     }
   ]

@@ -4,7 +4,7 @@ import fs from 'fs'
 import os from 'os'
 import { getDataConfig } from './system'
 import { log } from '../config/log'
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import ffmpegPath from 'ffmpeg-static'
 
 export const createTempFolder = (uuid) => {
@@ -237,3 +237,10 @@ export const moveVideoFileToFolder = async (filePath, destinationFolder) => {
     }
   }
 }
+
+ipcMain.handle('file:openFolder', (event, folderPath) => {
+  if (folderPath) {
+    // Use spawn to open the image with the default viewer
+    spawn('explorer', [folderPath])
+  }
+})

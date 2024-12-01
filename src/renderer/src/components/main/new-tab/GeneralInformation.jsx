@@ -141,35 +141,6 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
-
-        <Controller
-          control={control}
-          name={'date'}
-          key={'date'}
-          rules={{
-            required: 'Үзлэгийн огноо оруулна уу'
-          }}
-          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
-            return (
-              <div className="flex flex-col items-start gap-1">
-                <Label htmlFor={name} className="pb-1">
-                  Үзлэгийн огноо <span className="text-red-500">*</span>
-                </Label>
-                <DatePicker
-                  id={name}
-                  value={value}
-                  className="w-full"
-                  placeholder="Үзлэгийн огноо сонгох"
-                  hideIcon
-                  onChange={(e) => {
-                    onChange(e)
-                  }}
-                />
-                {error && <p className="text-sm text-destructive">{error.message}</p>}
-              </div>
-            )
-          }}
-        />
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Controller
@@ -607,6 +578,34 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                     <SelectItem value="lower">Lower Gi</SelectItem>
                   </SelectContent>
                 </Select>
+                {error && <p className="text-sm text-destructive">{error.message}</p>}
+              </div>
+            )
+          }}
+        />
+        <Controller
+          control={control}
+          name={'date'}
+          key={'date'}
+          rules={{
+            required: 'Үзлэгийн огноо оруулна уу'
+          }}
+          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+            return (
+              <div className="flex flex-col items-start gap-1">
+                <Label htmlFor={name} className="pb-1">
+                  Үзлэгийн огноо <span className="text-red-500">*</span>
+                </Label>
+                <DatePicker
+                  id={name}
+                  value={value}
+                  className="w-full"
+                  placeholder="Үзлэгийн огноо сонгох"
+                  hideIcon
+                  onChange={(e) => {
+                    onChange(e)
+                  }}
+                />
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
             )

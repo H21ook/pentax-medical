@@ -19,6 +19,10 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   useEffect(() => {
     window.electron.ipcRenderer.on('init-page', (_e, data) => {
       setCurrentPageKey(data?.pageKey)
+      if (data?.pageKey === 'login') {
+        localStorage.removeItem('newData')
+        localStorage.removeItem('tabs')
+      }
       setLoading(false)
     })
     return () => {
