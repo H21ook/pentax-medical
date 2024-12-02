@@ -23,3 +23,8 @@ export const removeImageFile = (path) => {
 export const openFolder = (path) => {
   return ipcRenderer.invoke('file:openFolder', path)
 }
+
+export const print = (data) => {
+  ipcRenderer.send('print-pdf', data)
+  return true
+}

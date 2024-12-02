@@ -11,7 +11,8 @@ import {
   saveVideoFile,
   removeTempFiles,
   removeImageFile,
-  openFolder
+  openFolder,
+  print
 } from './routes/file'
 import { createEmployee, getEmployee, getEmployeeList } from './routes/employee'
 import { getDataConfig } from './routes/dataConfig'
@@ -51,7 +52,8 @@ const api = {
   getEmployee,
 
   //DATA-CONFIG
-  getDataConfig
+  getDataConfig,
+  print
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

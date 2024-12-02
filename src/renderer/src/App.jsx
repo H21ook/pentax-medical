@@ -11,8 +11,9 @@ import MainPage from './pages/Main'
 import RootConfig from './pages/RootConfig'
 import Login from './pages/Login'
 import Settings from './pages/Settings'
+import PrintPage from './components/main/PrintPage'
 
-function App() {
+function App({ pageKey = 'loader' }) {
   return (
     <div className="h-screen w-full">
       <AuthProvider>
@@ -21,7 +22,7 @@ function App() {
             <AddressProvider>
               <NewDataProvider>
                 <PageRouterProvider
-                  defaultPageKey="loader"
+                  defaultPageKey={pageKey}
                   routes={[
                     {
                       key: 'loader',
@@ -46,6 +47,10 @@ function App() {
                     {
                       key: 'settings',
                       page: <Settings />
+                    },
+                    {
+                      key: 'report',
+                      page: <PrintPage />
                     }
                   ]}
                 />

@@ -1,0 +1,59 @@
+.paper {
+  border: 1px solid black;
+  margin: 2cm;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  font-weight: bold;
+}
+
+.gridWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.subGrid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  font-size: 14px;
+}
+
+.imageWrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.imageWrapper img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.imageContainer {
+  border: 1px solid black;
+}
+
+.imageTitleWrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.imageNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  width: 24px;
+  background-color: red;
+}
+
+.image {
+  object-fit: contain;
+}
