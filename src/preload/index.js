@@ -1,7 +1,15 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { checkToken, login, registerAndLogin, registerUser } from './routes/auth'
-import { getAllUsers, getProfile, updateProfile } from './routes/users'
+import {
+  blockUser,
+  changePassword,
+  changeUserPassword,
+  getAllUsers,
+  getProfile,
+  updateProfile,
+  updateUser
+} from './routes/users'
 import { saveDataDirectory } from './routes/system'
 import { createHospitalData, getHospitalData, updateHospitalData } from './routes/hospital'
 import { deleteAddress, getAllAddress, saveAddress } from './routes/address'
@@ -28,7 +36,11 @@ const api = {
   updateProfile,
   // USERS
   getAllUsers,
+  updateUser,
   saveDataDirectory,
+  changePassword,
+  changeUserPassword,
+  blockUser,
   // HOSPITAL
   createHospitalData,
   getHospitalData,

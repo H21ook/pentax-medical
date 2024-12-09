@@ -12,14 +12,19 @@ import DetailTab from '../components/main/DetailTab'
 import { useNewData } from '../context/new-data-context'
 import { useUsers } from '../context/users-context'
 import { useAddress } from '../context/address-context'
+import { useState } from 'react'
 
 const PatiantsTableHeader = ({ table, actions }) => {
-  const { parentAddress } = useAddress()
+  const { parentAddress, allAddressData } = useAddress()
+  const [selectedParentAddres, setSelecetedParentAddress] = useState()
   const isFiltered = table.getState().columnFilters.length > 0
 
   const clearFilters = () => {
     table.resetColumnFilters()
   }
+
+  const childAddressData =
+    allAddressData?.filter((item) => item.parentId === Number(selectedParentAddres || 0)) || []
 
   return (
     <div className="flex items-start justify-between">
@@ -37,6 +42,12 @@ const PatiantsTableHeader = ({ table, actions }) => {
           className="h-8 max-w-[200px]"
         />
         <Input
+          placeholder="Регистрийн дугаар"
+          value={table.getColumn('regNo')?.getFilterValue() ?? ''}
+          onChange={(event) => table.getColumn('regNo')?.setFilterValue(event.target.value)}
+          className="h-8 max-w-[200px]"
+        />
+        <Input
           placeholder="Төрсөн огноо"
           value={table.getColumn('birthDate')?.getFilterValue() ?? ''}
           onChange={(event) => table.getColumn('birthDate')?.setFilterValue(event.target.value)}
@@ -47,6 +58,7 @@ const PatiantsTableHeader = ({ table, actions }) => {
           name={name}
           value={table.getColumn('cityId')?.getFilterValue() ?? ''}
           onValueChange={(value) => {
+            setSelecetedParentAddress(value)
             table.getColumn('cityId')?.setFilterValue(value)
           }}
         >
@@ -55,7 +67,25 @@ const PatiantsTableHeader = ({ table, actions }) => {
           </SelectTrigger>
           <SelectContent
             data={parentAddress?.map((item) => ({
-              value: item?.id,
+              value: `${item?.id}`,
+              label: item?.name
+            }))}
+          />
+        </Select>
+        <Select
+          id={name}
+          name={name}
+          value={table.getColumn('districtId')?.getFilterValue() ?? ''}
+          onValueChange={(value) => {
+            table.getColumn('districtId')?.setFilterValue(value)
+          }}
+        >
+          <SelectTrigger className="h-8 max-w-[200px]">
+            <SelectValue placeholder="Дүүрэг/Сум" />
+          </SelectTrigger>
+          <SelectContent
+            data={childAddressData?.map((item) => ({
+              value: `${item?.id}`,
               label: item?.name
             }))}
           />
@@ -70,7 +100,23 @@ const PatiantsTableHeader = ({ table, actions }) => {
 
       <div className="flex items-center gap-2">
         {actions}
-        <ColumnVisible table={table} />
+        <ColumnVisible
+          table={table}
+          columnNameData={[
+            { name: 'ID', id: 'id' },
+            { name: 'Овог', id: 'firstName' },
+            { name: 'Нэр', id: 'lastName' },
+            { name: 'РД', id: 'regNo' },
+            { name: 'Төрсөн огноо', id: 'birthDate' },
+            { name: 'Хүйс', id: 'gender' },
+            { name: 'Хот/Аймаг', id: 'cityId' },
+            { name: 'Дүүрэг/Сум', id: 'districtId' },
+            { name: 'Утасны дугаар', id: 'phoneNumber' },
+            { name: 'Үзлэгийн төрөл', id: 'type' },
+            { name: 'Үзлэг огноо', id: 'date' },
+            { name: 'Файлын байршил', id: 'folderPath' }
+          ]}
+        />
       </div>
     </div>
   )

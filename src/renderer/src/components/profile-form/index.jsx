@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../ui/Button'
 import { useAuth } from '../../context/auth-context'
 
-const ProfileForm = () => {
+const ProfileForm = ({ openPasswordModal = () => {} }) => {
   const { user, token, getUserData } = useAuth()
 
   const {
@@ -238,7 +238,10 @@ const ProfileForm = () => {
         }}
       /> */}
 
-      <div className="col-span-2 flex justify-end">
+      <div className="col-span-2 flex justify-end gap-4">
+        <Button variant="secondary" onClick={openPasswordModal}>
+          Нууц үг солих
+        </Button>
         <Button type="submit" disabled={!isDirty}>
           Хадгалах
         </Button>

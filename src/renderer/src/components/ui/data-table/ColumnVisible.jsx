@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger
 } from '../Dropdown'
 
-const ColumnVisible = ({ table }) => {
+const ColumnVisible = ({ table, columnNameData = [] }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,6 +20,7 @@ const ColumnVisible = ({ table }) => {
           .getAllColumns()
           .filter((column) => column.getCanHide())
           .map((column) => {
+            const colNameData = columnNameData?.find((item) => item.id === column.id)
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
@@ -27,7 +28,7 @@ const ColumnVisible = ({ table }) => {
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {colNameData?.name || column.id}
               </DropdownMenuCheckboxItem>
             )
           })}

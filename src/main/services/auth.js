@@ -15,6 +15,13 @@ export const login = async ({ username, password }) => {
     }
   }
 
+  if (result.isBlock === 1) {
+    return {
+      result: false,
+      message: 'Таны эрх блоклогдсон байна. Админд хандана уу.'
+    }
+  }
+
   const { password: userPassword, ...other } = result
   const isMatch = await comparePassword(userPassword, password)
   if (!isMatch) {
