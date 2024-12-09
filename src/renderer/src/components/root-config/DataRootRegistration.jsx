@@ -30,7 +30,7 @@ const DataRootRegistration = () => {
 
   const onSubmit = async ({ path }) => {
     const token = localStorage.getItem('token')
-    const res = await window.api.saveDataDirectory({ path, token })
+    const res = await window.api.saveDataDirectory({ path }, token)
     if (!res.result) {
       toast.error('Амжилтгүй', {
         action: {

@@ -40,7 +40,8 @@ const HospitalProvider = ({ children }) => {
       value={{
         hospitalData: data,
         dataConfig,
-        getHospitalData
+        getHospitalData,
+        loadDataConfig
       }}
     >
       {children}

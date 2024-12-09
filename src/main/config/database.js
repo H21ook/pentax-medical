@@ -146,6 +146,7 @@ export const initTables = (isForce) => {
     CREATE TABLE IF NOT EXISTS data_config (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         directory TEXT NOT NULL,
+        device TEXT,
         status TEXT UNIQUE NOT NULL,
         createdAt TEXT NOT NULL,
         createdUserId INTEGER NOT NULL,
@@ -176,6 +177,13 @@ export const initTables = (isForce) => {
           ('2024120901', 'Ehnii migrate', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
   `)
 
+  // 2024120902
+  db.exec(`INSERT INTO
+        data_migrate (key, description, createdAt, executedAt)
+      VALUES
+          ('2024120902', 'data_config table-d device bagana nemew', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
+  `)
+
   const stmt = db.prepare('SELECT * FROM data_migrate WHERE executed = ?')
   const migrations = stmt.all(0)
 
@@ -185,6 +193,15 @@ export const initTables = (isForce) => {
     db.exec(`
       ALTER TABLE users ADD COLUMN isBlock NUMBER DEFAULT 0;
       UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_01.key}'
+  `)
+  }
+
+  const migrate_02 = migrations.find((m) => m.key === '2024120902')
+
+  if (migrate_02) {
+    db.exec(`
+      ALTER TABLE data_config ADD COLUMN device TEXT;
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_02.key}'
   `)
   }
 }

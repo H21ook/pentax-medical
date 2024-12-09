@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
 
-export const saveDataDirectory = async (data) => {
-  return await ipcRenderer.invoke('system:saveDataDirectory', data)
+export const saveDataDirectory = async (data, token) => {
+  return await ipcRenderer.invoke('system:saveDataDirectory', { data, token })
 }

@@ -3,9 +3,11 @@ import { Button } from '../ui/Button'
 import { useEffect, useRef, useState } from 'react'
 import { Buffer } from 'buffer'
 import { useNewData } from '../../context/new-data-context'
+import { useHospital } from '../../context/hospital-context'
 
 const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
   const { newData } = useNewData()
+  const { dataConfig } = useHospital()
   const videoRef = useRef(null)
   const [mediaRecorder, setMediaRecorder] = useState(null)
   const chunks = useRef([])
@@ -20,7 +22,9 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
         const devices = await navigator.mediaDevices.enumerateDevices()
         const videoDevices = devices.filter((d) => d.kind === 'videoinput')
         if (videoDevices.length > 0) {
-          const currentDevice = videoDevices[0]
+          const currentDevice = dataConfig?.device
+            ? videoDevices.find((v) => v.deviceId === dataConfig?.device)
+            : videoDevices[0]
           setSelectedDevice(currentDevice)
           const newStream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -62,7 +66,7 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
         mediaRecorder.stop() // Stops the recorder if running
       }
     }
-  }, [])
+  }, [dataConfig])
 
   const startRecording = async () => {
     if (mediaRecorder && mediaRecorder.state === 'inactive') {

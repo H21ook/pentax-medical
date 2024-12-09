@@ -20,7 +20,7 @@ export const getDataConfig = () => {
   }
 }
 
-ipcMain.handle('system:saveDataDirectory', (_, { path, token }) => {
+ipcMain.handle('system:saveDataDirectory', (_, { data, token }) => {
   try {
     const user = verifyToken(token)
 
@@ -34,11 +34,12 @@ ipcMain.handle('system:saveDataDirectory', (_, { path, token }) => {
     const configData = getDataConfig()
 
     const stmt = db.prepare(
-      'UPDATE data_config SET directory = @directory, status = @status, updatedAt = @updatedAt, updatedUserId = @updatedUserId WHERE id = @id'
+      'UPDATE data_config SET directory = @directory, device = @device, status = @status, updatedAt = @updatedAt, updatedUserId = @updatedUserId WHERE id = @id'
     )
 
     stmt.run({
-      directory: path,
+      directory: data?.path,
+      device: data?.device,
       status: 'runing',
       updatedAt: new Date().toISOString(),
       updatedUserId: user.id,
