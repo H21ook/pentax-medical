@@ -12,7 +12,7 @@ const PrintPage = React.forwardRef(
           <div className={`gridWrapper ${styles.gridWrapper}`}>
             <div>
               <div className={`subGrid ${styles.subGrid}`}>
-                <div>Эмнэлгийн 123 нэр</div>
+                <div>Эмнэлгийн нэр</div>
                 <b>{employeeData?.hospitalName}</b>
 
                 <div>Тасгийн нэр</div>
