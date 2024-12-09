@@ -1,7 +1,7 @@
 {
   "name": "pentax",
-  "version": "1.0.1",
-  "description": "An Electron application with React",
+  "version": "1.0.2",
+  "description": "Pentax эмнэлгийн дурангийн програм",
   "main": "./out/main/index.js",
   "author": "khishigbayar.u@gmail.com",
   "homepage": "https://electron-vite.org",
