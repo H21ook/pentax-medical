@@ -53,6 +53,7 @@ export const initTables = (isForce) => {
         role TEXT NOT NULL,
         position TEXT NOT NULL,
         type TEXT,
+        isBlock INTEGER NOT NULL DEFAULT 0,
         createdAt TEXT NOT NULL,
         password TEXT NOT NULL
     );
@@ -156,6 +157,36 @@ export const initTables = (isForce) => {
       VALUES
           ('${folderPath}', 'init', '${nowDate}', ${systemUserId}, '${nowDate}', ${systemUserId}) ON CONFLICT (status) DO NOTHING;
   `)
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS data_migrate (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
+        description TEXT,
+        executed INTEGER NOT NULL DEFAULT 0,
+        createdAt TEXT NOT NULL,
+        executedAt TEXT NOT NULL
+    );
+  `)
+
+  // 2024120901
+  db.exec(`INSERT INTO
+        data_migrate (key, description, createdAt, executedAt)
+      VALUES
+          ('2024120901', 'Ehnii migrate', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
+  `)
+
+  const stmt = db.prepare('SELECT * FROM data_migrate WHERE executed = ?')
+  const migrations = stmt.all(0)
+
+  const migrate_01 = migrations.find((m) => m.key === '2024120901')
+
+  if (migrate_01) {
+    db.exec(`
+      ALTER TABLE users ADD COLUMN isBlock NUMBER DEFAULT 0;
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_01.key}'
+  `)
+  }
 }
 
 export default db
