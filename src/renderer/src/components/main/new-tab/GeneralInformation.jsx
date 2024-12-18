@@ -7,7 +7,7 @@ import { DatePicker } from '../../ui/date-picker'
 import { Button } from '../../ui/Button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select'
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group'
-import { TreeDatePicker } from '../../ui/tree-date-picker'
+// import { TreeDatePicker } from '../../ui/tree-date-picker'
 import { useAddress } from '../../../context/address-context'
 import { useEffect, useMemo, useState } from 'react'
 import { useNewData } from '../../../context/new-data-context'
@@ -16,6 +16,7 @@ import { useHospital } from '../../../context/hospital-context'
 import { BsCameraReelsFill } from 'react-icons/bs'
 import { useAuth } from '../../../context/auth-context'
 import { toast } from 'sonner'
+import Editor from '../../ui/Editor'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
   const { hospitalData } = useHospital()
@@ -145,33 +146,6 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Controller
           control={control}
-          name={'patientCondition'}
-          key={'patientCondition'}
-          rules={{
-            required: 'Өвчтөний байдал оруулна уу'
-          }}
-          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
-            return (
-              <div className="flex flex-col gap-1 items-start">
-                <Label htmlFor={name} className="pb-1">
-                  Өвчтөний байдал <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id={name}
-                  name={name}
-                  value={value}
-                  placeholder="Өвчтөний байдал"
-                  onChange={(e) => {
-                    onChange(e.target.value)
-                  }}
-                />
-                {error && <p className="text-sm text-destructive">{error.message}</p>}
-              </div>
-            )
-          }}
-        />
-        <Controller
-          control={control}
           name={'diseaseIndication'}
           key={'diseaseIndication'}
           rules={{
@@ -288,8 +262,34 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
-
         <Controller
+          control={control}
+          name={'regNo'}
+          key={'regNo'}
+          rules={{
+            required: 'Регистрийн дугаар оруулна уу'
+          }}
+          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+            return (
+              <div className="flex flex-col gap-1 items-start">
+                <Label htmlFor={name} className="pb-1">
+                  Регистрийн дугаар <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id={name}
+                  name={name}
+                  value={value}
+                  placeholder="Регистрийн дугаар"
+                  onChange={(e) => {
+                    onChange(e.target.value)
+                  }}
+                />
+                {error && <p className="text-sm text-destructive">{error.message}</p>}
+              </div>
+            )
+          }}
+        />
+        {/* <Controller
           control={control}
           name={'birthDate'}
           key={'birthDate'}
@@ -317,7 +317,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
               </div>
             )
           }}
-        />
+        /> */}
         <Controller
           control={control}
           name={'gender'}
@@ -356,30 +356,8 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
-        <Controller
-          control={control}
-          name={'regNo'}
-          key={'regNo'}
-          render={({ field: { value, onChange, name } }) => {
-            return (
-              <div className="flex flex-col gap-1 items-start">
-                <Label htmlFor={name} className="pb-1">
-                  Регистрийн дугаар
-                </Label>
-                <Input
-                  id={name}
-                  name={name}
-                  value={value}
-                  placeholder="Регистрийн дугаар"
-                  onChange={(e) => {
-                    onChange(e.target.value)
-                  }}
-                />
-              </div>
-            )
-          }}
-        />
-        <Controller
+
+        {/* <Controller
           control={control}
           name={'age'}
           key={'age'}
@@ -401,7 +379,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
               </div>
             )
           }}
-        />
+        /> */}
 
         <Controller
           control={control}
@@ -418,29 +396,6 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   name={name}
                   value={value}
                   placeholder="Утасны дугаар"
-                  onChange={(e) => {
-                    onChange(e.target.value)
-                  }}
-                />
-              </div>
-            )
-          }}
-        />
-        <Controller
-          control={control}
-          name={'profession'}
-          key={'profession'}
-          render={({ field: { value, onChange, name } }) => {
-            return (
-              <div className="flex flex-col gap-1 items-start">
-                <Label htmlFor={name} className="pb-1">
-                  Мэргэжил
-                </Label>
-                <Input
-                  id={name}
-                  name={name}
-                  value={value}
-                  placeholder="Мэргэжил"
                   onChange={(e) => {
                     onChange(e.target.value)
                   }}
@@ -599,6 +554,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                 <DatePicker
                   id={name}
                   value={value}
+                  format="yyyy-MM-dd HH:mm:ss"
                   className="w-full"
                   placeholder="Үзлэгийн огноо сонгох"
                   hideIcon
@@ -612,7 +568,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           }}
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Controller
           control={control}
           name={'diagnosis'}
@@ -630,7 +586,8 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   id={name}
                   name={name}
                   value={value}
-                  rows={3}
+                  className="resize-none"
+                  rows={5}
                   placeholder="Онош"
                   onChange={(e) => {
                     onChange(e.target.value)
@@ -641,6 +598,8 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
+      </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Controller
           control={control}
           name={'summary'}
@@ -648,22 +607,29 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           rules={{
             required: 'Дүгнэлт оруулна уу'
           }}
-          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+          render={({ field, fieldState: { error } }) => {
             return (
               <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
                   Дүгнэлт <span className="text-red-500">*</span>
                 </Label>
-                <Textarea
+
+                <Editor
+                  id={field.name}
+                  placeholder="Дүгнэлт"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                {/* <Textarea
                   id={name}
                   name={name}
                   value={value}
-                  rows={3}
                   placeholder="Дүгнэлт"
                   onChange={(e) => {
                     onChange(e.target.value)
                   }}
-                />
+                  rows={3}
+                /> */}
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
             )
@@ -709,14 +675,11 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           control={control}
           name={'nurseId'}
           key={'nurseId'}
-          rules={{
-            required: 'Сувилагч сонгоно уу'
-          }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
               <div className="flex flex-col gap-1 items-start">
                 <Label htmlFor={name} className="pb-1">
-                  Сувилагч <span className="text-red-500">*</span>
+                  Сувилагч
                 </Label>
                 <Select
                   id={name}

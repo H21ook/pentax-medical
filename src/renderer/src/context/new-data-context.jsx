@@ -20,18 +20,16 @@ const formDefaultValues = {
   hospitalName: '',
   departmentName: '',
   date: '',
-  patientCondition: '',
   diseaseIndication: '',
   anesthesia: '',
   // Patient
   firstName: '',
   lastName: '',
   regNo: '',
-  birthDate: '',
+  // birthDate: '',
   age: '',
   gender: 'male',
   phoneNumber: '',
-  profession: '',
   cityId: '',
   districtId: '',
   address: '',
@@ -55,7 +53,7 @@ const NewDataProvider = ({ children }) => {
     uuid: uuidv4(),
     hospitalName: hospitalData?.name,
     departmentName: hospitalData?.departmentName,
-    date: format(new Date(), 'yyyy-MM-dd')
+    date: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
   }
 
   if (newDataStorage) {
@@ -67,6 +65,7 @@ const NewDataProvider = ({ children }) => {
 
   const [newData, setNewData] = useState(storageNewData)
   const generalInformationForm = useForm({
+    mode: 'onChange',
     defaultValues: { ...formDefaultValues, ...storageNewData }
   })
 
@@ -90,6 +89,9 @@ const NewDataProvider = ({ children }) => {
       localStorage.setItem('tabs', JSON.stringify(temp))
       return temp
     })
+    if (selectedTab !== 0 && index <= selectedTab) {
+      setSelectedTab((prev) => prev - 1)
+    }
     if (tempTab.type === 'new') {
       try {
         await window.api.removeTempFiles(newData?.uuid)
@@ -102,12 +104,9 @@ const NewDataProvider = ({ children }) => {
         uuid: uuidv4(),
         hospitalName: hospitalData?.name,
         departmentName: hospitalData?.departmentName,
-        date: format(new Date(), 'yyyy-MM-dd')
+        date: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
       })
       localStorage.removeItem('newData')
-    }
-    if (selectedTab !== 0 && index <= selectedTab) {
-      setSelectedTab((prev) => prev - 1)
     }
   }
 

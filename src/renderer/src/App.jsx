@@ -1,4 +1,5 @@
 import { Toaster } from './components/ui/Toaster'
+import { Route, Routes, HashRouter } from 'react-router-dom'
 import AuthProvider from './context/auth-context'
 import UsersProvider from './context/users-context'
 import HospitalProvider from './context/hospital-context'
@@ -13,54 +14,78 @@ import Login from './pages/Login'
 import Settings from './pages/Settings'
 import PrintPage from './components/main/PrintPage'
 
-function App({ pageKey = 'loader' }) {
+function App() {
   return (
-    <div className="h-screen w-full">
-      <AuthProvider>
-        <UsersProvider>
-          <HospitalProvider>
-            <AddressProvider>
-              <NewDataProvider>
-                <PageRouterProvider
-                  defaultPageKey={pageKey}
-                  routes={[
-                    {
-                      key: 'loader',
-                      page: <LoaderPage />
-                    },
-                    {
-                      key: 'get-started',
-                      page: <GetStarted />
-                    },
-                    {
-                      key: 'main',
-                      page: <MainPage />
-                    },
-                    {
-                      key: 'root-config',
-                      page: <RootConfig />
-                    },
-                    {
-                      key: 'login',
-                      page: <Login />
-                    },
-                    {
-                      key: 'settings',
-                      page: <Settings />
-                    },
-                    {
-                      key: 'report',
-                      page: <PrintPage />
-                    }
-                  ]}
-                />
-              </NewDataProvider>
-            </AddressProvider>
-          </HospitalProvider>
-        </UsersProvider>
-      </AuthProvider>
-      <Toaster />
-    </div>
+    <HashRouter>
+      <Routes>
+        <Route
+          index
+          element={
+            <div className="h-screen w-full">
+              <AuthProvider>
+                <UsersProvider>
+                  <HospitalProvider>
+                    <AddressProvider>
+                      <NewDataProvider>
+                        <PageRouterProvider
+                          defaultPageKey={'loader'}
+                          routes={[
+                            {
+                              key: 'loader',
+                              page: <LoaderPage />
+                            },
+                            {
+                              key: 'get-started',
+                              page: <GetStarted />
+                            },
+                            {
+                              key: 'main',
+                              page: <MainPage />
+                            },
+                            {
+                              key: 'root-config',
+                              page: <RootConfig />
+                            },
+                            {
+                              key: 'login',
+                              page: <Login />
+                            },
+                            {
+                              key: 'settings',
+                              page: <Settings />
+                            }
+                          ]}
+                        />
+                      </NewDataProvider>
+                    </AddressProvider>
+                  </HospitalProvider>
+                </UsersProvider>
+              </AuthProvider>
+              <Toaster />
+            </div>
+          }
+        />
+        <Route
+          path="print"
+          element={
+            <div className="h-screen w-full">
+              <AuthProvider>
+                <UsersProvider>
+                  <HospitalProvider>
+                    <AddressProvider>
+                      <NewDataProvider>
+                        <PrintPage />
+                      </NewDataProvider>
+                    </AddressProvider>
+                  </HospitalProvider>
+                </UsersProvider>
+              </AuthProvider>
+              <Toaster />
+            </div>
+          }
+        />
+      </Routes>
+    </HashRouter>
   )
 }
 

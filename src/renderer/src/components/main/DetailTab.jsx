@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNewData } from '../../context/new-data-context'
 import { Separator } from '../ui/seperator'
 import { useAddress } from '../../context/address-context'
@@ -6,13 +6,11 @@ import { useUsers } from '../../context/users-context'
 import { Button } from '../ui/Button'
 import { RxArrowRight, RxEyeOpen } from 'react-icons/rx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/Dialog'
-import PrintPage from './PrintPage'
 
 const DetailTab = () => {
   const { tabs, selectedTab } = useNewData()
   const { parentAddress, allAddressData } = useAddress()
   const { users } = useUsers()
-  const ref = useRef()
   const selectedTabData = tabs[selectedTab]
   const [employeeData, setEmployeeData] = useState()
   const [showModal, setShowModal] = useState(false)
@@ -24,7 +22,7 @@ const DetailTab = () => {
   }, [])
 
   useEffect(() => {
-    getDetailEmployee(selectedTabData.id)
+    getDetailEmployee(selectedTabData?.id)
   }, [getDetailEmployee, selectedTabData])
 
   const employeeParentAddress = parentAddress?.find((item) => item.id === employeeData?.cityId)
@@ -34,12 +32,8 @@ const DetailTab = () => {
   const nurse = users.find((u) => u.id === employeeData?.nurseId)
 
   const handlePrint = async () => {
-    console.log(employeeData, ref.current.innerHTML)
-    await window.api.print({
-      html: ref.current.innerHTML,
-      uuid: employeeData?.uuid,
-      createdDate: employeeData?.createdAt
-    })
+    localStorage.setItem('printUser', selectedTabData?.id)
+    await window.api.printPdf()
   }
 
   return (
@@ -141,13 +135,17 @@ const DetailTab = () => {
               <b>{employeeData?.diagnosis}</b>
 
               <div>Дүгнэлт</div>
-              <b>{employeeData?.summary}</b>
+              <div
+                className="!text-sm"
+                dangerouslySetInnerHTML={{
+                  __html: employeeData?.summary
+                }}
+              />
             </div>
           </div>
 
           <div className="text-sm">
             <div className="flex gap-4 items-center justify-between">
-              <div>Файлууд</div>
               <Button
                 variant="secondary"
                 onClick={async () => {
@@ -156,6 +154,7 @@ const DetailTab = () => {
               >
                 <span className="me-2">Файлын хавтасруу очих</span> <RxArrowRight />
               </Button>
+              <Button onClick={handlePrint}>Тайлан хэвлэх</Button>
             </div>
             <div className="flex flex-wrap mt-4 gap-2">
               {employeeData?.images?.map((imageData) => {
@@ -202,7 +201,7 @@ const DetailTab = () => {
               }
             }}
           >
-            <DialogContent className="max-w-[800px] ">
+            <DialogContent className="max-w-[800px] max-h-[800px] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex gap-2">
                   <span className="font-bold leading-none text-white text-xs h-5 w-5 rounded-full bg-primary flex items-center justify-center">
@@ -220,18 +219,7 @@ const DetailTab = () => {
             </DialogContent>
           </Dialog>
         )}
-        <div className="invisible absolute -z-[10]">
-          <PrintPage
-            ref={ref}
-            employeeData={employeeData}
-            employeeParentAddress={employeeParentAddress}
-            employeeSubAddress={employeeSubAddress}
-            doctor={doctor}
-            nurse={nurse}
-          />
-        </div>
       </div>
-      <Button onClick={handlePrint}>Print</Button>
     </div>
   )
 }

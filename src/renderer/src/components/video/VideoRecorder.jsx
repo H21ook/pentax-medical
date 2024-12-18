@@ -25,19 +25,26 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
           const currentDevice = dataConfig?.device
             ? videoDevices.find((v) => v.deviceId === dataConfig?.device)
             : videoDevices[0]
+
+          console.log(currentDevice)
           setSelectedDevice(currentDevice)
-          const newStream = await navigator.mediaDevices.getUserMedia({
+          const constraints = {
             video: {
-              deviceId: { exact: currentDevice.deviceId }
-            }
-          })
+              deviceId: { exact: currentDevice.deviceId },
+              width: { ideal: 1920 }, // Ideal width (Full HD)
+              height: { ideal: 1080 }, // Ideal height (Full HD)
+              frameRate: { ideal: 30 } // Adjust frame rate for smoother video
+            },
+            audio: false
+          }
+          const newStream = await navigator.mediaDevices.getUserMedia(constraints)
 
           if (videoRef.current) {
             videoRef.current.srcObject = newStream
           }
           stream.current = newStream
 
-          const recorder = new MediaRecorder(newStream)
+          const recorder = new MediaRecorder(newStream, { mimeType: 'video/webm;codecs=vp9' })
           setMediaRecorder(recorder)
         }
       } catch (err) {
@@ -96,12 +103,13 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
       mediaRecorder.onstop = async () => {
         const endTime = Date.now()
         const duration = (endTime - startTime) / 1000
-        const blob = new Blob(chunks.current, { type: 'video/webm; codecs=vp9' })
+        const blob = new Blob(chunks.current, { type: 'video/webm' })
         setStartTime(undefined)
 
         const arrayBuffer = await blob.arrayBuffer() // Convert Blob to ArrayBuffer
         const buffer = Buffer.from(arrayBuffer)
         const res = await window.api.saveVideoFile(buffer, newData.uuid)
+        console.log('rsave result ', res)
         if (res.result) {
           onEnd(res.data.path, duration)
         }

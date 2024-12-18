@@ -74,7 +74,8 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
   const tempDir = createTempFolder(uuid)
   const nowDate = Date.now()
   const filePath = join(tempDir, `recording-${nowDate}.webm`)
-  const fileMp4Path = join(tempDir, `recording-${nowDate}.mp4`)
+  // const fileMp4Path = join(tempDir, `recording-${nowDate}.mp4`)
+  const fileWebmPath = join(tempDir, `recording-${nowDate}-metadata.webm`)
 
   return new Promise((resolve) => {
     fs.writeFile(filePath, buffer, (err) => {
@@ -85,11 +86,12 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
           message: 'Файлыг хадгалахад алдаа гарлаа'
         })
       } else {
-        const command = `${ffmpegPath} -i "${filePath}" -c:v libx264 -c:a aac "${fileMp4Path}"`
+        // const command = `${ffmpegPath} -i "${filePath}" -c:v libx264 -c:a aac "${fileMp4Path}"`
+        const command = `${ffmpegPath} -i "${filePath}" -c:v copy -c:a copy -map_metadata 0 "${fileWebmPath}"`
 
         exec(command, (error) => {
           if (error) {
-            log.info(`Error convert to MP4: ${error.message}`)
+            log.info(`Error copy file metadata: ${error.message}`)
             return resolve({
               result: false,
               message: error?.message
@@ -107,7 +109,7 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
             resolve({
               result: true,
               data: {
-                path: fileMp4Path
+                path: fileWebmPath
               }
             })
           })
@@ -243,4 +245,43 @@ ipcMain.handle('file:openFolder', (event, folderPath) => {
     // Use spawn to open the image with the default viewer
     spawn('explorer', [folderPath])
   }
+})
+
+ipcMain.handle('file:testConvert', () => {
+  console.log('wert')
+  return new Promise((resolve) => {
+    const data = getDataConfig()
+    const filePath = join(data.directory, '/test/test3.webm')
+    const fileMp4Path = `${data.directory}/test3.mp4`
+    const fileWebmPath = `${data.directory}/test3.webm`
+
+    console.log(filePath, fileMp4Path)
+    const command = `${ffmpegPath} -i "${filePath}" -c:v copy -c:a copy -map_metadata 0 "${fileWebmPath}"`
+
+    exec(command, (error) => {
+      if (error) {
+        log.info(`Error convert to MP4: ${error.message}`)
+        return resolve({
+          result: false,
+          message: error?.message
+        })
+      }
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          log.info(`Error deleting file: ${err.message}`)
+          return resolve({
+            result: false,
+            message: err?.message
+          })
+        }
+        resolve({
+          result: true,
+          data: {
+            path: fileMp4Path
+          }
+        })
+      })
+    })
+  })
 })

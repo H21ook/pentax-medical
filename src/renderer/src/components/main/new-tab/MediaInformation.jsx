@@ -71,7 +71,7 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
     const latestSelectPath = localStorage.getItem('latestFilePath')
     const selectedFile = await window.electron.ipcRenderer.invoke('dialog:openFile', {
       path: latestSelectPath,
-      filters: [{ name: 'Videos', extensions: ['mp4', 'avi', 'mkv', 'mov'] }]
+      filters: [{ name: 'Videos', extensions: ['mp4', 'webm'] }]
     })
 
     localStorage.setItem('latestFilePath', selectedFile.folder)
@@ -97,6 +97,11 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
         description: res?.message || 'Алдаа гарлаа'
       })
     }
+  }
+
+  const testConvert = async () => {
+    const res = await window.api.testConvert()
+    console.log(res)
   }
 
   const resetVideo = async () => {
@@ -205,6 +210,10 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
           <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
             <RxReload className="me-2" />
             Шинээр эхлэх
+          </Button>
+          <Button variant="secondary" onClick={testConvert}>
+            <RxReload className="me-2" />
+            Test
           </Button>
         </div>
 

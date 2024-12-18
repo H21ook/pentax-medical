@@ -24,7 +24,17 @@ export const openFolder = (path) => {
   return ipcRenderer.invoke('file:openFolder', path)
 }
 
-export const print = (data) => {
-  ipcRenderer.send('print-pdf', data)
+export const printPdf = () => {
+  ipcRenderer.send('print-pdf')
   return true
+}
+
+export const print = (data) => {
+  ipcRenderer.send('print', data)
+  return true
+}
+
+export const testConvert = async () => {
+  console.log('wert ---- ')
+  return await ipcRenderer.invoke('file:testConvert')
 }

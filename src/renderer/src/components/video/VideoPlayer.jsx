@@ -19,6 +19,7 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
   const [currentTime, setCurrentTime] = useState(0)
   const [isEnded, setIsEnded] = useState(false)
 
+  console.log('src ', src)
   // Update current time as video plays
   const handleTimeUpdate = () => {
     setCurrentTime(videoRef.current.currentTime)
