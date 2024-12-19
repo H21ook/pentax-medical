@@ -24,9 +24,8 @@ export const openFolder = (path) => {
   return ipcRenderer.invoke('file:openFolder', path)
 }
 
-export const printPdf = () => {
-  ipcRenderer.send('print-pdf')
-  return true
+export const printPdf = (data) => {
+  return ipcRenderer.invoke('print-pdf', data)
 }
 
 export const print = (data) => {

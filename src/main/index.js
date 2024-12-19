@@ -15,6 +15,7 @@ import './services/employee'
 import { getDataDirectory } from './services/file'
 import { getDataConfig } from './services/system'
 import { format } from 'date-fns'
+import { exec } from 'child_process'
 
 function createWindow() {
   // Create the browser window.
@@ -161,64 +162,72 @@ app.whenReady().then(() => {
     }
   )
 
-  let printWindow = null
-  ipcMain.on('print-pdf', async () => {
-    printWindow = new BrowserWindow({
-      show: false,
-      webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
-        contextIsolation: true,
-        sandbox: false,
-        webSecurity: false,
-        enableRemoteModule: false
+  ipcMain.handle('print-pdf', (e, { createdDate, uuid }) => {
+    return new Promise((resolve) => {
+      try {
+        const printWindow = new BrowserWindow({
+          show: false,
+          webPreferences: {
+            preload: join(__dirname, '../preload/index.js'),
+            contextIsolation: true,
+            sandbox: false,
+            webSecurity: false,
+            enableRemoteModule: false
+          }
+        })
+
+        if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+          printWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/print`)
+        } else {
+          const indexPath = join(__dirname, '../renderer/index.html')
+          printWindow.loadURL(`file://${indexPath}#/print`)
+        }
+
+        printWindow.webContents.on('did-finish-load', async () => {
+          const dataConfig = getDataConfig()
+          const date = format(createdDate, 'yyyy-MM-dd')
+          const pdfPath = join(`${dataConfig.directory}/${date}/${uuid}`, 'report.pdf')
+
+          setTimeout(async () => {
+            const pdfData = await printWindow.webContents.printToPDF({
+              pageSize: 'A4',
+              printBackground: true
+            })
+
+            fs.writeFile(pdfPath, pdfData, async (err) => {
+              if (err) {
+                log.info('Failed to save PDF ', err)
+                printWindow.close()
+                resolve({
+                  result: false,
+                  message: 'Алдаа гарлаа'
+                })
+              } else {
+                console.log('PDF saved to:', pdfPath)
+                printWindow.close()
+                exec(`start "" "${pdfPath}"`, (error) => {
+                  if (error) {
+                    console.error('Error opening PDF:', error)
+                  }
+                })
+
+                resolve({
+                  result: true,
+                  data: pdfPath
+                })
+              }
+            })
+          }, 2000)
+        })
+      } catch (err) {
+        log.info('Print err ', err?.message)
+        resolve({
+          result: false,
+          message: 'Алдаа гарлаа'
+        })
+        return
       }
     })
-
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      printWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/print`)
-    } else {
-      const indexPath = join(__dirname, '../renderer/index.html')
-      printWindow.loadURL(`file://${indexPath}#/print`)
-    }
-  })
-
-  ipcMain.on('print', async (_, { createdDate, uuid }) => {
-    const dataConfig = getDataConfig()
-    const date = format(createdDate, 'yyyy-MM-dd')
-    const pdfPath = join(`${dataConfig.directory}/${date}/${uuid}`, 'report.pdf')
-
-    const pdfData = await printWindow.webContents.printToPDF({
-      pageSize: 'A4',
-      printBackground: true
-    })
-
-    fs.writeFile(pdfPath, pdfData, (err) => {
-      if (err) {
-        console.error('Failed to save PDF:', err)
-      } else {
-        console.log('PDF saved to:', pdfPath)
-      }
-      printWindow.close()
-    })
-
-    const printPdfWindow = new BrowserWindow({
-      width: 900,
-      height: 800,
-      center: true,
-      autoHideMenuBar: true,
-      resizable: false,
-      frame: true,
-      ...(process.platform === 'linux' ? { icon } : {}),
-      webPreferences: {
-        nodeIntegration: true
-      }
-    })
-
-    // Load the PDF file (replace with your file path)
-    printPdfWindow.loadURL(`file:///${pdfPath}`)
-
-    // Trigger printing
-    printPdfWindow.webContents.on('did-finish-load', () => {})
   })
 
   // renderer log

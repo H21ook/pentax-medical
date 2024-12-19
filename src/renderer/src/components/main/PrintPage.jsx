@@ -1,41 +1,23 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './index.module.css'
 import lowerImage from '../../assets/lower.png'
 import upperImage from '../../assets/upper.png'
-import { useAddress } from '../../context/address-context'
-import { useUsers } from '../../context/users-context'
 
 const PrintPage = () => {
-  const { parentAddress, allAddressData } = useAddress()
-  const { users } = useUsers()
-  const [employeeData, setEmployeeData] = useState()
-
-  const getDetailEmployee = useCallback(async (_id) => {
-    const res = await window.api.getEmployee(_id)
-    setEmployeeData(res)
-    window.api.print({
-      uuid: res?.uuid,
-      createdDate: res?.createdAt
-    })
-  }, [])
+  const [printData, setPrintData] = useState()
 
   useEffect(() => {
-    const printUserId = localStorage.getItem('printUser')
-    if (printUserId) {
-      getDetailEmployee(printUserId)
-    } else {
-      window.electron.ipcRenderer.send('close-print')
+    const printData = localStorage.getItem('printData')
+    if (printData) {
+      setPrintData(JSON.parse(printData))
     }
-    return () => {
-      window.electron.ipcRenderer.removeAllListeners('print-user')
-    }
-  }, [])
+  })
 
-  const employeeParentAddress = parentAddress?.find((item) => item.id === employeeData?.cityId)
-  const employeeSubAddress = allAddressData?.find((item) => item.id === employeeData?.districtId)
-
-  const doctor = users.find((u) => u.id === employeeData?.doctorId)
-  const nurse = users.find((u) => u.id === employeeData?.nurseId)
+  const employeeData = printData?.employeeData
+  const employeeParentAddress = printData?.employeeParentAddress
+  const employeeSubAddress = printData?.employeeSubAddress
+  const doctor = printData?.doctor
+  const nurse = printData?.nurse
 
   return (
     <div className="h-full overflow-y-auto">
@@ -137,7 +119,7 @@ const PrintPage = () => {
             />
             <div className={`information ${styles.information}`}>
               <p>Дүгнэлт:</p>
-              <div className={`summary ${styles.summary}`}>
+              <div className={`m-0 p-0 text-xs`}>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: employeeData?.summary

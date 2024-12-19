@@ -6,6 +6,7 @@ import { useUsers } from '../../context/users-context'
 import { Button } from '../ui/Button'
 import { RxArrowRight, RxEyeOpen } from 'react-icons/rx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/Dialog'
+import { toast } from 'sonner'
 
 const DetailTab = () => {
   const { tabs, selectedTab } = useNewData()
@@ -15,6 +16,7 @@ const DetailTab = () => {
   const [employeeData, setEmployeeData] = useState()
   const [showModal, setShowModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState()
+  const [loading, setLoading] = useState(false)
 
   const getDetailEmployee = useCallback(async (_id) => {
     const res = await window.api.getEmployee(_id)
@@ -32,8 +34,36 @@ const DetailTab = () => {
   const nurse = users.find((u) => u.id === employeeData?.nurseId)
 
   const handlePrint = async () => {
-    localStorage.setItem('printUser', selectedTabData?.id)
-    await window.api.printPdf()
+    setLoading(true)
+    localStorage.setItem(
+      'printData',
+      JSON.stringify({
+        employeeData,
+        employeeParentAddress,
+        employeeSubAddress,
+        doctor,
+        nurse
+      })
+    )
+    const res = await window.api.printPdf({
+      uuid: employeeData?.uuid,
+      createdDate: employeeData?.createdAt
+    })
+
+    console.log('response pdf ', res)
+    localStorage.removeItem('printData')
+    setLoading(false)
+    if (!res?.result) {
+      toast.error('Амжилтгүй', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: res?.message || 'Тайлан боловсруулахад алдаа гарлаа'
+      })
+    }
   }
 
   return (
@@ -154,7 +184,9 @@ const DetailTab = () => {
               >
                 <span className="me-2">Файлын хавтасруу очих</span> <RxArrowRight />
               </Button>
-              <Button onClick={handlePrint}>Тайлан хэвлэх</Button>
+              <Button onClick={handlePrint} disabled={loading}>
+                Тайлан хэвлэх
+              </Button>
             </div>
             <div className="flex flex-wrap mt-4 gap-2">
               {employeeData?.images?.map((imageData) => {

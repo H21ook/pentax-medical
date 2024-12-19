@@ -74,13 +74,13 @@ const createEmployee = async (employee, images, token) => {
     if (res.result) {
       const insert = db.prepare(`
         INSERT INTO employee (
-            uuid, hospitalName, departmentName, date, patientCondition, diseaseIndication, anesthesia,
-            firstName, lastName, birthDate, gender, cityId, districtId, regNo, age, phoneNumber,
-            profession, address, videoPath, type, diagnosis, summary, doctorId, nurseId, sourceType, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
+            uuid, hospitalName, departmentName, date, diseaseIndication, anesthesia,
+            firstName, lastName, gender, cityId, districtId, regNo, age, phoneNumber,
+            address, videoPath, type, diagnosis, summary, doctorId, nurseId, sourceType, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
         ) VALUES (
-            @uuid, @hospitalName, @departmentName, @date, @patientCondition, @diseaseIndication, @anesthesia,
-            @firstName, @lastName, @birthDate, @gender, @cityId, @districtId, @regNo, @age, @phoneNumber,
-            @profession, @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
+            @uuid, @hospitalName, @departmentName, @date, @diseaseIndication, @anesthesia,
+            @firstName, @lastName, @gender, @cityId, @districtId, @regNo, @age, @phoneNumber,
+            @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
         )
     `)
 
