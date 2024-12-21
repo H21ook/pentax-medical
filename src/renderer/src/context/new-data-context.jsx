@@ -33,7 +33,8 @@ const formDefaultValues = {
   cityId: '',
   districtId: '',
   address: '',
-  type: 'upper'
+  type: 'upper',
+  images: []
 }
 
 const NewDataProvider = ({ children }) => {
@@ -53,7 +54,8 @@ const NewDataProvider = ({ children }) => {
     uuid: uuidv4(),
     hospitalName: hospitalData?.name,
     departmentName: hospitalData?.departmentName,
-    date: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+    date: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+    images: []
   }
 
   if (newDataStorage) {

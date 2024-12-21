@@ -65,17 +65,8 @@ const PrintPage = () => {
               </div>
               <div>
                 <div className={`subGrid ${styles.subGrid}`}>
-                  <div>Эмнэлгийн нэр:</div>
-                  <div>{employeeData?.hospitalName}</div>
-
                   <div>Тасгийн нэр:</div>
                   <div>{employeeData?.departmentName}</div>
-
-                  <div>Заалт:</div>
-                  <div>{employeeData?.diseaseIndication}</div>
-
-                  <div>Мэдээ алдууулалт:</div>
-                  <div>{employeeData?.anesthesia}%</div>
 
                   <div>Үзлэгийн огноо:</div>
                   <div>{employeeData?.date}</div>
@@ -83,11 +74,21 @@ const PrintPage = () => {
                   <div>Үзлэгийн төрөл:</div>
                   <div>{employeeData?.type === 'lower' ? 'Lower Gi' : 'Upper Gi'}</div>
 
+                  <div>Заалт:</div>
+                  <div>{employeeData?.diseaseIndication}</div>
+
+                  <div>Мэдээ алдууулалт:</div>
+                  <div>{employeeData?.anesthesia}%</div>
+
                   <div>Эмч:</div>
                   <div>{doctor?.displayName}</div>
 
-                  <div>Сувилагч:</div>
-                  <div>{nurse?.displayName}</div>
+                  {nurse && (
+                    <>
+                      <div>Сувилагч:</div>
+                      <div>{nurse?.displayName}</div>
+                    </>
+                  )}
 
                   <div>Онош:</div>
                   <div>{employeeData?.diagnosis}</div>

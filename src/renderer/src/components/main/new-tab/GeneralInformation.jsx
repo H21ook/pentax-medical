@@ -49,21 +49,24 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   }, [watchFields])
 
   const onSubmit = async (values) => {
+    console.log(newData)
     if (
       !newData?.tempVideoPath ||
-      (newData?.tempImages && newData.tempImages?.some((item) => !item?.path))
+      !newData?.tempImages ||
+      newData?.tempImages?.filter((item) => item.path)?.length === 0
     ) {
       setError('Бичлэг, зураг бүрэн хийгдээгүй байна.')
       return
     }
-    const { sourceType, tempVideoPath, tempImages } = newData
+    const { sourceType, tempVideoPath, tempImages, images } = newData
     const res = await window.api.createEmployee({
       data: {
         ...values,
         videoPath: tempVideoPath,
         sourceType
       },
-      images: tempImages,
+      images,
+      tempImages,
       token
     })
 

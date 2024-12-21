@@ -8,6 +8,7 @@ import {
   createTempFolder,
   getDataDirectory,
   moveFilesToFolder,
+  moveImagesToFolder,
   moveVideoFileToFolder
 } from './file'
 
@@ -37,7 +38,7 @@ const prepareFolder = async (uuid) => {
   return userFolder
 }
 
-const createEmployeeImages = async ({ employeeId, uuid, images }) => {
+const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) => {
   const insert = db.prepare(`
         INSERT INTO employeeImages (
             uuid, employeeId, name, path, orderIndex, createdDate
@@ -47,7 +48,8 @@ const createEmployeeImages = async ({ employeeId, uuid, images }) => {
     `)
   const distFolder = await prepareFolder(uuid)
   const sourceFolder = createTempFolder(uuid)
-  const res = await moveFilesToFolder(images, distFolder, sourceFolder)
+  await moveImagesToFolder(images, distFolder)
+  const res = await moveFilesToFolder(tempImages, distFolder, sourceFolder)
   if (res.result) {
     res.files.map((imageData) => {
       const info = insert.run({
@@ -64,7 +66,7 @@ const createEmployeeImages = async ({ employeeId, uuid, images }) => {
   }
 }
 
-const createEmployee = async (employee, images, token) => {
+const createEmployee = async (employee, images, tempImages, token) => {
   try {
     const user = verifyToken(token)
 
@@ -99,7 +101,8 @@ const createEmployee = async (employee, images, token) => {
       createEmployeeImages({
         employeeId: newEmployeeId,
         uuid: employee.uuid,
-        images
+        images,
+        tempImages
       })
 
       return {
@@ -171,8 +174,8 @@ const getEmployee = (id) => {
   }
 }
 
-ipcMain.handle('employee:create', (_, { data, images, token }) => {
-  return createEmployee(data, images, token)
+ipcMain.handle('employee:create', (_, { data, images, tempImages, token }) => {
+  return createEmployee(data, images, tempImages, token)
 })
 
 ipcMain.handle('employee:employeeList', () => {

@@ -216,6 +216,43 @@ export const moveFilesToFolder = async (filesArray, destinationFolder, sourceFol
   }
 }
 
+export const moveImagesToFolder = async (filesArray, destinationFolder) => {
+  try {
+    // Ensure the destination folder exists
+    if (!fs.existsSync(destinationFolder)) {
+      fs.mkdirSync(destinationFolder, { recursive: true })
+    }
+
+    // Loop through each file in the array
+    const moveFilesRequest = []
+    const movedFiles = filesArray.map((item, index) => {
+      const { path: filePath } = item
+      const fileExtension = extname(filePath)
+      const destinationPath = join(destinationFolder, `${index + 1}${fileExtension}`)
+      moveFilesRequest.push(fs.promises.copyFile(filePath, destinationPath))
+      return {
+        ...item,
+        path: destinationPath
+      }
+    })
+
+    await Promise.all(moveFilesRequest)
+
+    log.info(`Moved: ${destinationFolder}`)
+
+    log.info(`All files moved to ${destinationFolder} successfully.`)
+    return {
+      result: true,
+      files: movedFiles
+    }
+  } catch (error) {
+    log.info('Error moving files:', error)
+    return {
+      result: false
+    }
+  }
+}
+
 export const moveVideoFileToFolder = async (filePath, destinationFolder) => {
   try {
     // Ensure the destination folder exists

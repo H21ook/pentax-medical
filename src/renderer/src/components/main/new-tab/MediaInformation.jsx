@@ -7,11 +7,14 @@ import { useNewData } from '../../../context/new-data-context'
 import { toast } from 'sonner'
 import { RxArrowLeft, RxReload } from 'react-icons/rx'
 import { Button } from '../../ui/Button'
-import lowerImage from '../../../assets/lower.png'
-import upperImage from '../../../assets/upper.png'
+// import lowerImage from '../../../assets/lower.png'
+// import upperImage from '../../../assets/upper.png'
 import ImagesComponent from './ImagesComponent'
 import { v4 as uuidv4 } from 'uuid'
 import { defaultLowerSlotsData, defaultUpperSlotsData } from '../../../lib/staticData'
+import { DndContext } from '@dnd-kit/core'
+import DraggableImage from '../../dnd/draggable-image'
+import DraggableOverlay from '../../dnd/draggable-overlay'
 
 const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => {
   return (
@@ -81,11 +84,29 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
     })
   }
 
+  // Huuchin
+  // const onCaptureImage = async (imageURL) => {
+  //   const res = await window.api.saveImageFile(imageURL, newData.uuid)
+  //   if (res?.result) {
+  //     const foundIndex = slots?.findIndex((item) => !item?.path)
+  //     updateItem(foundIndex, res?.data?.path)
+  //   } else {
+  //     toast.error('Амжилтгүй', {
+  //       action: {
+  //         label: 'Хаах',
+  //         onClick: () => {}
+  //       },
+  //       duration: 3000,
+  //       richColors: true,
+  //       description: res?.message || 'Алдаа гарлаа'
+  //     })
+  //   }
+  // }
+
   const onCaptureImage = async (imageURL) => {
     const res = await window.api.saveImageFile(imageURL, newData.uuid)
     if (res?.result) {
-      const foundIndex = slots?.findIndex((item) => !item?.path)
-      updateItem(foundIndex, res?.data?.path)
+      addImage(res?.data?.path)
     } else {
       toast.error('Амжилтгүй', {
         action: {
@@ -97,11 +118,6 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
         description: res?.message || 'Алдаа гарлаа'
       })
     }
-  }
-
-  const testConvert = async () => {
-    const res = await window.api.testConvert()
-    console.log(res)
   }
 
   const resetVideo = async () => {
@@ -133,12 +149,47 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
     })
   }
 
+  // Add item
+  const addImage = (newPath) => {
+    const images = [...newData.images]
+    images.push({
+      path: newPath
+    })
+    changeNewData({
+      images
+    })
+  }
+
+  // Add item
+  const removeImage = (index) => {
+    let slotImages = [...slots]
+    const images = [...newData.images]
+    const removedImage = images.splice(index, 1)
+    const removedSlots = slotImages.map((item) => {
+      if (item.path === removedImage[0]?.path) {
+        return {
+          ...item,
+          path: undefined
+        }
+      }
+      return item
+    })
+
+    console.log(removedSlots)
+    console.log('ri ', removedImage[0])
+    changeNewData({
+      images,
+      tempImages: removedSlots
+    })
+  }
+
   // Swap items between two slots
-  const swapItems = (slotIndex1, slotIndex2) => {
+  const moveItem = (fromIndex, toIndex) => {
     let images = [...slots]
-    let temp = images[slotIndex1]
-    images[slotIndex1].path = images[slotIndex2].path
-    images[slotIndex2].path = temp.path
+    const temp = slots[fromIndex].path
+    images[toIndex].path = temp
+    images[fromIndex].path = undefined
+    console.log('shshhs ', temp, images[fromIndex].path, images[toIndex].path)
     changeNewData({
       tempImages: images
     })
@@ -148,84 +199,93 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   const selectedType = newData?.sourceType
 
   return (
-    <div className="mb-14">
-      <form className="w-full flex gap-0 lg:gap-8 items-center mb-8">
-        <div className="w-[60%] lg:w-[40%]">
-          <div className="relative bg-black w-full">
-            {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
-              <ChooseVideoSrcType
-                onChange={(type) => {
-                  changeNewData({
-                    sourceType: type
-                  })
-                }}
-                setVideoSrc={selectVideoFile}
-              />
-            )}
-            {videoPath && (
-              <VideoPlayer
-                src={videoPath}
-                reRecord={async () => {
-                  changeNewData({
-                    tempVideoPath: undefined,
-                    sourceType: undefined
-                  })
-                }}
-                onCaptureImage={onCaptureImage}
-                type={selectedType}
-              />
-            )}
-            {!videoPath && selectedType === 'record' && (
-              <VideoRecorder
-                key={uuidv4()}
-                onEnd={onEnd}
-                back={() => {
-                  changeNewData({
-                    sourceType: undefined
-                  })
-                }}
-              />
-            )}
+    <div className="mb-14 h-[calc(100vh-280px)] overflow-hidden flex flex-col gap-4">
+      <DndContext>
+        <form className="w-full flex flex-col lg:flex-row gap-4 items-center lg:items-start">
+          <div className="max-w-[624px] min-w-[45%] w-[45%] 2xl:min-w-[654px] 2xl:w-[654px]">
+            <div className="relative bg-black w-full">
+              {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
+                <ChooseVideoSrcType
+                  onChange={(type) => {
+                    changeNewData({
+                      sourceType: type
+                    })
+                  }}
+                  setVideoSrc={selectVideoFile}
+                />
+              )}
+              {videoPath && (
+                <VideoPlayer
+                  src={videoPath}
+                  reRecord={async () => {
+                    changeNewData({
+                      tempVideoPath: undefined,
+                      sourceType: undefined
+                    })
+                  }}
+                  onCaptureImage={onCaptureImage}
+                  type={selectedType}
+                />
+              )}
+              {!videoPath && selectedType === 'record' && (
+                <VideoRecorder
+                  key={uuidv4()}
+                  onEnd={onEnd}
+                  back={() => {
+                    changeNewData({
+                      sourceType: undefined
+                    })
+                  }}
+                />
+              )}
+            </div>
           </div>
-        </div>
-        <div className="flex-1 lg:flex-auto lg:w-[00px] select-none pointer-events-none">
+          {/* <div className="flex-1 lg:flex-auto lg:w-[00px] select-none pointer-events-none">
           <img
             src={type === 'upper' ? upperImage : lowerImage}
             className="w-full lg:w-[500px] object-contain"
           />
-        </div>
-      </form>
-      <ImagesComponent
-        images={slots}
-        removeItem={removeItem}
-        updateItem={updateItem}
-        swapItems={swapItems}
-      />
-      <div className="flex gap-4 justify-between fixed left-0 right-0 bottom-[53px] z-10 bg-background p-4">
-        <div className="flex gap-4">
-          <Button variant="secondary" onClick={prevStep}>
-            <RxArrowLeft className="me-2" />
-            Буцах
-          </Button>
-          <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
-            <RxReload className="me-2" />
-            Шинээр эхлэх
-          </Button>
-          <Button variant="secondary" onClick={testConvert}>
-            <RxReload className="me-2" />
-            Test
-          </Button>
+        </div> */}
+          <div className="flex-1 lg:flex-auto">
+            <ImagesComponent
+              images={slots}
+              removeItem={removeItem}
+              updateItem={updateItem}
+              moveItem={moveItem}
+            />
+          </div>
+        </form>
+        <div className="flex-1 overflow-y-auto py-4">
+          <div className="grid grid-cols-6 lg:grid-cols-8 gap-1">
+            {newData?.images?.map((item, index) => {
+              return <DraggableImage key={index} item={item} index={index} onRemove={removeImage} />
+            })}
+          </div>
         </div>
 
-        <div className="flex gap-4">
-          <Button
-            disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
-            onClick={prevStep}
-          >
-            Хадгалах
-          </Button>
+        <div className="flex gap-4 justify-between fixed left-0 right-0 bottom-[53px] z-10 bg-background p-4">
+          <div className="flex gap-4">
+            <Button variant="secondary" onClick={prevStep}>
+              <RxArrowLeft className="me-2" />
+              Буцах
+            </Button>
+            <Button variant="secondary" onClick={resetVideo} disabled={!videoPath}>
+              <RxReload className="me-2" />
+              Шинээр эхлэх
+            </Button>
+          </div>
+
+          <div className="flex gap-4">
+            <Button
+              disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
+              onClick={prevStep}
+            >
+              Хадгалах
+            </Button>
+          </div>
         </div>
-      </div>
+        <DraggableOverlay />
+      </DndContext>
     </div>
   )
 }

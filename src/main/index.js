@@ -20,13 +20,13 @@ import { exec } from 'child_process'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    minWidth: 900,
-    minHeight: 670,
+    width: 1024,
+    height: 760,
+    minWidth: 1024,
+    minHeight: 760,
     show: false,
     autoHideMenuBar: false,
-    resizable: false,
+    resizable: true,
     frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -147,7 +147,7 @@ app.whenReady().then(() => {
     'dialog:openFile',
     async (_, { title = 'Файл сонгох', buttonLabel = 'Open', path, filters }) => {
       const documentsPath = app.getPath('documents')
-      const result = await dialog.showOpenDialog({
+      const result = await dialog.showOpenDialog(win, {
         title,
         buttonLabel,
         defaultPath: path || documentsPath,
