@@ -9,6 +9,8 @@ import {
 } from 'react-icons/tb'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { Slider } from '../ui/Slider'
+import { cn } from '../../lib/utils'
 
 const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) => {
   const videoRef = useRef(null)
@@ -25,9 +27,10 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
   }
 
   // Seek to a specific time in the video
-  const handleSeek = (event) => {
+  const handleSeek = (value) => {
+    const val = value[0]
     if (duration) {
-      const newTime = (event.target.value / 100) * (duration || 0)
+      const newTime = (val / 100) * (duration || 0)
       videoRef.current.currentTime = newTime
       setCurrentTime(newTime)
     }
@@ -120,25 +123,31 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
         <div className="w-full aspect-[4/3]"></div>
       )}
       <canvas ref={canvasRef} hidden />
-      <div className="absolute bottom-0 w-full flex gap-2 p-2 flex-col">
+      <div className="absolute bottom-0 w-full flex gap-2 p-2 flex-col text-sm">
         <div className="flex gap-2">
           <div className="text-white">
-            {Math.floor(currentTime / 60)}:
+            {Math.floor(currentTime / 60)
+              .toString()
+              .padStart(2, '0')}
+            :
             {Math.floor(currentTime % 60)
               .toString()
               .padStart(2, '0')}
           </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={(currentTime * 100) / duration}
-            onChange={handleSeek}
-            style={{ flex: '1' }}
+          <Slider
+            defaultValue={[0]}
+            max={100}
+            min={0}
+            onValueChange={handleSeek}
+            value={[(currentTime * 100) / duration]}
+            className="flex-1"
           />
           {duration && (
             <div className="text-white">
-              {Math.floor(duration / 60)}:
+              {Math.floor(duration / 60)
+                .toString()
+                .padStart(2, '0')}
+              :
               {Math.floor(duration % 60)
                 .toString()
                 .padStart(2, '0')}
@@ -153,7 +162,7 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
             <Button
               size="icon"
               variant="outline"
-              className="rounded-full"
+              className={cn('rounded-full')}
               onClick={togglePlayPause}
             >
               {isPlaying ? (
@@ -165,6 +174,8 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
             <Button size="icon" variant="outline" className="rounded-full" onClick={handleStop}>
               <TbPlayerStopFilled className="text-[#333]" size={20} />
             </Button>
+          </div>
+          <div>
             <Button
               size="icon"
               variant="outline"
@@ -179,7 +190,6 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
               )}
             </Button>
           </div>
-          <div></div>
         </div>
       </div>
     </div>

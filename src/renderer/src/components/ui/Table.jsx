@@ -2,8 +2,8 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { ScrollArea, ScrollBar } from './ScrollArea'
 
-const Table = React.forwardRef(({ className, ...props }, ref) => (
-  <ScrollArea className="whitespace-nowrap w-full">
+const Table = React.forwardRef(({ className, scrollClassname, ...props }, ref) => (
+  <ScrollArea className={cn('whitespace-nowrap w-full', scrollClassname)}>
     <div className="relative">
       <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>

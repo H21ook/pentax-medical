@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Buffer } from 'buffer'
 import { useNewData } from '../../context/new-data-context'
 import { useHospital } from '../../context/hospital-context'
+import { cn } from '../../lib/utils'
 
 const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
   const { newData } = useNewData()
@@ -15,7 +16,24 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
   const [selectedDevice, setSelectedDevice] = useState()
   const stream = useRef()
   const [startTime, setStartTime] = useState()
+  const [seconds, setSeconds] = useState(0)
+  const timer = useRef()
 
+  const timeFormatter = (_seconds) => {
+    let secs = _seconds
+    // let hours = 0
+    let minutes = 0
+    if (_seconds > 60) {
+      minutes = Math.floor(_seconds / 60)
+      secs = _seconds % 60
+    }
+    if (minutes > 60) {
+      // hours = Math.floor(minutes / 60)
+      minutes = minutes % 60
+    }
+
+    return `${`${minutes}`.padStart(2, '0')}:${`${secs}`.padStart(2, '0')}`
+  }
   useEffect(() => {
     const startCamera = async () => {
       try {
@@ -55,6 +73,9 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
 
     // Cleanup function to stop the camera
     return () => {
+      if (timer?.current) {
+        clearInterval(timer.current)
+      }
       if (stream.current) {
         stream.current.getTracks().forEach((track) => {
           console.log('Stopping track:', track)
@@ -78,6 +99,9 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
       mediaRecorder.start()
       setStartTime(Date.now())
       setRecording(true)
+      timer.current = setInterval(() => {
+        setSeconds((prev) => prev + 1)
+      }, 1000)
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.current.push(event.data)
@@ -105,9 +129,10 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
 
         const arrayBuffer = await blob.arrayBuffer() // Convert Blob to ArrayBuffer
         const buffer = Buffer.from(arrayBuffer)
+        clearInterval(timer.current)
         const res = await window.api.saveVideoFile(buffer, newData.uuid)
-        console.log('rsave result ', res)
         if (res.result) {
+          setSeconds(0)
           onEnd(res.data.path, duration)
         }
       }
@@ -123,30 +148,42 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
         </div>
       ) : null}
 
-      <div className="absolute bottom-0 w-full flex gap-2 p-2 justify-between">
-        <Button size="icon" variant="ghost" className="rounded-full border bg-white" onClick={back}>
-          <TbArrowLeft size={20} />
-        </Button>
-        <div className="flex gap-2">
+      <div className="absolute bottom-0 w-full ">
+        <div className="relative flex gap-2 p-2 justify-between">
           <Button
             size="icon"
             variant="ghost"
             className="rounded-full border bg-white"
-            disabled={recording}
-            onClick={startRecording}
+            onClick={back}
           >
-            <TbPlayerRecordFilled className="text-primary" size={20} />
+            <TbArrowLeft size={20} />
           </Button>
-          <Button
-            size="icon"
-            className="rounded-full"
-            disabled={!recording}
-            onClick={stopRecording}
-          >
-            <TbPlayerStopFilled size={20} />
-          </Button>
+          <div className="absolute left-[50%] -translate-x-[50%] flex gap-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className={cn('rounded-full border bg-white')}
+              disabled={recording}
+              onClick={startRecording}
+            >
+              <TbPlayerRecordFilled className="text-primary" size={20} />
+            </Button>
+            <Button
+              size="icon"
+              className={cn(
+                'transition-all rounded-full',
+                recording ? 'animate-pulse druation-100' : ''
+              )}
+              disabled={!recording}
+              onClick={stopRecording}
+            >
+              <TbPlayerStopFilled size={20} />
+            </Button>
+          </div>
+          <div className="bg-black/20 flex items-center rounded-full px-2 text-white text-sm">
+            {timeFormatter(seconds)}
+          </div>
         </div>
-        <div></div>
       </div>
     </div>
   )

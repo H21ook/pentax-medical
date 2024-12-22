@@ -47,12 +47,6 @@ const PatiantsTableHeader = ({ table, actions }) => {
           onChange={(event) => table.getColumn('regNo')?.setFilterValue(event.target.value)}
           className="h-8 max-w-[200px]"
         />
-        <Input
-          placeholder="Төрсөн огноо"
-          value={table.getColumn('birthDate')?.getFilterValue() ?? ''}
-          onChange={(event) => table.getColumn('birthDate')?.setFilterValue(event.target.value)}
-          className="h-8 max-w-[200px]"
-        />
         <Select
           id={name}
           name={name}
@@ -295,6 +289,7 @@ const MainPage = () => {
                     <DataTable
                       columns={columns}
                       data={employees}
+                      scrollClassname={'max-h-[calc(100vh-360px)]'}
                       selectedRows={new Set(selectedRows)}
                       onRowDoubleClick={(row) => {
                         addDetailTab(row.original)

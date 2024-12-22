@@ -8,29 +8,30 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { DataTablePagination } from './DataTablePagination'
+// import { DataTablePagination } from './DataTablePagination'
 
 const DataTable = ({
   columns,
   data,
   header = () => {},
+  scrollClassname,
   selectedRows,
   onRowDoubleClick = () => {},
   selectedRowClassname = () => {}
 }) => {
   const [sorting, setSorting] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10
-  })
+  // const [pagination, setPagination] = useState({
+  //   pageIndex: 0,
+  //   pageSize: 10
+  // })
   const [columnFilters, setColumnFilters] = useState([])
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
+    // onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -39,8 +40,8 @@ const DataTable = ({
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
-      pagination
+      columnVisibility
+      // pagination
     }
   })
 
@@ -56,11 +57,11 @@ const DataTable = ({
   }, [selectedRows, table])
 
   return (
-    <div>
+    <div className="overflow-y-auto">
       {header(table)}
       <div className="rounded-md border my-4">
-        <Table>
-          <TableHeader>
+        <Table scrollClassname={scrollClassname}>
+          <TableHeader className="sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -103,7 +104,12 @@ const DataTable = ({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      {/* <DataTablePagination table={table} /> */}
+      <div className="flex items-center justify-end">
+        <div className="flex w-fit items-center text-sm font-medium whitespace-nowrap">
+          Нийт: {table.getCoreRowModel().rows.length} мөр
+        </div>
+      </div>
     </div>
   )
 }
