@@ -62,6 +62,14 @@ const MenuHeader = () => {
           }
         },
         {
+          label: 'Үзлэгийн тохиргоо',
+          onClick: () => {
+            router.change('settings', {
+              tabKey: 'settings'
+            })
+          }
+        },
+        {
           label: 'Ажилчид',
           shortcut: <MenubarShortcut>Alt+D</MenubarShortcut>,
           onClick: () => {

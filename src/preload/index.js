@@ -26,6 +26,7 @@ import {
 } from './routes/file'
 import { createEmployee, getEmployee, getEmployeeList } from './routes/employee'
 import { getDataConfig } from './routes/dataConfig'
+import { getAllOptions, updateOptions, deleteOptions, createOptions } from './routes/options'
 
 // Custom APIs for renderer
 const api = {
@@ -69,7 +70,13 @@ const api = {
   //DATA-CONFIG
   getDataConfig,
   printPdf,
-  print
+  print,
+
+  //OPTIONS
+  getAllOptions,
+  createOptions,
+  updateOptions,
+  deleteOptions
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

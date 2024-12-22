@@ -8,6 +8,7 @@ import { RxArrowRight, RxEyeOpen } from 'react-icons/rx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/Dialog'
 import { toast } from 'sonner'
 import { calculateAgeFromRegister } from '../../lib/utils'
+import { useOptions } from '../../context/options-context'
 
 const DetailTab = () => {
   const { tabs, selectedTab } = useNewData()
@@ -18,6 +19,14 @@ const DetailTab = () => {
   const [showModal, setShowModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState()
   const [loading, setLoading] = useState(false)
+  const { allOptions } = useOptions()
+
+  const inspectionData = allOptions?.filter((item) => item.type === 'inspectionType')
+  const scopeData = allOptions?.filter((item) => item.type === 'scopeType')
+  const procedureData = allOptions?.filter((item) => item.type === 'procedureType')
+  const selectedType = inspectionData.find((item) => item.value === employeeData?.type)
+  const selectedScope = scopeData.find((item) => item.value === employeeData?.scopeType)
+  const selectedProcedure = procedureData.find((item) => item.value === employeeData?.procedure)
 
   const getDetailEmployee = useCallback(async (_id) => {
     const res = await window.api.getEmployee(_id)
@@ -81,18 +90,21 @@ const DetailTab = () => {
 
               <div>Тасгийн нэр</div>
               <b>{employeeData?.departmentName}</b>
+
+              <div>Дурангийн төрөл</div>
+              <b>{selectedScope?.name}</b>
             </div>
           </div>
           <div>
             <div className="grid grid-cols-[200px_1fr] text-sm gap-2">
-              <div>Өвчтөний байдал</div>
-              <b>{employeeData?.patientCondition}</b>
-
               <div>Заалт</div>
               <b>{employeeData?.diseaseIndication}</b>
 
               <div>Мэдээ алдууулалт</div>
               <b>{employeeData?.anesthesia}%</b>
+
+              <div>Нэмэлт процедур</div>
+              <b>{selectedProcedure?.name}</b>
             </div>
           </div>
         </div>
@@ -143,7 +155,7 @@ const DetailTab = () => {
             <b>{employeeData?.date}</b>
 
             <div>Үзлэгийн төрөл</div>
-            <b>{employeeData?.type === 'lower' ? 'Lower Gi' : 'Upper Gi'}</b>
+            <b>{selectedType?.name}</b>
 
             <div>Эмч</div>
             <b>{doctor?.displayName}</b>

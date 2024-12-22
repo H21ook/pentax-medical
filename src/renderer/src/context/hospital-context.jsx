@@ -4,7 +4,8 @@ import LoaderPage from '../pages/Loader'
 const HospitalContext = createContext({
   hospitalData: undefined,
   dataConfig: undefined,
-  getHospitalData: () => {}
+  getHospitalData: () => {},
+  loadDataConfig: () => {}
 })
 
 export const useHospital = () => {

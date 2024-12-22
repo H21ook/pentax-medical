@@ -72,7 +72,7 @@ const AddressRegisterModal = ({
             Та эхний сонголтоос хот/аймаг эсвэл дүүрэг/сум-ын алийг бүртгэхээ сонгоно уу
           </DialogDescription>
         </DialogHeader>
-        <form className="flex flex-col gap-2 mt-2" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col gap-4 mt-2" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col items-start gap-1">
             <Label htmlFor="type" className="pb-1">
               Ангилал

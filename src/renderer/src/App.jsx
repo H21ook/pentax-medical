@@ -13,6 +13,7 @@ import RootConfig from './pages/RootConfig'
 import Login from './pages/Login'
 import Settings from './pages/Settings'
 import PrintPage from './components/main/PrintPage'
+import OptionsProvider from './context/options-context'
 
 function App() {
   return (
@@ -23,43 +24,45 @@ function App() {
           element={
             <div className="h-screen w-full">
               <AuthProvider>
-                <UsersProvider>
-                  <HospitalProvider>
-                    <AddressProvider>
-                      <NewDataProvider>
-                        <PageRouterProvider
-                          defaultPageKey={'loader'}
-                          routes={[
-                            {
-                              key: 'loader',
-                              page: <LoaderPage />
-                            },
-                            {
-                              key: 'get-started',
-                              page: <GetStarted />
-                            },
-                            {
-                              key: 'main',
-                              page: <MainPage />
-                            },
-                            {
-                              key: 'root-config',
-                              page: <RootConfig />
-                            },
-                            {
-                              key: 'login',
-                              page: <Login />
-                            },
-                            {
-                              key: 'settings',
-                              page: <Settings />
-                            }
-                          ]}
-                        />
-                      </NewDataProvider>
-                    </AddressProvider>
-                  </HospitalProvider>
-                </UsersProvider>
+                <OptionsProvider>
+                  <UsersProvider>
+                    <HospitalProvider>
+                      <AddressProvider>
+                        <NewDataProvider>
+                          <PageRouterProvider
+                            defaultPageKey={'loader'}
+                            routes={[
+                              {
+                                key: 'loader',
+                                page: <LoaderPage />
+                              },
+                              {
+                                key: 'get-started',
+                                page: <GetStarted />
+                              },
+                              {
+                                key: 'main',
+                                page: <MainPage />
+                              },
+                              {
+                                key: 'root-config',
+                                page: <RootConfig />
+                              },
+                              {
+                                key: 'login',
+                                page: <Login />
+                              },
+                              {
+                                key: 'settings',
+                                page: <Settings />
+                              }
+                            ]}
+                          />
+                        </NewDataProvider>
+                      </AddressProvider>
+                    </HospitalProvider>
+                  </UsersProvider>
+                </OptionsProvider>
               </AuthProvider>
               <Toaster />
             </div>
@@ -70,15 +73,17 @@ function App() {
           element={
             <div className="h-screen w-full">
               <AuthProvider>
-                <UsersProvider>
-                  <HospitalProvider>
-                    <AddressProvider>
-                      <NewDataProvider>
-                        <PrintPage />
-                      </NewDataProvider>
-                    </AddressProvider>
-                  </HospitalProvider>
-                </UsersProvider>
+                <OptionsProvider>
+                  <UsersProvider>
+                    <HospitalProvider>
+                      <AddressProvider>
+                        <NewDataProvider>
+                          <PrintPage />
+                        </NewDataProvider>
+                      </AddressProvider>
+                    </HospitalProvider>
+                  </UsersProvider>
+                </OptionsProvider>
               </AuthProvider>
               <Toaster />
             </div>

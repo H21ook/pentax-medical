@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut } from 'electron'
 import { join, dirname } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -12,6 +12,7 @@ import './services/system'
 import './services/hospital'
 import './services/address'
 import './services/employee'
+import './services/options'
 import { getDataDirectory } from './services/file'
 import { getDataConfig } from './services/system'
 import { format } from 'date-fns'
@@ -216,7 +217,7 @@ app.whenReady().then(() => {
                 })
               }
             })
-          }, 2000)
+          }, 1000)
         })
       } catch (err) {
         log.info('Print err ', err?.message)
@@ -228,6 +229,16 @@ app.whenReady().then(() => {
       }
     })
   })
+
+  for (let i = 1; i <= 12; i++) {
+    const key = `F${i}`
+    globalShortcut.register(key, () => {
+      win.webContents.send('changeTab', {
+        path: 'main',
+        index: i - 1
+      })
+    })
+  }
 
   // renderer log
   ipcMain.on('log-error', (_e, data) => {

@@ -34,6 +34,8 @@ const formDefaultValues = {
   districtId: '',
   address: '',
   type: 'upper',
+  procedure: 'none',
+  scopeType: 'pentax',
   images: []
 }
 
@@ -55,6 +57,8 @@ const NewDataProvider = ({ children }) => {
     hospitalName: hospitalData?.name,
     departmentName: hospitalData?.departmentName,
     date: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+    procedure: 'none',
+    scopeType: 'pentax',
     images: []
   }
 

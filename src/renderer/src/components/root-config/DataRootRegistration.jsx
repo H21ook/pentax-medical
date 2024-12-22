@@ -9,10 +9,12 @@ import { Input } from '../ui/Input'
 import { GoFileDirectory } from 'react-icons/go'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { useHospital } from '../../context/hospital-context'
 
 const DataRootRegistration = () => {
   const { checkLogged } = useAuth()
   const router = useRouter()
+  const { getHospitalData, loadDataConfig } = useHospital()
 
   const { handleSubmit, control, setValue } = useForm({
     defaultValues: {
@@ -45,6 +47,8 @@ const DataRootRegistration = () => {
     }
 
     await checkLogged()
+    await getHospitalData()
+    await loadDataConfig()
     router.change('main')
   }
 

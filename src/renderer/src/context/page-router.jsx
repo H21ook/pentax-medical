@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useNewData } from './new-data-context'
 
 const PageRouterContext = React.createContext({
   change: () => {},
@@ -15,6 +16,7 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   const [loading, setLoading] = useState(true)
   const [pageParams, setPageParams] = useState()
   const [currentPageKey, setCurrentPageKey] = useState(defaultPageKey)
+  const { tabs, setSelectedTab } = useNewData()
 
   useEffect(() => {
     window.electron.ipcRenderer.on('init-page', (_e, data) => {
@@ -29,6 +31,19 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
       window.electron.ipcRenderer.removeAllListeners('init-page')
     }
   }, [])
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('changeTab', (_, { path, index }) => {
+      setCurrentPageKey(path)
+      if (tabs.length > index) {
+        setSelectedTab(index)
+      }
+    })
+
+    return () => {
+      window.electron.ipcRenderer.removeAllListeners('changeTab')
+    }
+  }, [tabs])
 
   useEffect(() => {
     if (loading) {

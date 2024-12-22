@@ -3,8 +3,10 @@ import styles from './index.module.css'
 import lowerImage from '../../assets/lower.png'
 import upperImage from '../../assets/upper.png'
 import { calculateAgeFromRegister } from '../../lib/utils'
+import { useOptions } from '../../context/options-context'
 
 const PrintPage = () => {
+  const { allOptions } = useOptions()
   const [printData, setPrintData] = useState()
 
   useEffect(() => {
@@ -12,13 +14,22 @@ const PrintPage = () => {
     if (printData) {
       setPrintData(JSON.parse(printData))
     }
-  })
+  }, [])
+
+  const inspectionData = allOptions?.filter((item) => item.type === 'inspectionType')
+  const scopeData = allOptions?.filter((item) => item.type === 'scopeType')
+  const procedureData = allOptions?.filter((item) => item.type === 'procedureType')
 
   const employeeData = printData?.employeeData
   const employeeParentAddress = printData?.employeeParentAddress
   const employeeSubAddress = printData?.employeeSubAddress
   const doctor = printData?.doctor
   const nurse = printData?.nurse
+
+  const selectedType = inspectionData.find((item) => item.value === employeeData?.type)
+  const selectedScope = scopeData.find((item) => item.value === employeeData?.scopeType)
+  const selectedProcedure = procedureData.find((item) => item.value === employeeData?.procedure)
+
   const info = calculateAgeFromRegister(employeeData?.regNo)
   return (
     <div className="h-full overflow-y-auto">
@@ -69,20 +80,23 @@ const PrintPage = () => {
                   <div>Тасгийн нэр:</div>
                   <div>{employeeData?.departmentName}</div>
 
+                  <div>Дурангийн төрөл:</div>
+                  <div>{selectedScope?.name}</div>
+
+                  <div>Үзлэгийн нэр:</div>
+                  <div>{selectedType?.name}</div>
+
                   <div>Үзлэгийн огноо:</div>
                   <div>{employeeData?.date}</div>
-
-                  <div>Үзлэгийн төрөл:</div>
-                  <div>{employeeData?.type === 'lower' ? 'Lower Gi' : 'Upper Gi'}</div>
 
                   <div>Заалт:</div>
                   <div>{employeeData?.diseaseIndication}</div>
 
+                  <div>Нэмэлт процедур:</div>
+                  <div>{selectedProcedure?.name}</div>
+
                   <div>Мэдээ алдууулалт:</div>
                   <div>{employeeData?.anesthesia}%</div>
-
-                  <div>Эмч:</div>
-                  <div>{doctor?.displayName}</div>
 
                   {nurse && (
                     <>

@@ -98,6 +98,8 @@ export const initTables = (isForce) => {
         doctorId INTEGER NOT NULL,
         nurseId INTEGER,
         sourceType TEXT NOT NULL,
+        scopeType TEXT,
+        procedure TEXT,
         createdAt TEXT NOT NULL,
         createdUserId INTEGER NOT NULL,
         updatedAt TEXT NOT NULL,
@@ -120,6 +122,15 @@ export const initTables = (isForce) => {
         parentId INTEGER,
         isParent INTEGER NOT NULL DEFAULT 0,
         createdAt TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS optionsData (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        type TEXT,
+        value TEXT,
+        description TEXT,
+        UNIQUE (type, value)
     );
     `)
 
@@ -169,6 +180,39 @@ export const initTables = (isForce) => {
         executedAt TEXT NOT NULL
     );
   `)
+
+  const insertOptionsData = db.prepare(`INSERT INTO
+        optionsData (name, type, value)
+      VALUES
+          (@name, @type, @value) ON CONFLICT (type, value) DO NOTHING;`)
+
+  const options = insertOptionsData.run({
+    name: 'Lower Gi',
+    type: 'inspectionType',
+    value: 'lower'
+  })
+  log.info(`Option data created: ${options.lastInsertRowid}`)
+
+  const options2 = insertOptionsData.run({
+    name: 'Upper Gi',
+    type: 'inspectionType',
+    value: 'upper'
+  })
+  log.info(`Option data created: ${options2.lastInsertRowid}`)
+
+  const options3 = insertOptionsData.run({
+    name: 'Pentax',
+    type: 'scopeType',
+    value: 'pentax'
+  })
+  log.info(`Option data created: ${options3.lastInsertRowid}`)
+
+  const options4 = insertOptionsData.run({
+    name: 'Байхгүй',
+    type: 'procedureType',
+    value: 'none'
+  })
+  log.info(`Option data created: ${options4.lastInsertRowid}`)
 
   // MIGRATION N ANH UDAA ALGASAH ???
   // // 2024120901

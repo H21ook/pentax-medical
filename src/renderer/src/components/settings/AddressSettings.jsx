@@ -62,7 +62,7 @@ const AddressSettings = () => {
             <ul className="list-none px-4 pb-4">
               {childAddress.map((item) => {
                 return (
-                  <li key={`parent_${item.id}`} className="p-2 rounded-sm hover:bg-muted">
+                  <li key={`parent_${item.id}`} className="p-2 rounded-sm hover:bg-muted text-sm">
                     {item.name}
                   </li>
                 )

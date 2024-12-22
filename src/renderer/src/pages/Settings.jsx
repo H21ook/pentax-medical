@@ -7,6 +7,7 @@ import ProfileSettings from '../components/settings/ProfileSettings'
 import { useRouter } from '../context/page-router'
 import AddressSettings from '../components/settings/AddressSettings'
 import DataSettings from '../components/settings/DataSettings'
+import InspectionSettings from '../components/settings/InspectionSettings'
 
 const Settings = () => {
   const { params } = useRouter()
@@ -28,6 +29,11 @@ const Settings = () => {
       tab: <HospitalSettings />
     },
     {
+      key: 'settings',
+      name: 'Үзлэгийн тохиргоо',
+      tab: <InspectionSettings />
+    },
+    {
       key: 'workers',
       name: 'Ажилчид',
       tab: <WorkerSettings />
@@ -37,6 +43,7 @@ const Settings = () => {
       name: 'Хаяг',
       tab: <AddressSettings />
     },
+
     {
       key: 'data-store',
       name: 'Дата, хадгалалт',
@@ -49,7 +56,7 @@ const Settings = () => {
   return (
     <MainLayout>
       <div className="w-full h-full flex">
-        <ScrollArea className="h-full w-[200px]">
+        <ScrollArea className="h-full w-[200px] min-w-[200px] max-w-[200px]">
           <ul className="list-none flex flex-col gap-[2px] py-4">
             {menu.map((item) => (
               <li

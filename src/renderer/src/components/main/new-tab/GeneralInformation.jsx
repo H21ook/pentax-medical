@@ -1,11 +1,10 @@
 import { Input } from '../../ui/Input'
 import { Label } from '../../ui/Label'
 import { Separator } from '../../ui/seperator'
-import { Textarea } from '../../ui/Textarea'
 import { Controller } from 'react-hook-form'
 import { DatePicker } from '../../ui/date-picker'
 import { Button } from '../../ui/Button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select'
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../../ui/Select'
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group'
 // import { TreeDatePicker } from '../../ui/tree-date-picker'
 import { useAddress } from '../../../context/address-context'
@@ -17,6 +16,7 @@ import { BsCameraReelsFill } from 'react-icons/bs'
 import { useAuth } from '../../../context/auth-context'
 import { toast } from 'sonner'
 import Editor from '../../ui/Editor'
+import { useOptions } from '../../../context/options-context'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
   const { hospitalData } = useHospital()
@@ -25,6 +25,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   const [error, setError] = useState('')
   const { parentAddress, allAddressData } = useAddress()
   const { generalInformationForm, newData, complete, selectedTab } = useNewData()
+  const { allOptions } = useOptions()
 
   const { control, handleSubmit, watch } = generalInformationForm
 
@@ -37,6 +38,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   const subAddress = useMemo(() => {
     return allAddressData.filter((item) => item.parentId === cityId)
   }, [allAddressData, cityId])
+
+  const inspectionData = allOptions?.filter((item) => item.type === 'inspectionType')
+  const scopeData = allOptions?.filter((item) => item.type === 'scopeType')
+  const procedureData = allOptions?.filter((item) => item.type === 'procedureType')
+  const anesthesiaData = allOptions?.filter((item) => item.type === 'anesthesia')
+  const diagnosisData = allOptions?.filter((item) => item.type === 'diagnosis')
 
   useEffect(() => {
     localStorage.setItem(
@@ -144,6 +151,31 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
+        <Controller
+          control={control}
+          name={'scopeType'}
+          key={'scopeType'}
+          render={({ field: { value, onChange, name } }) => {
+            return (
+              <div className="flex flex-col gap-1 items-start">
+                <Label htmlFor={name} className="pb-1">
+                  Дурангийн төрөл <span className="text-red-500">*</span>
+                </Label>
+                <Select id={name} name={name} value={value} onValueChange={(e) => onChange(e)}>
+                  <SelectTrigger readonly={true}>
+                    <SelectValue placeholder="Дурангийн төрөл" />
+                  </SelectTrigger>
+                  <SelectContent
+                    data={scopeData?.map((item) => ({
+                      value: item?.value,
+                      label: item?.name
+                    }))}
+                  />
+                </Select>
+              </div>
+            )
+          }}
+        />
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Controller
@@ -186,20 +218,43 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                 <Label htmlFor={name} className="pb-1">
                   Мэдээ алдуулалт <span className="text-red-500">*</span>
                 </Label>
-                <Select
-                  id={name}
-                  name={name}
-                  value={value}
-                  onValueChange={(e) => onChange(Number(e))}
-                >
+                <Select id={name} name={name} value={value} onValueChange={(e) => onChange(e)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Мэдээ алдуулалт сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={1}>Dicaini 1%-0.5</SelectItem>
-                  </SelectContent>
+                  <SelectContent
+                    data={anesthesiaData?.map((item) => ({
+                      value: item?.value,
+                      label: item?.name
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
+              </div>
+            )
+          }}
+        />
+        <Controller
+          control={control}
+          name={'procedure'}
+          key={'procedure'}
+          render={({ field: { value, onChange, name } }) => {
+            return (
+              <div className="flex flex-col gap-1 items-start">
+                <Label htmlFor={name} className="pb-1">
+                  Нэмэлт процедур <span className="text-red-500">*</span>
+                </Label>
+                <Select id={name} name={name} value={value} onValueChange={(e) => onChange(e)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Нэмэлт процедур сонгох" />
+                  </SelectTrigger>
+                  <SelectContent
+                    data={procedureData?.map((item) => ({
+                      value: item?.value,
+                      label: item?.name
+                    }))}
+                  />
+                </Select>
               </div>
             )
           }}
@@ -530,10 +585,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Үзлэгийн төрөл сонгох" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="upper">Upper Gi</SelectItem>
-                    <SelectItem value="lower">Lower Gi</SelectItem>
-                  </SelectContent>
+                  <SelectContent
+                    data={inspectionData?.map((item) => ({
+                      value: item?.value,
+                      label: item?.name
+                    }))}
+                  />
                 </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
@@ -569,14 +626,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             )
           }}
         />
-      </div>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Controller
           control={control}
           name={'diagnosis'}
           key={'diagnosis'}
           rules={{
-            required: 'Онош оруулна уу'
+            required: 'Онош сонгоно уу'
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (
@@ -584,17 +639,17 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                 <Label htmlFor={name} className="pb-1">
                   Онош <span className="text-red-500">*</span>
                 </Label>
-                <Textarea
-                  id={name}
-                  name={name}
-                  value={value}
-                  className="resize-none"
-                  rows={5}
-                  placeholder="Онош"
-                  onChange={(e) => {
-                    onChange(e.target.value)
-                  }}
-                />
+                <Select id={name} name={name} value={value} onValueChange={(e) => onChange(e)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Онош сонгох" />
+                  </SelectTrigger>
+                  <SelectContent
+                    data={diagnosisData?.map((item) => ({
+                      value: item?.value,
+                      label: item?.name
+                    }))}
+                  />
+                </Select>
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
             )
