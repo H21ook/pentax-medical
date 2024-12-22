@@ -49,7 +49,6 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   }, [watchFields])
 
   const onSubmit = async (values) => {
-    console.log(newData)
     if (
       !newData?.tempVideoPath ||
       !newData?.tempImages ||

@@ -26,7 +26,6 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
             ? videoDevices.find((v) => v.deviceId === dataConfig?.device)
             : videoDevices[0]
 
-          console.log(currentDevice)
           setSelectedDevice(currentDevice)
           const constraints = {
             video: {
@@ -56,9 +55,7 @@ const VideoRecorder = ({ onEnd = () => {}, back = () => {} }) => {
 
     // Cleanup function to stop the camera
     return () => {
-      console.log('useEffect cleanup - Stopping Camera')
       if (stream.current) {
-        console.log('Stopping stream tracks:', stream.current.getTracks())
         stream.current.getTracks().forEach((track) => {
           console.log('Stopping track:', track)
           track.stop()

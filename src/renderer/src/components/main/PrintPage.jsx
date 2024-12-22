@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import styles from './index.module.css'
 import lowerImage from '../../assets/lower.png'
 import upperImage from '../../assets/upper.png'
+import { calculateAgeFromRegister } from '../../lib/utils'
 
 const PrintPage = () => {
   const [printData, setPrintData] = useState()
@@ -18,7 +19,7 @@ const PrintPage = () => {
   const employeeSubAddress = printData?.employeeSubAddress
   const doctor = printData?.doctor
   const nurse = printData?.nurse
-
+  const info = calculateAgeFromRegister(employeeData?.regNo)
   return (
     <div className="h-full overflow-y-auto">
       <div className={`title ${styles.title}`}>Сүхбаатар дүүргийн эрүүл мэндийн төв</div>
@@ -40,10 +41,10 @@ const PrintPage = () => {
                   <div>{employeeData?.regNo}</div>
 
                   <div>Төгсөн огноо:</div>
-                  <div>{employeeData?.birthDate}</div>
+                  <div>{info?.birthDate}</div>
 
                   <div>Нас:</div>
-                  <div>{employeeData?.age}</div>
+                  <div>{info?.age}</div>
 
                   <div>Хүйс:</div>
                   <div>

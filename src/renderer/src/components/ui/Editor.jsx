@@ -6,7 +6,6 @@ const Editor = ({ id, name, placeholder = 'Энд тэкст бичнэ', value,
 
   const handleChangeContent = (newContent) => {
     const res = removeAttributesFromHtml(newContent)
-    console.log('change ', res)
     if (res !== '<p><br></p>') {
       onChange(res)
     } else {

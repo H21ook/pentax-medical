@@ -174,9 +174,6 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
       }
       return item
     })
-
-    console.log(removedSlots)
-    console.log('ri ', removedImage[0])
     changeNewData({
       images,
       tempImages: removedSlots
@@ -189,7 +186,6 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
     const temp = slots[fromIndex].path
     images[toIndex].path = temp
     images[fromIndex].path = undefined
-    console.log('shshhs ', temp, images[fromIndex].path, images[toIndex].path)
     changeNewData({
       tempImages: images
     })
@@ -277,7 +273,9 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
 
           <div className="flex gap-4">
             <Button
-              disabled={!newData?.tempVideoPath || slots.some((item) => !item?.path)}
+              disabled={
+                !newData?.tempVideoPath || slots?.filter((item) => item?.path)?.length === 0
+              }
               onClick={prevStep}
             >
               Хадгалах

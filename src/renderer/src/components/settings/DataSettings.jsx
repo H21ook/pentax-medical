@@ -5,12 +5,15 @@ import { GoFileDirectory } from 'react-icons/go'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { useHospital } from '../../context/hospital-context'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../ui/Select'
+import { RxReload } from 'react-icons/rx'
+import { cn } from '../../lib/utils'
 
 const DataSettings = () => {
   const { dataConfig, loadDataConfig } = useHospital()
   const [deviceList, setDeviceList] = useState([])
+  const [isRotating, setIsRotating] = useState(false)
 
   const {
     handleSubmit,
@@ -23,15 +26,15 @@ const DataSettings = () => {
     }
   })
 
-  useEffect(() => {
-    const getDevices = async () => {
-      const devices = await navigator.mediaDevices.enumerateDevices()
-      const videoDevices = devices.filter((d) => d.kind === 'videoinput')
-      setDeviceList(videoDevices)
-    }
-
-    getDevices()
+  const getDevices = useCallback(async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    const videoDevices = devices.filter((d) => d.kind === 'videoinput')
+    setDeviceList(videoDevices)
   }, [])
+
+  useEffect(() => {
+    getDevices()
+  }, [getDevices])
 
   const onSubmit = async (values) => {
     const token = localStorage.getItem('token')
@@ -61,12 +64,17 @@ const DataSettings = () => {
     loadDataConfig()
   }
 
+  const relaodList = () => {
+    setIsRotating(true)
+    getDevices()
+    setTimeout(() => setIsRotating(false), 500) // Match the animation duration
+  }
+
   const selectDirectory = async (value, onChange) => {
     const selectedDir = await window.electron.ipcRenderer.invoke('select-directory', value)
     onChange(selectedDir[0])
   }
 
-  console.log('dataConfig ', dataConfig)
   return (
     <div className="w-full">
       <h1 className="font-semibold mb-4 mt-2">Дата, хадгалалт тохиргоо</h1>
@@ -108,7 +116,7 @@ const DataSettings = () => {
           }}
         />
 
-        <div className="grid grid-cols-2 mt-4">
+        <div className="grid grid-cols-2 gap-1 mt-4">
           <Controller
             control={control}
             name={'device'}
@@ -138,6 +146,12 @@ const DataSettings = () => {
               )
             }}
           />
+          <div className="flex items-end">
+            <Button variant="secondary" type="button" onClick={relaodList}>
+              <RxReload className={cn('me-2', isRotating ? 'animate-rotate360' : '')} />{' '}
+              Төхөөрөмжийн мэдээлэл шинэчлэх
+            </Button>
+          </div>
         </div>
 
         <div className="w-full flex justify-end mt-4">

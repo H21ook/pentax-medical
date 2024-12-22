@@ -203,7 +203,6 @@ app.whenReady().then(() => {
                   message: 'Алдаа гарлаа'
                 })
               } else {
-                console.log('PDF saved to:', pdfPath)
                 printWindow.close()
                 exec(`start "" "${pdfPath}"`, (error) => {
                   if (error) {
