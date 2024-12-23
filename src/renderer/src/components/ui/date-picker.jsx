@@ -13,6 +13,7 @@ export function DatePicker({
   onChange = () => {},
   className,
   placeholder,
+  disabled = false,
   format = 'yyyy-MM-dd',
   hideIcon = false,
   defaultMonth
@@ -33,11 +34,12 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button
           variant={'outline'}
+          disabled={disabled}
           onClick={() => {
             setIsOpen(true)
           }}
           className={cn(
-            'justify-start text-left font-normal px-3',
+            'justify-start text-left font-normal px-3 disabled:opacity-100',
             !value && 'text-muted-foreground',
             className
           )}

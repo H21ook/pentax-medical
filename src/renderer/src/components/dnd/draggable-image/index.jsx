@@ -3,7 +3,7 @@ import { cn } from '../../../lib/utils'
 import { Button } from '../../ui/Button'
 import { RxCross2 } from 'react-icons/rx'
 
-const DraggableImage = ({ item, index, onRemove = () => {} }) => {
+const DraggableImage = ({ item, index, deletable = true, onRemove = () => {} }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `draggable_${index}`,
     data: {
@@ -28,9 +28,16 @@ const DraggableImage = ({ item, index, onRemove = () => {} }) => {
         >
           {index + 1}
         </div>
-        <Button size="icon" variant="secondary" className="size-5" onClick={() => onRemove(index)}>
-          <RxCross2 />
-        </Button>
+        {deletable && (
+          <Button
+            size="icon"
+            variant="secondary"
+            className="size-5"
+            onClick={() => onRemove(index)}
+          >
+            <RxCross2 />
+          </Button>
+        )}
       </div>
       <div
         ref={setNodeRef}

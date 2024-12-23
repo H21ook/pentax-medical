@@ -2,19 +2,22 @@ import { Button } from '../../ui/Button'
 import { RxCross2 } from 'react-icons/rx'
 import { useDndMonitor, useDroppable } from '@dnd-kit/core'
 import { cn } from '../../../lib/utils'
-import DraggableImageTwo from '../../dnd/draggable-image-two'
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../../ui/Select'
+import { useState } from 'react'
 
 const ItemImage = ({
-  item,
   index,
+  defaultSlots = [],
+  item,
   onRemove = () => {},
   onUpdate = () => {},
   onMove = () => {}
 }) => {
+  const [selectedSlot, setSelectedSlot] = useState(item?.position)
+
   const { isOver, setNodeRef } = useDroppable({
-    id: `orderIndex-${item.orderIndex}`,
+    id: `orderIndex-${index}`,
     data: {
-      ...item,
       index
     }
   })
@@ -28,11 +31,19 @@ const ItemImage = ({
 
       if (over?.data?.current) {
         if (active?.data?.current?.type === 'move') {
-          if (over.data.current.index === index) {
+          if (over.data.current.index === index && active?.data?.current.fromIndex !== index) {
             onMove(active?.data?.current.fromIndex, over.data.current.index)
           }
         } else {
-          onUpdate(over.data.current.index, active?.data?.current?.path)
+          if (over.data.current.index === index) {
+            const slotData = defaultSlots.find((s) => s.orderIndex === selectedSlot)
+            onUpdate(over.data.current.index, {
+              path: active?.data?.current?.path,
+              position: selectedSlot,
+              name: slotData.name,
+              imageChanged: true
+            })
+          }
         }
       }
     }
@@ -41,17 +52,47 @@ const ItemImage = ({
   return (
     <div
       className={cn(
-        'max-w-[200px] bg-black/50 rounded-md overflow-hidden transition-all duration-100',
+        'w-[264px] bg-black/50 rounded-md overflow-hidden transition-all duration-100',
         isOver ? 'border-2 border-primary' : 'border'
       )}
     >
-      <div className="w-full p-1 flex items-center bg-white gap-2">
-        <div className="flex-1 flex items-center gap-1">
+      <div className="flex items-center justify-between gap-1 p-1 bg-white">
+        <div className="flex-1">
+          <Select
+            value={selectedSlot}
+            onValueChange={(e) => {
+              const i = Number(e)
+              setSelectedSlot(i)
+              const slotData = defaultSlots.find((s) => s.orderIndex === i)
+              onUpdate(index, {
+                path: item.path,
+                position: Number(e),
+                name: slotData.name
+              })
+            }}
+          >
+            <SelectTrigger
+              className={cn(
+                'w-full truncate whitespace-nowrap',
+                item?.path ? 'w-[224px]' : 'w-full'
+              )}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent
+              data={defaultSlots?.map((item) => ({
+                value: item?.orderIndex,
+                label: `${item?.orderIndex} - ${item?.name}`
+              }))}
+            />
+          </Select>
+        </div>
+        {/* <div className="flex-1 flex items-center gap-1">
           <div className="font-bold leading-none text-white text-xs size-5 rounded-full bg-primary flex items-center justify-center">
             {item.orderIndex}
           </div>
           <p className="flex-grow text-xs truncate whitespace-nowrap w-[134px]">{item.name}</p>
-        </div>
+        </div> */}
         {item?.path && (
           <Button
             size="icon"
@@ -70,26 +111,37 @@ const ItemImage = ({
           isOver ? 'opacity-50' : 'opacity-100'
         )}
       >
-        {item?.path ? <DraggableImageTwo item={item} index={index} /> : <div></div>}
+        {item?.path ? (
+          <img
+            src={item.path}
+            alt={`image_placed_${index}`}
+            className={cn('aspect-[4/2.5] bg-black/50 object-cover')}
+          />
+        ) : (
+          <div></div>
+        )}
       </div>
     </div>
   )
 }
-const ImagesComponent = ({ images = [], removeItem, updateItem, moveItem }) => {
+const ImagesComponent = ({ images = [], defaultSlots = [], removeItem, updateItem, moveItem }) => {
   return (
-    <div className="w-fit grid lg:grid-cols-4 gap-1 xl:gap-4 ">
-      {images.map((item, index) => {
-        return (
-          <ItemImage
-            key={`image_${index}`}
-            item={item}
-            index={index}
-            onRemove={removeItem}
-            onUpdate={updateItem}
-            onMove={moveItem}
-          />
-        )
-      })}
+    <div className="flex-1 overflow-y-auto">
+      <div className="w-fit flex flex-wrap gap-1 xl:gap-4 ">
+        {images.map((item, index) => {
+          return (
+            <ItemImage
+              key={`image_${index}`}
+              defaultSlots={defaultSlots}
+              item={item}
+              index={index}
+              onRemove={removeItem}
+              onUpdate={updateItem}
+              onMove={moveItem}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }

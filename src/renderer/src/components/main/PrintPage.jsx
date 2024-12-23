@@ -31,20 +31,26 @@ const PrintPage = () => {
   const selectedType = inspectionData.find((item) => item.value === employeeData?.type)
   const selectedScope = scopeData.find((item) => item.value === employeeData?.scopeType)
   const selectedProcedure = procedureData.find((item) => item.value === employeeData?.procedure)
+  const selectedImages =
+    employeeData?.images?.filter((item) => item.type === 'selected' && item?.path) || []
 
   const info = calculateAgeFromRegister(employeeData?.regNo)
+
   return (
-    <div className="h-full overflow-y-auto">
-      <div className={`title ${styles.title}`}>{employeeData?.hospitalName}</div>
-      <div className="m-5">
+    <div>
+      <div className={`mb-8 w-full text-center font-semibold`}>{employeeData?.hospitalName}</div>
+      <div className="m-5 border border-black">
         <div className={`wrapper ${styles.wrapper}`}>
           <div>
             {/* <div>
                 <h3 className={`header ${styles.header}`}>Ерөнхий мэдээлэл</h3>
               </div> */}
-            <div className={`gridWrapper ${styles.gridWrapper}`}>
+            <div className={`px-4 m-4 ${styles.gridWrapper}`}>
               <div>
                 <div className={`subGrid ${styles.subGrid}`}>
+                  <div>№:</div>
+                  <div>{employeeData?.id}</div>
+
                   <div>Нэр:</div>
                   <div>
                     {employeeData?.lastName?.[0]}. {employeeData?.firstName}
@@ -98,7 +104,7 @@ const PrintPage = () => {
                   <div>{selectedProcedure?.name}</div>
 
                   <div>Мэдээ алдууулалт:</div>
-                  <div>{employeeData?.anesthesia}%</div>
+                  <div>{employeeData?.anesthesia}</div>
 
                   {nurse && (
                     <>
@@ -115,14 +121,12 @@ const PrintPage = () => {
           </div>
 
           <div className={`imageWrapper ${styles.imageWrapper}`}>
-            {employeeData?.images?.map((imageData) => {
+            {selectedImages?.map((imageData) => {
               return (
                 <div key={imageData.id} className={`imageContainer ${styles.imageContainer}`}>
                   <div className={`imageTitleWrapper ${styles.imageTitleWrapper}`}>
-                    <div className={`imageNumber ${styles.imageNumber}`}>
-                      {imageData.orderIndex}
-                    </div>
-                    <div className={`imageName ${styles.imageName}`}>{imageData.name}</div>
+                    <div className={`imageNumber ${styles.imageNumber}`}>{imageData.position}</div>
+                    {/* <div className={`imageName ${styles.imageName}`}>{imageData.name}</div> */}
                   </div>
                   <img src={imageData?.path} alt={imageData.name} className="image" />
                 </div>
@@ -135,7 +139,7 @@ const PrintPage = () => {
               src={employeeData?.type === 'upper' ? upperImage : lowerImage}
               className={`typeImage ${styles.typeImage} ms-1`}
             />
-            <div className={`information ${styles.information}`}>
+            <div className={`me-4 ${styles.information}`}>
               <p>Дүгнэлт:</p>
               <div className={`m-0 p-0 text-xs`}>
                 <div
@@ -146,19 +150,19 @@ const PrintPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-start justify-between text-xs">
-            <div className="flex-1 flex flex-col">
-              {hospitalData?.address ? <div>Хаяг: {hospitalData.address}</div> : ''}
-            </div>
-            <div className="flex justify-between">
-              <div className="flex flex-col w-[150px]">
-                <div>Эмч:</div>
-                <div>Гарын үсэг:</div>
-              </div>
-              <div className="flex flex-col w-fit">
-                <div>{doctor?.displayName}</div>
-              </div>
-            </div>
+        </div>
+      </div>
+      <div className="flex items-start justify-between text-xs m-5 mt-0">
+        <div className="flex-1 flex flex-col">
+          {hospitalData?.address ? <div>Хаяг: {hospitalData.address}</div> : ''}
+        </div>
+        <div className="flex justify-between">
+          <div className="flex flex-col w-[150px]">
+            <div>Эмч:</div>
+            <div>Гарын үсэг:</div>
+          </div>
+          <div className="flex flex-col w-fit">
+            <div>{doctor?.displayName}</div>
           </div>
         </div>
       </div>

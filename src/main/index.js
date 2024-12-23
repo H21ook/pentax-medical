@@ -174,7 +174,7 @@ app.whenReady().then(() => {
     }
   )
 
-  ipcMain.handle('print-pdf', (e, { createdDate, uuid }) => {
+  ipcMain.handle('print-pdf', (e, { createdDate, uuid, isPrint = false }) => {
     return new Promise((resolve) => {
       try {
         const printWindow = new BrowserWindow({
@@ -187,6 +187,8 @@ app.whenReady().then(() => {
             enableRemoteModule: false
           }
         })
+
+        // printWindow.webContents.openDevTools()
 
         if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
           printWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/print`)
@@ -215,20 +217,33 @@ app.whenReady().then(() => {
                   message: 'Алдаа гарлаа'
                 })
               } else {
-                printWindow.close()
-                exec(`start "" "${pdfPath}"`, (error) => {
-                  if (error) {
-                    console.error('Error opening PDF:', error)
-                  }
-                })
+                if (isPrint) {
+                  printWindow.webContents.print(
+                    {
+                      silent: false,
+                      pageSize: 'A4',
+                      printBackground: true
+                    },
+                    (success, failureReason) => {
+                      if (!success) console.error('Print failed:', failureReason)
+                      printWindow.close()
+                    }
+                  )
+                } else {
+                  printWindow.close()
+                  exec(`start "" "${pdfPath}"`, (error) => {
+                    if (error) {
+                      console.error('Error opening PDF:', error)
+                    }
+                  })
+                }
 
                 resolve({
-                  result: true,
-                  data: pdfPath
+                  result: true
                 })
               }
             })
-          }, 1000)
+          }, 1500)
         })
       } catch (err) {
         log.info('Print err ', err?.message)

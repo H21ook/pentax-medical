@@ -6,7 +6,6 @@ import { DatePicker } from '../../ui/date-picker'
 import { Button } from '../../ui/Button'
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../../ui/Select'
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group'
-// import { TreeDatePicker } from '../../ui/tree-date-picker'
 import { useAddress } from '../../../context/address-context'
 import { useEffect, useMemo, useState } from 'react'
 import { useNewData } from '../../../context/new-data-context'
@@ -17,6 +16,7 @@ import { useAuth } from '../../../context/auth-context'
 import { toast } from 'sonner'
 import Editor from '../../ui/Editor'
 import { useOptions } from '../../../context/options-context'
+import { format } from 'date-fns'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
   const { hospitalData } = useHospital()
@@ -64,10 +64,13 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
       setError('Бичлэг, зураг бүрэн хийгдээгүй байна.')
       return
     }
-    const { sourceType, tempVideoPath, tempImages, images } = newData
+
+    const { sourceType, tempVideoPath, tempImages, images, uuid } = newData
     const res = await window.api.createEmployee({
       data: {
         ...values,
+        uuid,
+        date: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         hospitalName: hospitalData?.name,
         departmentName: hospitalData?.departmentName,
         videoPath: tempVideoPath,
@@ -105,7 +108,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   }
 
   return (
-    <form className="space-y-6 px-2" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-6 px-2 pb-[50px]" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <h3 className="text-lg font-medium">Ерөнхий мэдээлэл</h3>
       </div>
@@ -590,10 +593,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           control={control}
           name={'date'}
           key={'date'}
-          rules={{
-            required: 'Үзлэгийн огноо оруулна уу'
-          }}
-          render={({ field: { value, onChange, name }, fieldState: { error } }) => {
+          render={({ field: { name }, fieldState: { error } }) => {
             return (
               <div className="flex flex-col items-start gap-1">
                 <Label htmlFor={name} className="pb-1">
@@ -601,14 +601,12 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
                 </Label>
                 <DatePicker
                   id={name}
-                  value={value}
+                  value={format(new Date(), 'yyyy-MM-dd HH:mm:ss')}
+                  disabled={true}
                   format="yyyy-MM-dd HH:mm:ss"
                   className="w-full"
                   placeholder="Үзлэгийн огноо сонгох"
                   hideIcon
-                  onChange={(e) => {
-                    onChange(e)
-                  }}
                 />
                 {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
@@ -749,7 +747,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           }}
         />
       </div>
-      <div>
+      <div className="fixed left-0 bottom-[53px] bg-background w-full py-2 px-4 border-t">
         <div className="flex gap-4 items-center">
           <Button
             variant="outline"
@@ -763,8 +761,9 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
             Бичлэг хийх
           </Button>
           <Button type="submit">Үзлэг дуусгах</Button>
+
+          <div className="text-sm text-destructive mt-0.5">{error}</div>
         </div>
-        <div className="text-sm text-destructive mt-0.5">{error}</div>
       </div>
     </form>
   )

@@ -53,6 +53,9 @@ const ChooseVideoSrcType = ({ onChange = () => {}, setVideoSrc = () => {} }) => 
 
 const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   const { changeNewData, newData } = useNewData()
+
+  const defaultSlots = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+
   let ti = newData?.tempImages
   if (ti && ti.length > 0) {
     if (ti[0].type !== type) {
@@ -123,6 +126,7 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   const resetVideo = async () => {
     changeNewData({
       tempImages: [],
+      images: [],
       tempVideoPath: undefined,
       sourceType: undefined
     })
@@ -141,9 +145,12 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   }
 
   // Update an item in a specific slot
-  const updateItem = (slotIndex, newPath) => {
+  const updateItem = (slotIndex, newData) => {
     let images = [...slots]
-    images[slotIndex].path = newPath
+    images[slotIndex] = {
+      ...images[slotIndex],
+      ...newData
+    }
     changeNewData({
       tempImages: images
     })
@@ -151,7 +158,7 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
 
   // Add item
   const addImage = (newPath) => {
-    const images = [...newData.images]
+    const images = [...(newData?.images || [])]
     images.push({
       path: newPath
     })
@@ -169,6 +176,7 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
       if (item.path === removedImage[0]?.path) {
         return {
           ...item,
+          position: item.orderIndex,
           path: undefined
         }
       }
@@ -197,8 +205,8 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   return (
     <div className="mb-14 h-[calc(100vh-280px)] overflow-hidden flex flex-col gap-4">
       <DndContext>
-        <form className="w-full flex flex-col lg:flex-row gap-4 items-center lg:items-start">
-          <div className="max-w-[624px] min-w-[45%] w-[45%] 2xl:min-w-[654px] 2xl:w-[654px]">
+        <form className="w-full grid grid-cols-[400px_1fr] 2xl:grid-cols-[654px_1fr] gap-4 h-[300px] 2xl:h-[491px]">
+          <div className="w-full">
             <div className="relative bg-black w-full">
               {(!selectedType || (selectedType === 'chooseFile' && !videoPath)) && (
                 <ChooseVideoSrcType
@@ -242,24 +250,27 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
             className="w-full lg:w-[500px] object-contain"
           />
         </div> */}
-          <div className="flex-1 lg:flex-auto">
-            <ImagesComponent
-              images={slots}
-              removeItem={removeItem}
-              updateItem={updateItem}
-              moveItem={moveItem}
-            />
-          </div>
+          <ImagesComponent
+            defaultSlots={defaultSlots}
+            images={slots}
+            removeItem={removeItem}
+            updateItem={updateItem}
+            moveItem={moveItem}
+          />
         </form>
-        <div className="flex-1 overflow-y-auto py-4">
-          <div className="grid grid-cols-6 lg:grid-cols-8 gap-1">
+        <div className="overflow-y-hidden overflow-x-auto w-full">
+          <div className="flex gap-2 min-w-max">
             {newData?.images?.map((item, index) => {
-              return <DraggableImage key={index} item={item} index={index} onRemove={removeImage} />
+              return (
+                <div key={index} className="w-[180px] 2xl:w-[220px]">
+                  <DraggableImage item={item} index={index} onRemove={removeImage} />
+                </div>
+              )
             })}
           </div>
         </div>
 
-        <div className="flex gap-4 justify-between fixed left-0 right-0 bottom-[53px] z-10 bg-background p-4">
+        <div className="flex gap-4 justify-between fixed left-0 right-0 bottom-[53px] border-t z-10 bg-background px-4 py-2">
           <div className="flex gap-4">
             <Button variant="secondary" onClick={prevStep}>
               <RxArrowLeft className="me-2" />

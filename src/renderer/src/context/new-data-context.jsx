@@ -16,7 +16,6 @@ const NewDataContext = createContext({
 })
 
 const formDefaultValues = {
-  uuid: uuidv4(),
   hospitalName: '',
   departmentName: '',
   date: '',
@@ -35,8 +34,7 @@ const formDefaultValues = {
   address: '',
   type: 'upper',
   procedure: 'none',
-  scopeType: 'pentax',
-  images: []
+  scopeType: 'pentax'
 }
 
 const NewDataProvider = ({ children }) => {
@@ -53,13 +51,10 @@ const NewDataProvider = ({ children }) => {
 
   const newDataStorage = localStorage.getItem('newData')
   let storageNewData = {
-    uuid: uuidv4(),
     hospitalName: hospitalData?.name,
     departmentName: hospitalData?.departmentName,
-    date: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
     procedure: 'none',
-    scopeType: 'pentax',
-    images: []
+    scopeType: 'pentax'
   }
 
   if (newDataStorage) {
@@ -107,7 +102,6 @@ const NewDataProvider = ({ children }) => {
       setNewData(undefined)
       reset({
         ...formDefaultValues,
-        uuid: uuidv4(),
         hospitalName: hospitalData?.name,
         departmentName: hospitalData?.departmentName,
         date: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
@@ -118,6 +112,8 @@ const NewDataProvider = ({ children }) => {
 
   const addNewTab = () => {
     const foundIndex = tabs.findIndex((item) => item.type === 'new')
+
+    console.log('newtab ', newData)
     setTabs((prev) => {
       let resultData = prev
       if (foundIndex < 0) {
@@ -130,7 +126,15 @@ const NewDataProvider = ({ children }) => {
       localStorage.setItem('tabs', JSON.stringify(resultData))
       return resultData
     })
+
     setSelectedTab(foundIndex < 0 ? tabs.length : foundIndex)
+    if (foundIndex < 0) {
+      setNewData({
+        ...storageNewData,
+        uuid: uuidv4(),
+        date: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+      })
+    }
   }
 
   const addDetailTab = (rowData) => {

@@ -34,6 +34,5 @@ export const print = (data) => {
 }
 
 export const testConvert = async () => {
-  console.log('wert ---- ')
   return await ipcRenderer.invoke('file:testConvert')
 }

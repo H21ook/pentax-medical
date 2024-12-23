@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import db from '../config/database'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import fs from 'fs'
 import { verifyToken } from '../config/token'
 import { getTodayName, log } from '../config/log'
@@ -41,23 +41,42 @@ const prepareFolder = async (uuid) => {
 const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) => {
   const insert = db.prepare(`
         INSERT INTO employeeImages (
-            uuid, employeeId, name, path, orderIndex, createdDate
+            uuid, employeeId, name, path, orderIndex, position, type, createdDate
         ) VALUES (
-            @uuid, @employeeId, @name, @path, @orderIndex, @createdDate
+            @uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate
         )
     `)
   const distFolder = await prepareFolder(uuid)
   const sourceFolder = createTempFolder(uuid)
-  await moveImagesToFolder(images, distFolder)
+  const rawImages = await moveImagesToFolder(images, distFolder)
   const res = await moveFilesToFolder(tempImages, distFolder, sourceFolder)
   if (res.result) {
-    res.files.map((imageData) => {
+    let allImages = res.files
+    if (rawImages?.result) {
+      allImages = [
+        ...res.files.map((item) => {
+          return {
+            ...item,
+            type: 'selected'
+          }
+        }),
+        ...rawImages.files.map((item) => {
+          return {
+            ...item,
+            type: 'raw'
+          }
+        })
+      ]
+    }
+    allImages.map((imageData) => {
       const info = insert.run({
         uuid: uuid,
         employeeId: employeeId,
         name: imageData.name,
         path: imageData.path,
-        orderIndex: imageData.orderIndex,
+        orderIndex: imageData?.orderIndex,
+        position: imageData?.position,
+        type: imageData?.type,
         createdDate: new Date().toISOString()
       })
 
@@ -116,6 +135,138 @@ const createEmployee = async (employee, images, tempImages, token) => {
     }
   } catch (err) {
     log.info('Create employee error:::')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    return {
+      result: false,
+      message: 'Алдаа гарлаа'
+    }
+  }
+}
+
+const fileDelete = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(path, (err) => {
+      if (err) {
+        log.info('Error deleting the file:', err)
+        reject(err)
+      } else {
+        log.info('File deleted successfully:', path)
+        resolve(true)
+      }
+    })
+  })
+}
+
+function copyAndRenameImage(currentFilePath, newFileName) {
+  return new Promise((resolve, reject) => {
+    const currentDir = dirname(currentFilePath)
+
+    // Construct the destination path with the new file name
+    const destinationPath = join(currentDir, newFileName)
+
+    // Check if the source file exists
+    fs.access(currentFilePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        log.info('Source file does not exist:', currentFilePath)
+        return reject(err)
+      }
+
+      // Copy and rename the file
+      fs.copyFile(currentFilePath, destinationPath, (err) => {
+        if (err) {
+          log.info('Error copying the file:', err)
+          return reject(err)
+        } else {
+          log.info(
+            `File copied and renamed successfully:\nFrom: ${currentFilePath}\nTo: ${destinationPath}`
+          )
+          return resolve(destinationPath)
+        }
+      })
+    })
+  })
+}
+
+const updateEmployeeImages = async (images) => {
+  try {
+    const deleteImages = images?.filter((it) => it.imageChanged)
+    if (deleteImages?.length > 0) {
+      const placeholders = deleteImages.map(() => '?').join(',')
+      const query = `SELECT * FROM employeeImages WHERE id IN (${placeholders})`
+      const stmt = db.prepare(query)
+      const oldImages = stmt.all(...deleteImages.map((item) => item.id))
+
+      // huuchin zurguudiig ustgaw
+      const deleteRequests = oldImages.map((img) => {
+        return fileDelete(img.path)
+      })
+
+      await Promise.all(deleteRequests)
+    }
+    //shine zurag copy hiine
+    const imageChanges = images.map(async (img) => {
+      if (!img.path) {
+        return { ...img, path: '' }
+      }
+      const newPath = await copyAndRenameImage(
+        img.path,
+        `${img.name.replaceAll(' ', '_')}_${img.orderIndex - 1}.png`
+      )
+      return {
+        ...img,
+        path: newPath
+      }
+    })
+
+    const newImages = await Promise.all(imageChanges)
+
+    newImages?.map((it) => {
+      const udpateEmployee = db.prepare(`UPDATE
+        employeeImages SET path = @path, name = @name, position = @position WHERE id = @id`)
+
+      udpateEmployee.run(it)
+    })
+
+    return {
+      result: true
+    }
+  } catch (err) {
+    log.info('Update employee images error:::')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    return {
+      result: false,
+      message: 'Алдаа гарлаа'
+    }
+  }
+}
+
+const updateEmployee = async ({ id, summary, images }) => {
+  try {
+    const nowDate = new Date().toISOString()
+    const udpateEmployee = db.prepare(`UPDATE
+        employee SET summary = @summary, updatedAt = @updatedAt WHERE id = @id`)
+
+    udpateEmployee.run({
+      summary,
+      updatedAt: nowDate,
+      id
+    })
+
+    if (images?.length > 0) {
+      await updateEmployeeImages(images)
+    }
+
+    return {
+      result: true
+    }
+  } catch (err) {
+    log.info('Update employee error:::')
     if (err instanceof Error) {
       log.info(err.message)
       log.info(err.stack)
@@ -188,4 +339,8 @@ ipcMain.handle('employee:employeeImages', () => {
 
 ipcMain.handle('employee:getEmployee', (_, id) => {
   return getEmployee(id)
+})
+
+ipcMain.handle('employee:update', (_, data) => {
+  return updateEmployee(data)
 })

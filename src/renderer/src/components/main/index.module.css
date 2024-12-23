@@ -44,7 +44,7 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin: 16px 0;
+  margin: 0;
 }
 
 .imageWrapper img {
@@ -54,15 +54,17 @@
 }
 
 .imageContainer {
+  position: relative;
   border: 1px solid black;
   grid-template-rows: 1fr auto;
   display: grid;
 }
 
 .imageTitleWrapper {
+  position: absolute;
   display: flex;
   gap: 8px;
-  height: 30px;
+  height: 24px;
   align-items: center;
 }
 

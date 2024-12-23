@@ -113,6 +113,8 @@ export const initTables = (isForce) => {
         name TEXT NOT NULL,
         path TEXT NOT NULL,
         orderIndex INTEGER,
+        position INTEGER,
+        type TEXT,
         createdDate TEXT NOT NULL
     );
 
@@ -134,6 +136,9 @@ export const initTables = (isForce) => {
     );
     `)
 
+  const selectQuery = db.prepare('SELECT username FROM users WHERE type = ?')
+  const systemRootUser = selectQuery.get('system-root')
+
   const insertUser = db.prepare(`INSERT INTO
         users (username, displayName, systemRole, role, position, type, createdAt, password)
       VALUES
@@ -147,7 +152,8 @@ export const initTables = (isForce) => {
     position: 'Developer',
     type: 'system-root',
     createdAt: nowDate,
-    password: '$2b$10$pohw5PGO4WDO5i3ooVLwZ.hEVhZCk.xfsvyZzbb4UcF8OgNhnVzqi'
+    password: '$2b$10$48IFnmpp.w2VYkgAKgwAbuVUb1ZlLvPLmFQ69zxQeKj23sbYkHQGG'
+    //Pentaxpassword
   })
 
   log.info(`SYSTEM_USER_ID: ${info.lastInsertRowid}`)
@@ -214,41 +220,66 @@ export const initTables = (isForce) => {
   })
   log.info(`Option data created: ${options4.lastInsertRowid}`)
 
-  // MIGRATION N ANH UDAA ALGASAH ???
-  // // 2024120901
-  // db.exec(`INSERT INTO
-  //       data_migrate (key, description, createdAt, executedAt)
-  //     VALUES
-  //         ('2024120901', 'Ehnii migrate', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
-  // `)
+  // MIGRATIONS
 
-  // // 2024120902
-  // db.exec(`INSERT INTO
-  //       data_migrate (key, description, createdAt, executedAt)
-  //     VALUES
-  //         ('2024120902', 'data_config table-d device bagana nemew', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
-  // `)
+  // 2024122301
+  db.exec(`INSERT INTO
+        data_migrate (key, description, createdAt, executedAt)
+      VALUES
+          ('2024122301', 'employeeImages table-d position bagana nemew', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
+  `)
 
-  // const stmt = db.prepare('SELECT * FROM data_migrate WHERE executed = ?')
-  // const migrations = stmt.all(0)
+  // 2024122302
+  db.exec(`INSERT INTO
+        data_migrate (key, description, createdAt, executedAt)
+      VALUES
+          ('2024122302', 'employeeImages table-d type bagana nemew', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
+  `)
 
-  // const migrate_01 = migrations.find((m) => m.key === '2024120901')
+  // 2024122303
+  db.exec(`INSERT INTO
+        data_migrate (key, description, createdAt, executedAt)
+      VALUES
+          ('2024122303', 'employeeImages table-d type bagana nemew', '${nowDate}', '${nowDate}') ON CONFLICT (key) DO NOTHING;
+  `)
 
-  // if (migrate_01) {
-  //   db.exec(`
-  //     ALTER TABLE users ADD COLUMN isBlock NUMBER DEFAULT 0;
-  //     UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_01.key}'
-  // `)
-  // }
+  if (systemRootUser) {
+    // MIGRATION HEREGJILT
+    const stmt = db.prepare('SELECT * FROM data_migrate WHERE executed = ?')
+    const migrations = stmt.all(0)
 
-  // const migrate_02 = migrations.find((m) => m.key === '2024120902')
+    const migrate_01 = migrations.find((m) => m.key === '2024122301')
 
-  // if (migrate_02) {
-  //   db.exec(`
-  //     ALTER TABLE data_config ADD COLUMN device TEXT;
-  //     UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_02.key}'
-  // `)
-  // }
+    if (migrate_01) {
+      db.exec(`
+      ALTER TABLE employeeImages ADD COLUMN position NUMBER;
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_01.key}'
+  `)
+    }
+    const migrate_02 = migrations.find((m) => m.key === '2024122302')
+
+    if (migrate_02) {
+      db.exec(`
+      ALTER TABLE employeeImages ADD COLUMN type TEXT;
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_02.key}'
+  `)
+    }
+
+    const migrate_03 = migrations.find((m) => m.key === '2024122303')
+
+    if (migrate_03) {
+      db.exec(`
+      Update users set password = '$2b$10$48IFnmpp.w2VYkgAKgwAbuVUb1ZlLvPLmFQ69zxQeKj23sbYkHQGG' where type = 'system-root';
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE key = '${migrate_03.key}'
+  `)
+    }
+  } else {
+    // ANH UDAA
+    log.info('WELCOMe')
+    db.exec(`
+      UPDATE data_migrate SET executed = 1, executedAt = '${nowDate}' WHERE executed = 0;
+    `)
+  }
 }
 
 export default db

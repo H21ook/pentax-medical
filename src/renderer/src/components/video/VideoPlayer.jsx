@@ -123,75 +123,77 @@ const VideoPlayer = ({ src, reRecord = () => {}, onCaptureImage = () => {} }) =>
         <div className="w-full aspect-[4/3]"></div>
       )}
       <canvas ref={canvasRef} hidden />
-      <div className="absolute bottom-0 w-full flex gap-2 p-2 flex-col text-sm">
-        <div className="flex gap-2">
-          <div className="text-white">
-            {Math.floor(currentTime / 60)
-              .toString()
-              .padStart(2, '0')}
-            :
-            {Math.floor(currentTime % 60)
-              .toString()
-              .padStart(2, '0')}
-          </div>
-          <Slider
-            defaultValue={[0]}
-            max={100}
-            min={0}
-            onValueChange={handleSeek}
-            value={[(currentTime * 100) / duration]}
-            className="flex-1"
-          />
-          {duration && (
+      {duration && (
+        <div className="absolute bottom-0 w-full flex gap-2 p-2 flex-col text-sm">
+          <div className="flex gap-2">
             <div className="text-white">
-              {Math.floor(duration / 60)
+              {Math.floor(currentTime / 60)
                 .toString()
                 .padStart(2, '0')}
               :
-              {Math.floor(duration % 60)
+              {Math.floor(currentTime % 60)
                 .toString()
                 .padStart(2, '0')}
             </div>
-          )}
-        </div>
-        <div className="flex gap-2 justify-between items-center">
-          <Button size="icon" variant="outline" className="rounded-full" onClick={reRecord}>
-            <TbReload className="text-[#333]" size={20} />
-          </Button>
-          <div className="flex gap-2">
-            <Button
-              size="icon"
-              variant="outline"
-              className={cn('rounded-full')}
-              onClick={togglePlayPause}
-            >
-              {isPlaying ? (
-                <TbPlayerPauseFilled className="text-[#333]" size={20} />
-              ) : (
-                <TbPlayerPlayFilled className="text-[#333]" size={20} />
-              )}
-            </Button>
-            <Button size="icon" variant="outline" className="rounded-full" onClick={handleStop}>
-              <TbPlayerStopFilled className="text-[#333]" size={20} />
-            </Button>
+            <Slider
+              defaultValue={[0]}
+              max={100}
+              min={0}
+              onValueChange={handleSeek}
+              value={[(currentTime * 100) / duration]}
+              className="flex-1"
+            />
+            {duration && (
+              <div className="text-white">
+                {Math.floor(duration / 60)
+                  .toString()
+                  .padStart(2, '0')}
+                :
+                {Math.floor(duration % 60)
+                  .toString()
+                  .padStart(2, '0')}
+              </div>
+            )}
           </div>
-          <div>
-            <Button
-              size="icon"
-              variant="outline"
-              className="rounded-full"
-              disabled={loadingCapture}
-              onClick={captureImage}
-            >
-              {loadingCapture ? (
-                <TbLoader className="text-[#333] animate-spin" size={20} />
-              ) : (
-                <TbCaptureFilled className="text-[#333]" size={20} />
-              )}
+          <div className="flex gap-2 justify-between items-center">
+            <Button size="icon" variant="outline" className="rounded-full" onClick={reRecord}>
+              <TbReload className="text-[#333]" size={20} />
             </Button>
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="outline"
+                className={cn('rounded-full')}
+                onClick={togglePlayPause}
+              >
+                {isPlaying ? (
+                  <TbPlayerPauseFilled className="text-[#333]" size={20} />
+                ) : (
+                  <TbPlayerPlayFilled className="text-[#333]" size={20} />
+                )}
+              </Button>
+              <Button size="icon" variant="outline" className="rounded-full" onClick={handleStop}>
+                <TbPlayerStopFilled className="text-[#333]" size={20} />
+              </Button>
+            </div>
+            <div>
+              <Button
+                size="icon"
+                variant="outline"
+                className="rounded-full"
+                disabled={loadingCapture}
+                onClick={captureImage}
+              >
+                {loadingCapture ? (
+                  <TbLoader className="text-[#333] animate-spin" size={20} />
+                ) : (
+                  <TbCaptureFilled className="text-[#333]" size={20} />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

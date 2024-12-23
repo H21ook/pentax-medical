@@ -188,12 +188,12 @@ export const moveFilesToFolder = async (filesArray, destinationFolder, sourceFol
 
     // Loop through each file in the array
     const moveFilesRequest = []
-    const movedFiles = filesArray.map((item) => {
+    const movedFiles = filesArray.map((item, index) => {
       const { name, path: filePath } = item
       const fileExtension = extname(filePath)
       const destinationPath = join(
         destinationFolder,
-        `${name.replaceAll(' ', '_')}${fileExtension}`
+        `${name.replaceAll(' ', '_')}_${index}${fileExtension}`
       )
       moveFilesRequest.push(fs.promises.copyFile(filePath, destinationPath))
       return {
@@ -232,10 +232,12 @@ export const moveImagesToFolder = async (filesArray, destinationFolder) => {
     const movedFiles = filesArray.map((item, index) => {
       const { path: filePath } = item
       const fileExtension = extname(filePath)
-      const destinationPath = join(destinationFolder, `${index + 1}${fileExtension}`)
+      const fileName = `raw-${index + 1}`
+      const destinationPath = join(destinationFolder, `${fileName}${fileExtension}`)
       moveFilesRequest.push(fs.promises.copyFile(filePath, destinationPath))
       return {
         ...item,
+        name: fileName,
         path: destinationPath
       }
     })

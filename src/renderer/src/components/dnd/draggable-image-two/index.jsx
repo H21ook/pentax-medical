@@ -14,8 +14,8 @@ const DraggableImageTwo = ({ item, index }) => {
   return (
     <div
       className={cn(
-        'rounded-md overflow-hidden',
-        isDragging ? 'border-2 border-primary' : 'border'
+        'overflow-hidden',
+        isDragging ? 'border-2 border-primary rounded-md' : 'border'
       )}
     >
       <div

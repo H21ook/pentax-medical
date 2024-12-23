@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from 'sonner'
 import { calculateAgeFromRegister } from '../../lib/utils'
 import { useOptions } from '../../context/options-context'
+import { TbPrinter } from 'react-icons/tb'
+import EditDetailForm from './EditDetailForm'
 
 const DetailTab = () => {
   const { tabs, selectedTab } = useNewData()
@@ -20,6 +22,7 @@ const DetailTab = () => {
   const [selectedImage, setSelectedImage] = useState()
   const [loading, setLoading] = useState(false)
   const { allOptions } = useOptions()
+  const [editData, setEditData] = useState(false)
 
   const inspectionData = allOptions?.filter((item) => item.type === 'inspectionType')
   const scopeData = allOptions?.filter((item) => item.type === 'scopeType')
@@ -34,6 +37,7 @@ const DetailTab = () => {
   }, [])
 
   useEffect(() => {
+    localStorage.removeItem('printData')
     getDetailEmployee(selectedTabData?.id)
   }, [getDetailEmployee, selectedTabData])
 
@@ -42,8 +46,9 @@ const DetailTab = () => {
 
   const doctor = users.find((u) => u.id === employeeData?.doctorId)
   const nurse = users.find((u) => u.id === employeeData?.nurseId)
+  const selectedImages = employeeData?.images?.filter((item) => item.type === 'selected') || []
 
-  const handlePrint = async () => {
+  const handlePrint = async (isPrint) => {
     setLoading(true)
     localStorage.setItem(
       'printData',
@@ -57,10 +62,10 @@ const DetailTab = () => {
     )
     const res = await window.api.printPdf({
       uuid: employeeData?.uuid,
-      createdDate: employeeData?.createdAt
+      createdDate: employeeData?.createdAt,
+      isPrint
     })
 
-    localStorage.removeItem('printData')
     setLoading(false)
     if (!res?.result) {
       toast.error('Амжилтгүй', {
@@ -178,53 +183,86 @@ const DetailTab = () => {
 
         <Separator />
 
+        {}
         <div className="mt-6 text-sm">
-          <div className="flex gap-4 items-center">
-            <Button onClick={handlePrint} disabled={loading}>
-              Тайлан
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                await window.api.openFolder(employeeData?.folderPath)
-              }}
-            >
-              <span className="me-2">Файлын хавтасруу очих</span> <RxArrowRight />
-            </Button>
-          </div>
-          <div className="grid grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 mt-4 gap-2">
-            {employeeData?.images?.map((imageData) => {
-              return (
-                <div key={imageData.id} className="border">
-                  <div className="flex gap-2">
-                    <div className="flex items-center justify-center bg-red-500 text-white w-6 text-left">
-                      {imageData.orderIndex}
+          {editData ? null : (
+            <div className="flex items-center justify-between">
+              <div className="flex gap-4 items-center">
+                <Button onClick={() => handlePrint(true)} disabled={loading}>
+                  <TbPrinter className="me-2" />
+                  Тайлан хэвлэх
+                </Button>
+                <Button variant={'secondary'} onClick={() => handlePrint(false)} disabled={loading}>
+                  <RxEyeOpen className="me-2" />
+                  Тайлан харах
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={async () => {
+                    await window.api.openFolder(employeeData?.folderPath)
+                  }}
+                >
+                  <span className="me-2">Файлын хавтасруу очих</span> <RxArrowRight />
+                </Button>
+              </div>
+              <Button
+                onClick={() => {
+                  setEditData(true)
+                }}
+                disabled={loading}
+              >
+                Засах
+              </Button>
+            </div>
+          )}
+
+          {editData ? (
+            employeeData && (
+              <EditDetailForm
+                employeeData={employeeData}
+                onHide={() => {
+                  setEditData(false)
+                }}
+                onSuccess={() => {
+                  getDetailEmployee(selectedTabData?.id)
+                }}
+              />
+            )
+          ) : (
+            <div className="grid grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 mt-4 gap-2">
+              {selectedImages?.map((imageData) => {
+                return (
+                  <div key={imageData.id} className="border">
+                    <div className="flex gap-2">
+                      <div className="flex items-center justify-center bg-red-500 text-white w-6 text-left">
+                        {imageData.position}
+                      </div>
+                      <p className="flex-1 truncate whitespace-nowrap">{imageData.name}</p>
                     </div>
-                    <p className="flex-1 truncate whitespace-nowrap">{imageData.name}</p>
-                  </div>
-                  <div className="relative group/item">
-                    <img
-                      src={imageData?.path}
-                      alt={imageData.name}
-                      className="w-full object-contain"
-                    />
-                    <div className="group/edit invisible group-hover/item:visible bg-white/20 absolute inset-0 flex items-center justify-center">
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        onClick={() => {
-                          setSelectedImage(imageData)
-                          setShowModal(true)
-                        }}
-                      >
-                        <RxEyeOpen />
-                      </Button>
+                    <div className="relative group/item">
+                      <img
+                        src={imageData?.path}
+                        alt={imageData.name}
+                        className="w-full object-contain"
+                      />
+                      <div className="group/edit invisible group-hover/item:visible bg-white/20 absolute inset-0 flex items-center justify-center">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          onClick={() => {
+                            setSelectedImage(imageData)
+                            setShowModal(true)
+                          }}
+                        >
+                          <RxEyeOpen />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
         {showModal && (
           <Dialog
@@ -240,7 +278,7 @@ const DetailTab = () => {
               <DialogHeader>
                 <DialogTitle className="flex gap-2">
                   <span className="font-bold leading-none text-white text-xs h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                    {selectedImage?.orderIndex}
+                    {selectedImage?.position}
                   </span>
                   {selectedImage?.name}
                 </DialogTitle>

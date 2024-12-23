@@ -15,3 +15,7 @@ export const getEmployeeImagesList = () => {
 export const createEmployee = (data) => {
   return ipcRenderer.invoke('employee:create', data)
 }
+
+export const updateEmployee = (data) => {
+  return ipcRenderer.invoke('employee:update', data)
+}
