@@ -33,17 +33,26 @@ const PageRouterProvider = ({ routes = [], defaultPageKey }) => {
   }, [])
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('changeTab', (_, { path, index }) => {
-      setCurrentPageKey(path)
-      if (tabs.length > index) {
-        setSelectedTab(index)
+    const handleKeyDown = (event) => {
+      if (event.key[0] === 'F' && event.key.length === 2) {
+        event.preventDefault()
+        const keyIndex = Number(event.key[1]) - 1
+        setCurrentPageKey('main')
+        if (tabs.length > keyIndex) {
+          setSelectedTab(keyIndex)
+        }
+        // Your application logic here, e.g., saving data or triggering a function
       }
-    })
-
-    return () => {
-      window.electron.ipcRenderer.removeAllListeners('changeTab')
     }
-  }, [tabs])
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown)
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   useEffect(() => {
     if (loading) {

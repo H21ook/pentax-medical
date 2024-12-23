@@ -16,7 +16,7 @@ const NewDataContext = createContext({
 })
 
 const formDefaultValues = {
-  uuid: '',
+  uuid: uuidv4(),
   hospitalName: '',
   departmentName: '',
   date: '',

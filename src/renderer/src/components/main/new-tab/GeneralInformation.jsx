@@ -68,6 +68,8 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
     const res = await window.api.createEmployee({
       data: {
         ...values,
+        hospitalName: hospitalData?.name,
+        departmentName: hospitalData?.departmentName,
         videoPath: tempVideoPath,
         sourceType
       },
@@ -112,19 +114,13 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           control={control}
           name={'hospitalName'}
           key={'hospitalName'}
-          render={({ field: { name, onChange, value } }) => {
+          render={({ field: { name } }) => {
             return (
               <div className="flex flex-col items-start gap-1">
                 <Label htmlFor={name} className="pb-1">
                   Эмнэлгийн нэр <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id={name}
-                  name={name}
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  readonly
-                />
+                <Input id={name} name={name} readonly value={hospitalData.name} />
               </div>
             )
           }}
@@ -133,20 +129,13 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           control={control}
           name={'departmentName'}
           key={'departmentName'}
-          defaultValue={hospitalData.departmentName}
-          render={({ field: { name, value, onChange } }) => {
+          render={({ field: { name } }) => {
             return (
               <div className="flex flex-col items-start gap-1">
                 <Label htmlFor={name} className="pb-1">
                   Тасгийн нэр <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id={name}
-                  name={name}
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  readonly
-                />
+                <Input id={name} name={name} readonly value={hospitalData.departmentName} />
               </div>
             )
           }}

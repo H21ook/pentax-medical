@@ -4,9 +4,11 @@ import lowerImage from '../../assets/lower.png'
 import upperImage from '../../assets/upper.png'
 import { calculateAgeFromRegister } from '../../lib/utils'
 import { useOptions } from '../../context/options-context'
+import { useHospital } from '../../context/hospital-context'
 
 const PrintPage = () => {
   const { allOptions } = useOptions()
+  const { hospitalData } = useHospital()
   const [printData, setPrintData] = useState()
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const PrintPage = () => {
   const info = calculateAgeFromRegister(employeeData?.regNo)
   return (
     <div className="h-full overflow-y-auto">
-      <div className={`title ${styles.title}`}>Сүхбаатар дүүргийн эрүүл мэндийн төв</div>
+      <div className={`title ${styles.title}`}>{employeeData?.hospitalName}</div>
       <div className="m-5">
         <div className={`wrapper ${styles.wrapper}`}>
           <div>
@@ -144,13 +146,18 @@ const PrintPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-end text-xs">
-            <div className="flex flex-col w-[150px]">
-              <div>Эмч:</div>
-              <div>Гарын үсэг:</div>
+          <div className="flex items-start justify-between text-xs">
+            <div className="flex-1 flex flex-col">
+              {hospitalData?.address ? <div>Хаяг: {hospitalData.address}</div> : ''}
             </div>
-            <div className="flex flex-col w-fit">
-              <div>{doctor?.displayName}</div>
+            <div className="flex justify-between">
+              <div className="flex flex-col w-[150px]">
+                <div>Эмч:</div>
+                <div>Гарын үсэг:</div>
+              </div>
+              <div className="flex flex-col w-fit">
+                <div>{doctor?.displayName}</div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, dirname } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -114,10 +114,10 @@ app.whenReady().then(() => {
   ipcMain.on('showAbout', () => {
     if (win) {
       dialog.showMessageBox(win, {
-        title: 'Програмын тухай',
+        title: 'Pentax',
         type: 'info',
-        message: 'Pentax',
-        detail: `Энэхүү програм нь дурангийн эмч нарт зориулагдсан болно.
+        message: 'Програмын тухай',
+        detail: `Энэхүү програм нь Pentax дурангийн эмч нарт зориулагдсан болно.
 
   Хувилбар:
       Node: v${process.versions.node}
@@ -126,6 +126,17 @@ app.whenReady().then(() => {
 
   Copyright © ${new Date().getFullYear()}
         `
+      })
+    }
+  })
+
+  ipcMain.on('showContact', () => {
+    if (win) {
+      dialog.showMessageBox(win, {
+        title: 'Pentax',
+        type: 'info',
+        message: 'Холбоо барих',
+        detail: `Програмтай холбоотой зүйлсийг khishigbayar.u@gmail.com имэйл хаягаар холбогдож лавлана уу.`
       })
     }
   })
@@ -229,16 +240,6 @@ app.whenReady().then(() => {
       }
     })
   })
-
-  for (let i = 1; i <= 12; i++) {
-    const key = `F${i}`
-    globalShortcut.register(key, () => {
-      win.webContents.send('changeTab', {
-        path: 'main',
-        index: i - 1
-      })
-    })
-  }
 
   // renderer log
   ipcMain.on('log-error', (_e, data) => {

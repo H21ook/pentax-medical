@@ -26,7 +26,10 @@ const MenuHeader = () => {
     trigger: 'Тусламж',
     children: [
       {
-        label: 'Холбоо барих'
+        label: 'Холбоо барих',
+        onClick: () => {
+          window.electron.ipcRenderer.send('showContact')
+        }
       },
       {
         label: 'Програмын тухай',

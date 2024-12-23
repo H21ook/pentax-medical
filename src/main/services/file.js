@@ -73,6 +73,7 @@ ipcMain.handle('file:saveImage', async (_, { uuid, imageData }) => {
 ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
   const tempDir = createTempFolder(uuid)
   const nowDate = Date.now()
+  const localFmpegPath = ffmpegPath.replace('\\app.asar\\', '\\app.asar.unpacked\\')
   const filePath = join(tempDir, `recording-${nowDate}.webm`)
   // const fileMp4Path = join(tempDir, `recording-${nowDate}.mp4`)
   const fileWebmPath = join(tempDir, `recording-${nowDate}-metadata.webm`)
@@ -86,8 +87,11 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
           message: 'Файлыг хадгалахад алдаа гарлаа'
         })
       } else {
+        log.info('Path ', ffmpegPath)
+        log.info('Local ', localFmpegPath)
+
         // const command = `${ffmpegPath} -i "${filePath}" -c:v libx264 -c:a aac "${fileMp4Path}"`
-        const command = `${ffmpegPath} -i "${filePath}" -c:v copy -c:a copy -map_metadata 0 "${fileWebmPath}"`
+        const command = `"${localFmpegPath}" -i "${filePath}" -c:v copy -c:a copy -map_metadata 0 "${fileWebmPath}"`
 
         exec(command, (error) => {
           if (error) {
