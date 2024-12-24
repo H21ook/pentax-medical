@@ -31,8 +31,10 @@ const PrintPage = () => {
   const selectedType = inspectionData.find((item) => item.value === employeeData?.type)
   const selectedScope = scopeData.find((item) => item.value === employeeData?.scopeType)
   const selectedProcedure = procedureData.find((item) => item.value === employeeData?.procedure)
-  const selectedImages =
+  const reportAllImages =
     employeeData?.images?.filter((item) => item.type === 'selected' && item?.path) || []
+  const selectedImages =
+    reportAllImages?.length > 9 ? reportAllImages.splice(0, 9) : reportAllImages
 
   const info = calculateAgeFromRegister(employeeData?.regNo)
 
@@ -141,7 +143,7 @@ const PrintPage = () => {
             />
             <div className={`me-4 ${styles.information}`}>
               <b>Дүгнэлт:</b>
-              <div className={`m-0 p-0 text-xs`}>
+              <div className={`m-0 p-0 text-xs !leading-[14px]`}>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: employeeData?.summary

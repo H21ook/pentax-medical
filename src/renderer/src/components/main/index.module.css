@@ -37,7 +37,7 @@
   display: grid;
   grid-template-columns: 120px 1fr;
   font-size: 12px;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .imageWrapper {

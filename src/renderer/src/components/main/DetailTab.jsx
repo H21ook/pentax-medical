@@ -170,8 +170,10 @@ const DetailTab = () => {
 
             <div>Онош</div>
             <b>{employeeData?.diagnosis}</b>
+          </div>
 
-            <div>Дүгнэлт</div>
+          <div className="col-span-2">
+            <div className="text-sm my-2">Дүгнэлт</div>
             <div
               className="!text-sm"
               dangerouslySetInnerHTML={{
