@@ -48,8 +48,11 @@ const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) =>
     `)
   const distFolder = await prepareFolder(uuid)
   const sourceFolder = createTempFolder(uuid)
+
   const rawImages = await moveImagesToFolder(images, distFolder)
-  const res = await moveFilesToFolder(tempImages, distFolder, sourceFolder)
+  const imageWithFiles = tempImages?.filter((item) => item?.path)
+  log.info('Image path data ', imageWithFiles)
+  const res = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
   if (res.result) {
     let allImages = res.files
     if (rawImages?.result) {

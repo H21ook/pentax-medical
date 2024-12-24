@@ -179,7 +179,7 @@ ipcMain.handle('file:removeImageFile', async (_, path) => {
   })
 })
 
-export const moveFilesToFolder = async (filesArray, destinationFolder, sourceFolder) => {
+export const moveFilesToFolder = async (filesArray = [], destinationFolder, sourceFolder) => {
   try {
     // Ensure the destination folder exists
     if (!fs.existsSync(destinationFolder)) {
@@ -188,7 +188,7 @@ export const moveFilesToFolder = async (filesArray, destinationFolder, sourceFol
 
     // Loop through each file in the array
     const moveFilesRequest = []
-    const movedFiles = filesArray.map((item, index) => {
+    const movedFiles = filesArray?.map((item, index) => {
       const { name, path: filePath } = item
       const fileExtension = extname(filePath)
       const destinationPath = join(
@@ -244,15 +244,15 @@ export const moveImagesToFolder = async (filesArray, destinationFolder) => {
 
     await Promise.all(moveFilesRequest)
 
-    log.info(`Moved: ${destinationFolder}`)
+    log.info(`Copied: ${destinationFolder}`)
 
-    log.info(`All files moved to ${destinationFolder} successfully.`)
+    log.info(`All files copied to ${destinationFolder} successfully.`)
     return {
       result: true,
       files: movedFiles
     }
   } catch (error) {
-    log.info('Error moving files:', error)
+    log.info('Error copy files:', error)
     return {
       result: false
     }
