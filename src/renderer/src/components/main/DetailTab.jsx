@@ -122,7 +122,7 @@ const DetailTab = () => {
             </div>
             <div>Нэр:</div>
             <b>
-              {employeeData?.lastName?.[0]}. {employeeData?.firstName}
+              {employeeData?.firstName?.[0]}. {employeeData?.lastName}
             </b>
 
             <div>Регистрийн дугаар:</div>

@@ -53,7 +53,7 @@ const PrintPage = () => {
 
                   <div>Нэр:</div>
                   <div>
-                    {employeeData?.lastName?.[0]}. {employeeData?.firstName}
+                    {employeeData?.firstName?.[0]}. {employeeData?.lastName}
                   </div>
 
                   <div>Регистрийн дугаар:</div>
