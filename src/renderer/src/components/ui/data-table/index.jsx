@@ -61,7 +61,7 @@ const DataTable = ({
       {header(table)}
       <div className="rounded-md border my-4">
         <Table scrollClassname={scrollClassname}>
-          <TableHeader className="sticky top-0">
+          <TableHeader className="sticky top-0 z-[2]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

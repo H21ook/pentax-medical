@@ -13,7 +13,7 @@ const Table = React.forwardRef(({ className, scrollClassname, ...props }, ref) =
 Table.displayName = 'Table'
 
 const TableHeader = React.forwardRef(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b bg-slate-200/50', className)} {...props} />
+  <thead ref={ref} className={cn('[&_tr]:border-b bg-slate-50', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
