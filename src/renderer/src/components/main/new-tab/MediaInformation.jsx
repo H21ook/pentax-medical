@@ -7,8 +7,6 @@ import { useNewData } from '../../../context/new-data-context'
 import { toast } from 'sonner'
 import { RxArrowLeft, RxReload } from 'react-icons/rx'
 import { Button } from '../../ui/Button'
-// import lowerImage from '../../../assets/lower.png'
-// import upperImage from '../../../assets/upper.png'
 import ImagesComponent from './ImagesComponent'
 import { v4 as uuidv4 } from 'uuid'
 import { defaultLowerSlotsData, defaultUpperSlotsData } from '../../../lib/staticData'
@@ -55,14 +53,15 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   const { changeNewData, newData } = useNewData()
 
   const defaultSlots = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+  const mainSlots = defaultSlots.slice(0, 9)
 
   let ti = newData?.tempImages
   if (ti && ti.length > 0) {
     if (ti[0].type !== type) {
-      ti = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+      ti = mainSlots
     }
   } else {
-    ti = type === 'upper' ? defaultUpperSlotsData : defaultLowerSlotsData
+    ti = mainSlots
   }
 
   const slots = ti?.sort((a, b) => a.orderIndex - b.orderIndex)

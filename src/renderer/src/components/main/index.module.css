@@ -43,7 +43,7 @@
 .imageWrapper {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   margin: 0;
 }
 
@@ -101,8 +101,9 @@
 }
 
 .typeImage {
-  width: 260px;
+  width: 150px;
   object-fit: contain;
+  align-self: flex-end;
 }
 
 .signatureWrapper {

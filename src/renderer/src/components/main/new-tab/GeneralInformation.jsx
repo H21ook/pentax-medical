@@ -19,6 +19,7 @@ import { useOptions } from '../../../context/options-context'
 import { format } from 'date-fns'
 
 const GeneralInformation = ({ nextStep = () => {} }) => {
+  const REGISTRY_REG = /^[\p{а-яА-ЯёүөЁҮӨ}]{2}[0-9]{8}$/
   const { hospitalData } = useHospital()
   const { token } = useAuth()
   const { users, getEmployeeList } = useUsers()
@@ -56,11 +57,7 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
   }, [watchFields])
 
   const onSubmit = async (values) => {
-    if (
-      !newData?.tempVideoPath ||
-      !newData?.tempImages ||
-      newData?.tempImages?.filter((item) => item.path)?.length === 0
-    ) {
+    if (!newData?.tempVideoPath || newData?.tempImages?.some((item) => !item?.path)) {
       setError('Бичлэг, зураг бүрэн хийгдээгүй байна.')
       return
     }
@@ -316,7 +313,11 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
           name={'regNo'}
           key={'regNo'}
           rules={{
-            required: 'Регистрийн дугаар оруулна уу'
+            required: 'Регистрийн дугаар оруулна уу',
+            pattern: {
+              value: REGISTRY_REG,
+              message: 'Регистрийн дугаар буруу байна'
+            }
           }}
           render={({ field: { value, onChange, name }, fieldState: { error } }) => {
             return (

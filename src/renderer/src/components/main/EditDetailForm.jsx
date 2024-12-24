@@ -16,7 +16,7 @@ const EditDetailForm = ({ employeeData, onHide = () => {}, onSuccess = () => {} 
   let tempImages = employeeData?.images?.filter((item) => item.type === 'selected')
   let raw_images = employeeData?.images?.filter((item) => item.type === 'raw')
   tempImages?.sort((a, b) => a.orderIndex - b.orderIndex)
-  const [slots, setSlots] = useState(tempImages)
+  const [slots, setSlots] = useState(JSON.parse(JSON.stringify(tempImages)))
   const [rawImages, setRawImages] = useState(raw_images)
   const [summary, setSummary] = useState(employeeData?.summary)
   const [loading, setLoading] = useState(false)

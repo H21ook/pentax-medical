@@ -140,7 +140,7 @@ const PrintPage = () => {
               className={`typeImage ${styles.typeImage} ms-1`}
             />
             <div className={`me-4 ${styles.information}`}>
-              <p>Дүгнэлт:</p>
+              <b>Дүгнэлт:</b>
               <div className={`m-0 p-0 text-xs`}>
                 <div
                   dangerouslySetInnerHTML={{
