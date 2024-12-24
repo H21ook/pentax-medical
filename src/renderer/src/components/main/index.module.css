@@ -55,9 +55,8 @@
 
 .imageContainer {
   position: relative;
+  width: 100%;
   border: 1px solid black;
-  grid-template-rows: 1fr auto;
-  display: grid;
 }
 
 .imageTitleWrapper {

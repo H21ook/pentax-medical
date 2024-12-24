@@ -116,62 +116,64 @@ const DetailTab = () => {
         <Separator />
 
         <div className="mt-6 grid grid-cols-2">
-          <div className="grid grid-cols-[200px_1fr] text-sm gap-2">
+          <div>
             <div className="col-span-2">
               <h3 className="text-lg font-medium">Өвчтөний мэдээлэл</h3>
             </div>
-            <div>Нэр:</div>
-            <b>
-              {employeeData?.firstName?.[0]}. {employeeData?.lastName}
-            </b>
+            <div className="grid grid-cols-[200px_1fr] text-sm gap-2 mt-6">
+              <div>Нэр:</div>
+              <b>
+                {employeeData?.firstName?.[0]}. {employeeData?.lastName}
+              </b>
 
-            <div>Регистрийн дугаар:</div>
-            <b>{employeeData?.regNo}</b>
+              <div>Регистрийн дугаар:</div>
+              <b>{employeeData?.regNo}</b>
 
-            <div>Төгсөн огноо:</div>
-            <b>{info?.birthDate}</b>
+              <div>Төгсөн огноо:</div>
+              <b>{info?.birthDate}</b>
 
-            <div>Нас:</div>
-            <b>{info?.age}</b>
+              <div>Нас:</div>
+              <b>{info?.age}</b>
 
-            <div>Хүйс:</div>
-            <b>
-              {employeeData?.gender === 'male'
-                ? 'Эр'
-                : employeeData?.gender === 'female'
-                  ? 'Эм'
-                  : 'Бусад'}
-            </b>
+              <div>Хүйс:</div>
+              <b>
+                {employeeData?.gender === 'male'
+                  ? 'Эр'
+                  : employeeData?.gender === 'female'
+                    ? 'Эм'
+                    : 'Бусад'}
+              </b>
 
-            <div>Хаяг:</div>
-            <b>
-              {employeeParentAddress?.name}, {employeeSubAddress?.name}, {employeeData?.address}
-            </b>
+              <div>Хаяг:</div>
+              <b>
+                {employeeParentAddress?.name}, {employeeSubAddress?.name}, {employeeData?.address}
+              </b>
 
-            <div>Утасны дугаар:</div>
-            <b>{employeeData?.phoneNumber}</b>
+              <div>Утасны дугаар:</div>
+              <b>{employeeData?.phoneNumber}</b>
+            </div>
           </div>
-
-          <div className="grid grid-cols-[200px_1fr] text-sm gap-2">
+          <div>
             <div className="col-span-2">
               <h3 className="text-lg font-medium">Үзлэгийн мэдээлэл</h3>
             </div>
-            <div>Үзлэгийн огноо</div>
-            <b>{employeeData?.date}</b>
+            <div className="grid grid-cols-[200px_1fr] text-sm gap-2 mt-6">
+              <div>Үзлэгийн огноо</div>
+              <b>{employeeData?.date}</b>
 
-            <div>Үзлэгийн төрөл</div>
-            <b>{selectedType?.name}</b>
+              <div>Үзлэгийн төрөл</div>
+              <b>{selectedType?.name}</b>
 
-            <div>Эмч</div>
-            <b>{doctor?.displayName}</b>
+              <div>Эмч</div>
+              <b>{doctor?.displayName}</b>
 
-            <div>Сувилагч</div>
-            <b>{nurse?.displayName}</b>
+              <div>Сувилагч</div>
+              <b>{nurse?.displayName}</b>
 
-            <div>Онош</div>
-            <b>{employeeData?.diagnosis}</b>
+              <div>Онош</div>
+              <b>{employeeData?.diagnosis}</b>
+            </div>
           </div>
-
           <div className="col-span-2">
             <div className="text-sm my-2">Дүгнэлт</div>
             <div

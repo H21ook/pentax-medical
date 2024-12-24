@@ -125,12 +125,22 @@ const PrintPage = () => {
           <div className={`imageWrapper ${styles.imageWrapper}`}>
             {selectedImages?.map((imageData) => {
               return (
-                <div key={imageData.id} className={`imageContainer ${styles.imageContainer}`}>
+                <div
+                  key={imageData.id}
+                  className={`aspect-[4/3] flex imageContainer ${styles.imageContainer}`}
+                >
                   <div className={`imageTitleWrapper ${styles.imageTitleWrapper}`}>
                     <div className={`imageNumber ${styles.imageNumber}`}>{imageData.position}</div>
                     {/* <div className={`imageName ${styles.imageName}`}>{imageData.name}</div> */}
                   </div>
-                  <img src={imageData?.path} alt={imageData.name} className="image" />
+                  <img
+                    src={imageData?.path}
+                    alt={imageData.name}
+                    style={{
+                      objectFit: 'cover'
+                    }}
+                    className="flex-1 size-full bg-black"
+                  />
                 </div>
               )
             })}
