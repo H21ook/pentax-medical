@@ -125,10 +125,12 @@ const ItemImage = ({
   )
 }
 const ImagesComponent = ({ images = [], defaultSlots = [], removeItem, updateItem, moveItem }) => {
+  console.log(images)
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="w-fit flex flex-wrap gap-1 xl:gap-4 ">
         {images.map((item, index) => {
+          // const currentItem = images.find()
           return (
             <ItemImage
               key={`image_${index}`}

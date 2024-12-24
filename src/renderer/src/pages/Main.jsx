@@ -1,7 +1,7 @@
 import MainLayout from '../components/layouts/main-layout'
 import DataTable from '../components/ui/data-table'
 import { Button } from '../components/ui/Button'
-import { RxCross2, RxPlus } from 'react-icons/rx'
+import { RxCross2, RxPlus, RxTrash } from 'react-icons/rx'
 import ColumnVisible from '../components/ui/data-table/ColumnVisible'
 import { Input } from '../components/ui/Input'
 import { Select, SelectContent, SelectTrigger, SelectValue } from '../components/ui/Select'
@@ -13,6 +13,8 @@ import { useNewData } from '../context/new-data-context'
 import { useUsers } from '../context/users-context'
 import { useAddress } from '../context/address-context'
 import { useState } from 'react'
+import { useAuth } from '../context/auth-context'
+import { toast } from 'sonner'
 
 const PatiantsTableHeader = ({ table, actions }) => {
   const { parentAddress, allAddressData } = useAddress()
@@ -116,11 +118,38 @@ const PatiantsTableHeader = ({ table, actions }) => {
   )
 }
 const MainPage = () => {
-  const { employees } = useUsers()
+  const { user } = useAuth()
+  const { employees, getEmployeeList } = useUsers()
   const { allAddressData } = useAddress()
   const { selectedTab, tabs, setSelectedTab, removeTab, addDetailTab, addNewTab } = useNewData()
 
   const selectedRows = tabs?.filter((item) => item.type === 'detail')?.map((item) => item.id) || []
+
+  const removeEmployee = async (data) => {
+    const res = await window.api.deleteEmployee(data.id)
+    if (!res.result) {
+      toast.error('Амжилтгүй', {
+        action: {
+          label: 'Хаах',
+          onClick: () => {}
+        },
+        duration: 3000,
+        richColors: true,
+        description: 'Алдаа гарлаа'
+      })
+      return
+    }
+    toast.success('Амжилттай', {
+      action: {
+        label: 'Хаах',
+        onClick: () => {}
+      },
+      duration: 3000,
+      richColors: true,
+      description: ''
+    })
+    getEmployeeList()
+  }
 
   const columns = [
     {
@@ -243,6 +272,25 @@ const MainPage = () => {
     }
   ]
 
+  if (user?.type === 'system-root') {
+    columns.push({
+      accessorKey: 'action',
+      header: 'Үйлдэл',
+      cell: ({ row }) => {
+        return (
+          <Button
+            size="icon"
+            className="size-6"
+            onClick={() => {
+              removeEmployee(row?.original)
+            }}
+          >
+            <RxTrash />
+          </Button>
+        )
+      }
+    })
+  }
   return (
     <MainLayout>
       <div>

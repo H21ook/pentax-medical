@@ -19,3 +19,7 @@ export const createEmployee = (data) => {
 export const updateEmployee = (data) => {
   return ipcRenderer.invoke('employee:update', data)
 }
+
+export const deleteEmployee = (id) => {
+  return ipcRenderer.invoke('employee:delete', id)
+}

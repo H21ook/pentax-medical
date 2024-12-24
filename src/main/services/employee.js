@@ -328,6 +328,26 @@ const getEmployee = (id) => {
   }
 }
 
+const deleteEmployee = (id) => {
+  try {
+    db.exec(`DELETE from employeeImages WHERE employeeId = ${id}`)
+    db.exec(`DELETE from employee WHERE id = ${id}`)
+    return {
+      result: true
+    }
+  } catch (err) {
+    log.info('delete employee error:::')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    return {
+      result: false,
+      message: 'Алдаа гарлаа'
+    }
+  }
+}
+
 ipcMain.handle('employee:create', (_, { data, images, tempImages, token }) => {
   return createEmployee(data, images, tempImages, token)
 })
@@ -346,4 +366,8 @@ ipcMain.handle('employee:getEmployee', (_, id) => {
 
 ipcMain.handle('employee:update', (_, data) => {
   return updateEmployee(data)
+})
+
+ipcMain.handle('employee:delete', (_, id) => {
+  return deleteEmployee(id)
 })

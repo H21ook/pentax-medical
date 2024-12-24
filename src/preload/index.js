@@ -24,7 +24,13 @@ import {
   testConvert,
   printPdf
 } from './routes/file'
-import { createEmployee, getEmployee, getEmployeeList, updateEmployee } from './routes/employee'
+import {
+  createEmployee,
+  deleteEmployee,
+  getEmployee,
+  getEmployeeList,
+  updateEmployee
+} from './routes/employee'
 import { getDataConfig } from './routes/dataConfig'
 import { getAllOptions, updateOptions, deleteOptions, createOptions } from './routes/options'
 
@@ -67,6 +73,7 @@ const api = {
   getEmployeeList,
   getEmployee,
   updateEmployee,
+  deleteEmployee,
 
   //DATA-CONFIG
   getDataConfig,
