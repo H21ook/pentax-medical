@@ -50,27 +50,14 @@ const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) =>
   const sourceFolder = createTempFolder(uuid)
 
   const rawImages = await moveImagesToFolder(images, distFolder)
-  const imageWithFiles = tempImages?.filter((item) => item?.path)
-  log.info('Image path data ', imageWithFiles)
-  const res = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
-  if (res.result) {
-    let allImages = res.files
-    if (rawImages?.result) {
-      allImages = [
-        ...res.files.map((item) => {
-          return {
-            ...item,
-            type: 'selected'
-          }
-        }),
-        ...rawImages.files.map((item) => {
-          return {
-            ...item,
-            type: 'raw'
-          }
-        })
-      ]
-    }
+
+  if (rawImages?.result) {
+    const allImages = rawImages.files.map((item) => {
+      return {
+        ...item,
+        type: 'raw'
+      }
+    })
     allImages.map((imageData) => {
       const info = insert.run({
         uuid: uuid,
@@ -85,6 +72,33 @@ const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) =>
 
       return info.lastInsertRowid
     })
+  }
+  log.info('Raw images saved ')
+  const imageWithFiles = tempImages?.filter((item) => item?.path)
+  log.info('Image path data ', imageWithFiles)
+  const res = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
+  if (res.result) {
+    let allImages = res.files.map((item) => {
+      return {
+        ...item,
+        type: 'selected'
+      }
+    })
+    allImages.map((imageData) => {
+      const info = insert.run({
+        uuid: uuid,
+        employeeId: employeeId,
+        name: imageData.name,
+        path: imageData.path,
+        orderIndex: imageData?.orderIndex,
+        position: imageData?.position,
+        type: imageData?.type,
+        createdDate: new Date().toISOString()
+      })
+
+      return info.lastInsertRowid
+    })
+    log.info('Selected images saved ')
   }
 }
 
