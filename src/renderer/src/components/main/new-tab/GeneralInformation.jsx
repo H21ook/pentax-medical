@@ -106,8 +106,8 @@ const GeneralInformation = ({ nextStep = () => {} }) => {
 
   return (
     <form className="space-y-6 px-2 pb-[50px]" onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <h3 className="text-lg font-medium">Ерөнхий мэдээлэл</h3>
+      <div className="flex items-center gap-4">
+        <h3 className="text-lg font-medium">Ерөнхий мэдээлэл</h3> <p>({newData?.uuid})</p>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Controller
