@@ -22,7 +22,9 @@ import {
   openFolder,
   print,
   testConvert,
-  printPdf
+  printPdf,
+  openLogFolder,
+  openTempFolder
 } from './routes/file'
 import {
   createEmployee,
@@ -66,6 +68,8 @@ const api = {
   removeTempFiles,
   removeImageFile,
   openFolder,
+  openLogFolder,
+  openTempFolder,
   testConvert,
 
   //EMPLOYEE

@@ -32,6 +32,18 @@ const MenuHeader = () => {
         }
       },
       {
+        label: 'Лог харах',
+        onClick: async () => {
+          await window.api.openLogFolder()
+        }
+      },
+      {
+        label: 'Темп фолдэрт очих',
+        onClick: async () => {
+          await window.api.openTempFolder()
+        }
+      },
+      {
         label: 'Програмын тухай',
         shortcut: <MenubarShortcut>Alt+I</MenubarShortcut>,
         onClick: () => {

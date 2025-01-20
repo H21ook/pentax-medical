@@ -15,6 +15,10 @@ const EditDetailForm = ({ employeeData, onHide = () => {}, onSuccess = () => {} 
 
   let tempImages = employeeData?.images?.filter((item) => item.type === 'selected')
   let raw_images = employeeData?.images?.filter((item) => item.type === 'raw')
+
+  if (tempImages?.length < 9) {
+    tempImages = [...tempImages, ...defaultSlots.slice(tempImages?.length || 0, 9)]
+  }
   tempImages?.sort((a, b) => a.orderIndex - b.orderIndex)
   const [slots, setSlots] = useState(JSON.parse(JSON.stringify(tempImages)))
   const [rawImages, setRawImages] = useState(raw_images)
@@ -114,6 +118,7 @@ const EditDetailForm = ({ employeeData, onHide = () => {}, onSuccess = () => {} 
       setLoading(false)
     }
   }
+
   return (
     <div>
       <DndContext>
@@ -133,7 +138,7 @@ const EditDetailForm = ({ employeeData, onHide = () => {}, onSuccess = () => {} 
         </div>
         <ImagesComponent
           defaultSlots={defaultSlots}
-          images={slots}
+          images={slots || defaultSlots.splice(0, 9)}
           removeItem={removeItem}
           updateItem={updateItem}
           moveItem={moveItem}

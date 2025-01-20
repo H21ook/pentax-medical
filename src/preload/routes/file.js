@@ -21,7 +21,15 @@ export const removeImageFile = (path) => {
 }
 
 export const openFolder = (path) => {
-  return ipcRenderer.invoke('file:openFolder', path)
+  return ipcRenderer.invoke('file:openFolder', 'custom', path)
+}
+
+export const openLogFolder = () => {
+  return ipcRenderer.invoke('file:openFolder', 'log')
+}
+
+export const openTempFolder = () => {
+  return ipcRenderer.invoke('file:openFolder', 'temp')
 }
 
 export const printPdf = (data) => {

@@ -179,7 +179,11 @@ ipcMain.handle('file:removeImageFile', async (_, path) => {
   })
 })
 
-export const moveFilesToFolder = async (filesArray = [], destinationFolder, sourceFolder) => {
+export const moveFilesToFolder = async (
+  filesArray = [],
+  destinationFolder
+  //, sourceFolder
+) => {
   try {
     // Ensure the destination folder exists
     if (!fs.existsSync(destinationFolder)) {
@@ -203,7 +207,7 @@ export const moveFilesToFolder = async (filesArray = [], destinationFolder, sour
     })
 
     await Promise.all(moveFilesRequest)
-    await fs.promises.rm(sourceFolder, { recursive: true })
+    // await fs.promises.rm(sourceFolder, { recursive: true })
 
     log.info(`Moved: ${destinationFolder}`)
 
@@ -283,10 +287,19 @@ export const moveVideoFileToFolder = async (filePath, destinationFolder) => {
   }
 }
 
-ipcMain.handle('file:openFolder', (event, folderPath) => {
-  if (folderPath) {
+ipcMain.handle('file:openFolder', (event, type, folderPath) => {
+  if (type === 'custom' && folderPath) {
     // Use spawn to open the image with the default viewer
     spawn('explorer', [folderPath])
+  }
+  if (type === 'log') {
+    const logFolder = app.getPath('logs')
+    spawn('explorer', [logFolder])
+  }
+  if (type === 'temp') {
+    const tempDir = os.tmpdir()
+    const appFolder = join(tempDir, app.getName())
+    spawn('explorer', [appFolder])
   }
 })
 
