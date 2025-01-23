@@ -38,115 +38,176 @@ const prepareFolder = async (uuid) => {
   return userFolder
 }
 
-const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) => {
-  const insert = db.prepare(`
-        INSERT INTO employeeImages (
-            uuid, employeeId, name, path, orderIndex, position, type, createdDate
-        ) VALUES (
-            @uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate
-        )
-    `)
-  const distFolder = await prepareFolder(uuid)
-  const sourceFolder = createTempFolder(uuid)
+// const createEmployeeImages = async ({ employeeId, uuid, images, tempImages }) => {
+//   const insert = db.prepare(`
+//         INSERT INTO employeeImages (
+//             uuid, employeeId, name, path, orderIndex, position, type, createdDate
+//         ) VALUES (
+//             @uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate
+//         )
+//     `)
+//   const distFolder = await prepareFolder(uuid)
+//   const sourceFolder = createTempFolder(uuid)
 
-  const rawImages = await moveImagesToFolder(images, distFolder)
+//   const rawImages = await moveImagesToFolder(images, distFolder)
 
-  if (rawImages?.result) {
-    const allImages = rawImages.files.map((item) => {
-      return {
-        ...item,
-        type: 'raw'
-      }
-    })
-    allImages.map((imageData) => {
-      const info = insert.run({
-        uuid: uuid,
-        employeeId: employeeId,
-        name: imageData.name,
-        path: imageData.path,
-        orderIndex: imageData?.orderIndex,
-        position: imageData?.position,
-        type: imageData?.type,
-        createdDate: new Date().toISOString()
-      })
+//   if (rawImages?.result) {
+//     const allImages = rawImages.files.map((item) => {
+//       return {
+//         ...item,
+//         type: 'raw'
+//       }
+//     })
+//     allImages.map((imageData) => {
+//       const info = insert.run({
+//         // uuid: uuid,
+//         employeeId: employeeId,
+//         name: imageData.name,
+//         path: imageData.path,
+//         orderIndex: imageData?.orderIndex,
+//         position: imageData?.position,
+//         type: imageData?.type,
+//         createdDate: new Date().toISOString()
+//       })
 
-      return info.lastInsertRowid
-    })
-  }
-  log.info('Raw images saved ')
-  const imageWithFiles = tempImages?.filter((item) => item?.path)
-  log.info('Image path data ', imageWithFiles)
-  const res = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
-  if (res.result) {
-    let allImages = res.files.map((item) => {
-      return {
-        ...item,
-        type: 'selected'
-      }
-    })
-    allImages.map((imageData) => {
-      const info = insert.run({
-        uuid: uuid,
-        employeeId: employeeId,
-        name: imageData.name,
-        path: imageData.path,
-        orderIndex: imageData?.orderIndex,
-        position: imageData?.position,
-        type: imageData?.type,
-        createdDate: new Date().toISOString()
-      })
+//       return info.lastInsertRowid
+//     })
+//   }
+//   log.info('Raw images saved ')
+//   const imageWithFiles = tempImages?.filter((item) => item?.path)
+//   log.info('Image path data ', imageWithFiles)
+//   const res = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
+//   if (res.result) {
+//     let allImages = res.files.map((item) => {
+//       return {
+//         ...item,
+//         type: 'selected'
+//       }
+//     })
+//     allImages.map((imageData) => {
+//       const info = insert.run({
+//         uuid: uuid,
+//         employeeId: employeeId,
+//         name: imageData.name,
+//         path: imageData.path,
+//         orderIndex: imageData?.orderIndex,
+//         position: imageData?.position,
+//         type: imageData?.type,
+//         createdDate: new Date().toISOString()
+//       })
 
-      return info.lastInsertRowid
-    })
-    log.info('Selected images saved ')
-  }
-}
+//       return info.lastInsertRowid
+//     })
+//     log.info('Selected images saved ')
+//   }
+// }
 
 const createEmployee = async (employee, images, tempImages, token) => {
   try {
     const user = verifyToken(token)
-
+    const uuid = employee?.uuid
     const distFolder = await prepareFolder(employee.uuid)
     const res = await moveVideoFileToFolder(employee.videoPath, distFolder)
+    const sourceFolder = createTempFolder(uuid)
+
+    // raw images
+    const rawImages = await moveImagesToFolder(images, distFolder)
+    // reportImages
+    const imageWithFiles = tempImages?.filter((item) => item?.path)
+    log.info('Image path data ', imageWithFiles)
+    const reportImages = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
 
     if (res.result) {
-      const insert = db.prepare(`
-        INSERT INTO employee (
-            uuid, hospitalName, departmentName, date, diseaseIndication, anesthesia,
-            firstName, lastName, gender, cityId, districtId, regNo, age, phoneNumber,
-            address, videoPath, type, diagnosis, summary, doctorId, nurseId, sourceType, scopeType, procedure, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
-        ) VALUES (
-            @uuid, @hospitalName, @departmentName, @date, @diseaseIndication, @anesthesia,
-            @firstName, @lastName, @gender, @cityId, @districtId, @regNo, @age, @phoneNumber,
-            @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @scopeType, @procedure, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
-        )
-    `)
+      const transaction = db.transaction(() => {
+        // Example query 1: Insert into table1
+        const insert = db.prepare(`
+            INSERT INTO employee (
+                uuid, hospitalName, departmentName, date, diseaseIndication, anesthesia,
+                firstName, lastName, gender, cityId, districtId, regNo, age, phoneNumber,
+                address, videoPath, type, diagnosis, summary, doctorId, nurseId, sourceType, scopeType, procedure, folderPath, createdAt, createdUserId, updatedAt, updatedUserId
+            ) VALUES (
+                @uuid, @hospitalName, @departmentName, @date, @diseaseIndication, @anesthesia,
+                @firstName, @lastName, @gender, @cityId, @districtId, @regNo, @age, @phoneNumber,
+                @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @scopeType, @procedure, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
+            )
+        `)
+        const nowDate = new Date().toISOString()
+        const info = insert.run({
+          ...employee,
+          folderPath: distFolder,
+          videoPath: res.path,
+          createdAt: nowDate,
+          createdUserId: user.id,
+          updatedAt: nowDate,
+          updatedUserId: user.id
+        })
+        const newEmployeeId = info.lastInsertRowid
 
-      const nowDate = new Date().toISOString()
-      const info = insert.run({
-        ...employee,
-        folderPath: distFolder,
-        videoPath: res.path,
-        createdAt: nowDate,
-        createdUserId: user.id,
-        updatedAt: nowDate,
-        updatedUserId: user.id
+        // Save images
+        const imagesQuery = db.prepare(`
+            INSERT INTO employeeImages (
+                uuid, employeeId, name, path, orderIndex, position, type, createdDate
+            ) VALUES (
+                @uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate
+            )
+        `)
+
+        if (rawImages?.result) {
+          const allImages = rawImages.files.map((item) => {
+            return {
+              ...item,
+              type: 'raw'
+            }
+          })
+          allImages.forEach((imageData) => {
+            const info = imagesQuery.run({
+              uuid: uuid,
+              employeeId: newEmployeeId,
+              name: imageData.name,
+              path: imageData.path,
+              orderIndex: imageData?.orderIndex,
+              position: imageData?.position,
+              type: imageData?.type,
+              createdDate: new Date().toISOString()
+            })
+
+            return info.lastInsertRowid
+          })
+        }
+        log.info('Raw images saved ')
+
+        if (reportImages.result) {
+          let allImages = reportImages.files.map((item) => {
+            return {
+              ...item,
+              type: 'selected'
+            }
+          })
+          allImages.forEach((imageData) => {
+            const info = imagesQuery.run({
+              uuid: uuid,
+              employeeId: newEmployeeId,
+              name: imageData.name,
+              path: imageData.path,
+              orderIndex: imageData?.orderIndex,
+              position: imageData?.position,
+              type: imageData?.type,
+              createdDate: new Date().toISOString()
+            })
+
+            return info.lastInsertRowid
+          })
+          log.info('Selected images saved ')
+        }
       })
-      const newEmployeeId = info.lastInsertRowid
 
-      createEmployeeImages({
-        employeeId: newEmployeeId,
-        uuid: employee.uuid,
-        images,
-        tempImages
-      })
-
+      await transaction() // Commit the transaction
+      console.log('Transaction completed successfully.', employee?.uuid)
+      // Execute the transaction
       return {
-        result: true,
-        message: true
+        result: true
       }
     }
-
     return {
       result: false
     }

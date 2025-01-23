@@ -257,9 +257,7 @@ export const moveImagesToFolder = async (filesArray, destinationFolder) => {
     }
   } catch (error) {
     log.info('Error copy files:', error)
-    return {
-      result: false
-    }
+    throw error
   }
 }
 
@@ -281,9 +279,7 @@ export const moveVideoFileToFolder = async (filePath, destinationFolder) => {
     }
   } catch (error) {
     log.info('Error moving video file:', error)
-    return {
-      result: false
-    }
+    throw error
   }
 }
 
