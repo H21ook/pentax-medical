@@ -82,7 +82,7 @@ const NewDataProvider = ({ children }) => {
     })
   }, [])
 
-  const removeTab = async (index) => {
+  const removeTab = async (index, isSuccess = false) => {
     const tempTab = tabs[index]
     setTabs((prev) => {
       const temp = [...prev]
@@ -95,7 +95,9 @@ const NewDataProvider = ({ children }) => {
     }
     if (tempTab.type === 'new') {
       try {
-        await window.api.removeTempFiles(newData?.uuid)
+        if (!isSuccess) {
+          await window.api.removeTempFiles(newData?.uuid)
+        }
       } catch (err) {
         /* empty */
       }
@@ -156,8 +158,8 @@ const NewDataProvider = ({ children }) => {
     setSelectedTab(tabs.length)
   }
 
-  const complete = (index) => {
-    removeTab(index)
+  const complete = (index, isSuccess) => {
+    removeTab(index, isSuccess)
   }
 
   return (

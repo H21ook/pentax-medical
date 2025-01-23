@@ -1,6 +1,6 @@
 {
   "name": "pentax",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Pentax дурангийн програм",
   "main": "./out/main/index.js",
   "author": "khishigbayar.u@gmail.com",
