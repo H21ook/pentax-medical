@@ -20,6 +20,10 @@ export const updateEmployee = (data) => {
   return ipcRenderer.invoke('employee:update', data)
 }
 
+export const recoverEmployeeImages = (data) => {
+  return ipcRenderer.invoke('employee:recoverImages', data)
+}
+
 export const deleteEmployee = (id) => {
   return ipcRenderer.invoke('employee:delete', id)
 }

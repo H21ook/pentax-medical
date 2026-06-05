@@ -18,6 +18,7 @@ import {
   saveImageFile,
   saveVideoFile,
   removeTempFiles,
+  getTempFiles,
   removeImageFile,
   openFolder,
   print,
@@ -31,6 +32,7 @@ import {
   deleteEmployee,
   getEmployee,
   getEmployeeList,
+  recoverEmployeeImages,
   updateEmployee
 } from './routes/employee'
 import { getDataConfig } from './routes/dataConfig'
@@ -66,6 +68,7 @@ const api = {
   getVideoDeviceList,
   saveImageFile,
   removeTempFiles,
+  getTempFiles,
   removeImageFile,
   openFolder,
   openLogFolder,
@@ -76,6 +79,7 @@ const api = {
   createEmployee,
   getEmployeeList,
   getEmployee,
+  recoverEmployeeImages,
   updateEmployee,
   deleteEmployee,
 

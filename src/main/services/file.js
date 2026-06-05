@@ -33,6 +33,12 @@ export const createTempFolder = (uuid) => {
   return appFolder
 }
 
+export const getTempFolder = (uuid) => {
+  const tempDir = os.tmpdir()
+  const appFolder = join(tempDir, app.getName())
+  return uuid ? join(appFolder, uuid) : appFolder
+}
+
 export const getDataDirectory = () => {
   const configData = getDataConfig()
   if (configData.status === 'init') {
@@ -126,9 +132,7 @@ ipcMain.handle('file:saveVideoFile', async (_, { buffer, uuid }) => {
 ipcMain.handle('file:removeTempFiles', async (_, uuid) => {
   return new Promise((resolve) => {
     try {
-      const tempDir = os.tmpdir()
-      const appFolder = join(tempDir, app.getName())
-      const userTempFolder = join(appFolder, uuid)
+      const userTempFolder = getTempFolder(uuid)
 
       fs.rm(userTempFolder, { recursive: true, force: true }, (err) => {
         if (err) {
@@ -150,6 +154,51 @@ ipcMain.handle('file:removeTempFiles', async (_, uuid) => {
       })
     }
   })
+})
+
+ipcMain.handle('file:getTempFiles', async (_, uuid) => {
+  try {
+    const tempFolder = getTempFolder(uuid)
+
+    if (!fs.existsSync(tempFolder)) {
+      return {
+        result: true,
+        files: []
+      }
+    }
+
+    const entries = await fs.promises.readdir(tempFolder, { withFileTypes: true })
+    const files = entries
+      .filter((entry) => entry.isFile())
+      .map((entry, index) => {
+        const path = join(tempFolder, entry.name)
+        const ext = extname(entry.name).toLowerCase()
+        const isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp'].includes(ext)
+
+        return {
+          id: `${uuid || 'temp'}-${index}`,
+          name: entry.name,
+          path,
+          type: isImage ? 'raw' : 'file'
+        }
+      })
+
+    return {
+      result: true,
+      files
+    }
+  } catch (err) {
+    log.info('Error reading temp files:::')
+    if (err instanceof Error) {
+      log.info(err.message)
+      log.info(err.stack)
+    }
+    return {
+      result: false,
+      files: [],
+      message: 'Алдаа гарлаа'
+    }
+  }
 })
 
 ipcMain.handle('file:removeImageFile', async (_, path) => {
@@ -190,36 +239,64 @@ export const moveFilesToFolder = async (
       fs.mkdirSync(destinationFolder, { recursive: true })
     }
 
-    // Loop through each file in the array
     const moveFilesRequest = []
-    const movedFiles = filesArray?.map((item, index) => {
+
+    // 1. Алдаа гарсан ч дараагийн файлыг гацаахгүй байх асинхрон функц үүсгэнэ
+    const copyFileHandler = async (item, index) => {
       const { name, path: filePath } = item
       const fileExtension = extname(filePath)
       const destinationPath = join(
         destinationFolder,
         `${name.replaceAll(' ', '_')}_${index}${fileExtension}`
       )
-      moveFilesRequest.push(fs.promises.copyFile(filePath, destinationPath))
-      return {
-        ...item,
-        path: destinationPath
+
+      try {
+        // Эх файл систем дээр үнэхээр байгаа эсэхийг урьдчилж шалгах
+        if (!fs.existsSync(filePath)) {
+          log.warn(`Файл олдсонгүй, алгаслаа: ${filePath}`)
+          return null // Байхгүй бол null буцаана
+        }
+
+        // Файл хуулах үйлдэл
+        await fs.promises.copyFile(filePath, destinationPath)
+
+        // Амжилттай болсон бол шинэчлэгдсэн path-тай объектыг буцаана
+        return {
+          ...item,
+          path: destinationPath
+        }
+      } catch (fileError) {
+        // Аль нэг файл дээр алдаа гарвал энд барьж аваад log үлдээнэ
+        log.error(`Файл зөөх явцад алдаа гарлаа [${name}]:`, fileError)
+        return null // Алдаа гарсан файлыг null болгож алгасна
       }
+    }
+
+    // 2. Файл бүрт зориулж асинхрон хүсэлтүүдээ бэлдэнэ
+    filesArray?.forEach((item, index) => {
+      moveFilesRequest.push(copyFileHandler(item, index))
     })
 
-    await Promise.all(moveFilesRequest)
-    // await fs.promises.rm(sourceFolder, { recursive: true })
+    // 3. Бүх амлалтуудыг зэрэг ажиллуулж, үр дүнг хүлээнэ
+    const results = await Promise.all(moveFilesRequest)
 
-    log.info(`Moved: ${destinationFolder}`)
+    // 4. Зөвхөн амжилттай зөөгдсөн (null биш) файлуудыг шүүж авна
+    const movedFiles = results.filter((file) => file !== null)
 
-    log.info(`All files moved to ${destinationFolder} successfully.`)
+    log.info(`Moved files to: ${destinationFolder}`)
+    log.info(`Successfully moved ${movedFiles.length} out of ${filesArray.length} files.`)
+
+    // Процесс бүрмөсөн унаагүй тул ямагт true болон амжилттай хуулсан файлуудыг буцаана
     return {
       result: true,
       files: movedFiles
     }
   } catch (error) {
-    log.info('Error moving files:', error)
+    // Энэ хэсэгт зөвхөн хавтас үүсгэх зэрэг системд ерөнхий critical алдаа гарвал орж ирнэ
+    log.error('Error moving files (General critical error):', error)
     return {
-      result: false
+      result: false,
+      files: []
     }
   }
 }

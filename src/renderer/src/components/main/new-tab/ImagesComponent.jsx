@@ -8,12 +8,19 @@ import { useState } from 'react'
 const ItemImage = ({
   index,
   defaultSlots = [],
+  images = [],
   item,
   onRemove = () => {},
   onUpdate = () => {},
   onMove = () => {}
 }) => {
   const [selectedSlot, setSelectedSlot] = useState(item?.position)
+  const occupiedSlots = images
+    .filter((img, imgIndex) => img?.path && imgIndex !== index)
+    .map((img) => img?.position)
+  const availableSlots = defaultSlots.filter(
+    (slot) => !occupiedSlots.includes(slot?.orderIndex) || slot?.orderIndex === selectedSlot
+  )
 
   const { isOver, setNodeRef } = useDroppable({
     id: `orderIndex-${index}`,
@@ -39,9 +46,12 @@ const ItemImage = ({
             const slotData = defaultSlots.find((s) => s.orderIndex === selectedSlot)
             onUpdate(over.data.current.index, {
               path: active?.data?.current?.path,
+              orderIndex: selectedSlot,
               position: selectedSlot,
-              name: slotData.name,
-              imageChanged: true
+              name: slotData?.name,
+              type: 'selected',
+              deleted: false,
+              edited: true
             })
           }
         }
@@ -66,8 +76,12 @@ const ItemImage = ({
               const slotData = defaultSlots.find((s) => s.orderIndex === i)
               onUpdate(index, {
                 path: item.path,
-                position: Number(e),
-                name: slotData.name
+                orderIndex: i,
+                position: i,
+                name: slotData?.name,
+                type: 'selected',
+                deleted: false,
+                edited: true
               })
             }}
           >
@@ -80,19 +94,13 @@ const ItemImage = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent
-              data={defaultSlots?.map((item) => ({
-                value: item?.orderIndex,
-                label: `${item?.orderIndex} - ${item?.name}`
+              data={availableSlots?.map((slot) => ({
+                value: slot?.orderIndex,
+                label: `${slot?.orderIndex} - ${slot?.name}`
               }))}
             />
           </Select>
         </div>
-        {/* <div className="flex-1 flex items-center gap-1">
-          <div className="font-bold leading-none text-white text-xs size-5 rounded-full bg-primary flex items-center justify-center">
-            {item.orderIndex}
-          </div>
-          <p className="flex-grow text-xs truncate whitespace-nowrap w-[134px]">{item.name}</p>
-        </div> */}
         {item?.path && (
           <Button
             size="icon"
@@ -124,16 +132,17 @@ const ItemImage = ({
     </div>
   )
 }
+
 const ImagesComponent = ({ images = [], defaultSlots = [], removeItem, updateItem, moveItem }) => {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="w-fit flex flex-wrap gap-1 xl:gap-4 ">
         {images.map((item, index) => {
-          // const currentItem = images.find()
           return (
             <ItemImage
               key={`image_${index}`}
               defaultSlots={defaultSlots}
+              images={images}
               item={item}
               index={index}
               onRemove={removeItem}

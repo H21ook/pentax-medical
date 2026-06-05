@@ -16,6 +16,10 @@ export const removeTempFiles = (uuid) => {
   return ipcRenderer.invoke('file:removeTempFiles', uuid)
 }
 
+export const getTempFiles = (uuid) => {
+  return ipcRenderer.invoke('file:getTempFiles', uuid)
+}
+
 export const removeImageFile = (path) => {
   return ipcRenderer.invoke('file:removeImageFile', path)
 }
