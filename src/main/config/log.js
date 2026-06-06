@@ -2,7 +2,6 @@ import { app } from 'electron'
 import Logger from 'electron-log'
 import { join } from 'path'
 
-
 export const getTodayName = () => {
   const today = new Date()
   const year = today.getFullYear()

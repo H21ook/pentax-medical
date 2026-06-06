@@ -50,8 +50,8 @@ const PatiantsTableHeader = ({ table, actions }) => {
           className="h-8 max-w-[200px]"
         />
         <Select
-          id={name}
-          name={name}
+          id="cityId"
+          name="cityId"
           value={table.getColumn('cityId')?.getFilterValue() ?? ''}
           onValueChange={(value) => {
             setSelecetedParentAddress(value)
@@ -69,8 +69,8 @@ const PatiantsTableHeader = ({ table, actions }) => {
           />
         </Select>
         <Select
-          id={name}
-          name={name}
+          id="districtId"
+          name="districtId"
           value={table.getColumn('districtId')?.getFilterValue() ?? ''}
           onValueChange={(value) => {
             table.getColumn('districtId')?.setFilterValue(value)

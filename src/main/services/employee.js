@@ -203,9 +203,9 @@ const createEmployee = async (employee, images, tempImages, token) => {
     const reportImages = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
 
     if (res.result) {
-      const transaction = db.transaction(() => {
-        // Example query 1: Insert into table1
-        const insert = db.prepare(`
+    const transaction = db.transaction(() => {
+      // Example query 1: Insert into table1
+      const insert = db.prepare(`
             INSERT INTO employee (
                 uuid, hospitalName, departmentName, date, diseaseIndication, anesthesia,
                 firstName, lastName, gender, cityId, districtId, regNo, age, phoneNumber,
@@ -216,20 +216,20 @@ const createEmployee = async (employee, images, tempImages, token) => {
                 @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @scopeType, @procedure, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
             )
         `)
-        const nowDate = new Date().toISOString()
-        const info = insert.run({
-          ...employee,
-          folderPath: distFolder,
-          videoPath: res.path,
-          createdAt: nowDate,
-          createdUserId: user.id,
-          updatedAt: nowDate,
-          updatedUserId: user.id
-        })
-        const newEmployeeId = info.lastInsertRowid
+      const nowDate = new Date().toISOString()
+      const info = insert.run({
+        ...employee,
+        folderPath: distFolder,
+        videoPath: res.path,
+        createdAt: nowDate,
+        createdUserId: user.id,
+        updatedAt: nowDate,
+        updatedUserId: user.id
+      })
+      const newEmployeeId = info.lastInsertRowid
 
-        // Save images
-        const imagesQuery = db.prepare(`
+      // Save images
+      const imagesQuery = db.prepare(`
             INSERT INTO employeeImages (
                 uuid, employeeId, name, path, orderIndex, position, type, createdDate
             ) VALUES (
@@ -237,62 +237,62 @@ const createEmployee = async (employee, images, tempImages, token) => {
             )
         `)
 
-        if (rawImages?.result) {
-          const allImages = rawImages.files.map((item) => {
-            return {
-              ...item,
-              type: 'raw'
-            }
+      if (rawImages?.result) {
+        const allImages = rawImages.files.map((item) => {
+          return {
+            ...item,
+            type: 'raw'
+          }
+        })
+        allImages.forEach((imageData) => {
+          const info = imagesQuery.run({
+            uuid: uuid,
+            employeeId: newEmployeeId,
+            name: imageData.name,
+            path: imageData.path,
+            orderIndex: imageData?.orderIndex,
+            position: imageData?.position,
+            type: imageData?.type,
+            createdDate: new Date().toISOString()
           })
-          allImages.forEach((imageData) => {
-            const info = imagesQuery.run({
-              uuid: uuid,
-              employeeId: newEmployeeId,
-              name: imageData.name,
-              path: imageData.path,
-              orderIndex: imageData?.orderIndex,
-              position: imageData?.position,
-              type: imageData?.type,
-              createdDate: new Date().toISOString()
-            })
 
-            return info.lastInsertRowid
-          })
-        }
-        log.info('Raw images saved ')
-
-        if (reportImages.result) {
-          let allImages = reportImages.files.map((item) => {
-            return {
-              ...item,
-              type: 'selected'
-            }
-          })
-          allImages.forEach((imageData) => {
-            const info = imagesQuery.run({
-              uuid: uuid,
-              employeeId: newEmployeeId,
-              name: imageData.name,
-              path: imageData.path,
-              orderIndex: imageData?.orderIndex,
-              position: imageData?.position,
-              type: imageData?.type,
-              createdDate: new Date().toISOString()
-            })
-
-            return info.lastInsertRowid
-          })
-          log.info('Selected images saved ')
-        }
-      })
-
-      await transaction() // Commit the transaction
-      console.log('Transaction completed successfully.', employee?.uuid)
-      // Execute the transaction
-      return {
-        result: true
+          return info.lastInsertRowid
+        })
       }
+      log.info('Raw images saved ')
+
+      if (reportImages.result) {
+        let allImages = reportImages.files.map((item) => {
+          return {
+            ...item,
+            type: 'selected'
+          }
+        })
+        allImages.forEach((imageData) => {
+          const info = imagesQuery.run({
+            uuid: uuid,
+            employeeId: newEmployeeId,
+            name: imageData.name,
+            path: imageData.path,
+            orderIndex: imageData?.orderIndex,
+            position: imageData?.position,
+            type: imageData?.type,
+            createdDate: new Date().toISOString()
+          })
+
+          return info.lastInsertRowid
+        })
+        log.info('Selected images saved ')
+      }
+    })
+
+    await transaction() // Commit the transaction
+    console.log('Transaction completed successfully.', employee?.uuid)
+    // Execute the transaction
+    return {
+      result: true
     }
+  }
     return {
       result: false
     }
@@ -634,7 +634,11 @@ const updateEmployee = async ({ id, summary, images }) => {
     })
 
     if (images?.length > 0) {
-      await updateEmployeeImages(images.filter((img) => img?.edited), employee?.folderPath, employee)
+      await updateEmployeeImages(
+        images.filter((img) => img?.edited),
+        employee?.folderPath,
+        employee
+      )
     }
 
     return {
@@ -708,8 +712,8 @@ const getEmployee = async (id) => {
 
 const deleteEmployee = (id) => {
   try {
-    db.exec(`DELETE from employeeImages WHERE employeeId = ${id}`)
-    db.exec(`DELETE from employee WHERE id = ${id}`)
+    db.prepare('DELETE FROM employeeImages WHERE employeeId = ?').run(id)
+    db.prepare('DELETE FROM employee WHERE id = ?').run(id)
     return {
       result: true
     }

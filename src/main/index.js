@@ -297,7 +297,7 @@ app.on('window-all-closed', () => {
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error)
   log.info(error)
-  // Optionally show a dialog or notification to the user
+  closeDb()
 })
 
 // Catch unhandled promise rejections

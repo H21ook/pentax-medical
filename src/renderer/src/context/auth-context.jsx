@@ -28,10 +28,11 @@ const AuthProvider = ({ children }) => {
 
     const tokenResult = await window.api.checkToken(token)
     if (tokenResult.data?.isLogged) {
-      setLogged(isLogged)
+      setLogged(true)
       getUserData(token)
+    } else {
+      setLogged(false)
     }
-    setLogged(false)
   }, [getUserData])
 
   const getToken = () => {
