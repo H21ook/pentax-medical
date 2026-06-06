@@ -155,12 +155,13 @@ const EditDetailForm = ({ employeeData, onHide = () => {}, onSuccess = () => {} 
   const save = async () => {
     setLoading(true)
     try {
-      const res = await window.api.updateEmployee({
+      const updateData = {
         images: slots.filter((item) => item?.edited),
         summary,
         id: employeeData?.id,
         uuid: employeeData.uuid
-      })
+      }
+      const res = await window.api.updateEmployee(updateData)
 
       if (res?.result) {
         toast.success('Амжилттай', {

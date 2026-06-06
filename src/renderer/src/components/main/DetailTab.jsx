@@ -46,7 +46,9 @@ const DetailTab = () => {
 
   const doctor = users.find((u) => u.id === employeeData?.doctorId)
   const nurse = users.find((u) => u.id === employeeData?.nurseId)
-  const selectedImages = employeeData?.images?.filter((item) => item.type === 'selected') || []
+  const selectedImages = (
+    employeeData?.images?.filter((item) => item.type === 'selected') || []
+  ).sort((a, b) => a.orderIndex - b.orderIndex)
 
   const handlePrint = async (isPrint) => {
     setLoading(true)

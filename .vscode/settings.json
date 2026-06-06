@@ -9,5 +9,4 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "files.eol": "\r\n",
-  "prettier.endOfLine": "crlf"
 }

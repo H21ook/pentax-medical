@@ -34,7 +34,9 @@ const PrintPage = () => {
   const reportAllImages =
     employeeData?.images?.filter((item) => item.type === 'selected' && item?.path) || []
   const selectedImages =
-    reportAllImages?.length > 9 ? reportAllImages.splice(0, 9) : reportAllImages
+    (reportAllImages?.length > 9 ? reportAllImages.splice(0, 9) : reportAllImages)?.sort((a, b) =>
+      a.orderIndex != null && b.orderIndex != null ? a.orderIndex - b.orderIndex : 0
+    ) || []
 
   const info = calculateAgeFromRegister(employeeData?.regNo)
 

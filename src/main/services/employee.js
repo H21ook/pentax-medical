@@ -18,22 +18,22 @@ const prepareFolder = async (uuid) => {
   const today = getTodayName()
   const todayFolderPath = join(rootPath, today)
 
-  if (!fs.existsSync(todayFolderPath)) {
-    // Create the folder if it doesn't exist
-    fs.mkdirSync(todayFolderPath, { recursive: true })
-    log.info(`Created day folder: ${todayFolderPath}`)
-  } else {
+  try {
+    await fs.promises.access(todayFolderPath, fs.constants.F_OK)
     log.info(`Day Folder already exists: ${todayFolderPath}`)
+  } catch (error) {
+    await fs.promises.mkdir(todayFolderPath, { recursive: true })
+    log.info(`Created day folder: ${todayFolderPath}`)
   }
 
   const userFolder = join(todayFolderPath, uuid)
 
-  if (!fs.existsSync(userFolder)) {
-    // Create the folder if it doesn't exist
-    fs.mkdirSync(userFolder, { recursive: true })
+  try {
+    await fs.promises.access(userFolder, fs.constants.F_OK)
+    log.info(`User folder already exists: ${userFolder}`)
+  } catch (error) {
+    await fs.promises.mkdir(userFolder, { recursive: true })
     log.info(`Created user folder: ${userFolder}`)
-  } else {
-    log.info(`User folder already exists: ${todayFolderPath}`)
   }
 
   return userFolder
@@ -203,9 +203,9 @@ const createEmployee = async (employee, images, tempImages, token) => {
     const reportImages = await moveFilesToFolder(imageWithFiles, distFolder, sourceFolder)
 
     if (res.result) {
-    const transaction = db.transaction(() => {
-      // Example query 1: Insert into table1
-      const insert = db.prepare(`
+      const transaction = db.transaction(() => {
+        // Example query 1: Insert into table1
+        const insert = db.prepare(`
             INSERT INTO employee (
                 uuid, hospitalName, departmentName, date, diseaseIndication, anesthesia,
                 firstName, lastName, gender, cityId, districtId, regNo, age, phoneNumber,
@@ -216,20 +216,20 @@ const createEmployee = async (employee, images, tempImages, token) => {
                 @address, @videoPath, @type, @diagnosis, @summary, @doctorId, @nurseId, @sourceType, @scopeType, @procedure, @folderPath, @createdAt, @createdUserId, @updatedAt, @updatedUserId
             )
         `)
-      const nowDate = new Date().toISOString()
-      const info = insert.run({
-        ...employee,
-        folderPath: distFolder,
-        videoPath: res.path,
-        createdAt: nowDate,
-        createdUserId: user.id,
-        updatedAt: nowDate,
-        updatedUserId: user.id
-      })
-      const newEmployeeId = info.lastInsertRowid
+        const nowDate = new Date().toISOString()
+        const info = insert.run({
+          ...employee,
+          folderPath: distFolder,
+          videoPath: res.path,
+          createdAt: nowDate,
+          createdUserId: user.id,
+          updatedAt: nowDate,
+          updatedUserId: user.id
+        })
+        const newEmployeeId = info.lastInsertRowid
 
-      // Save images
-      const imagesQuery = db.prepare(`
+        // Save images
+        const imagesQuery = db.prepare(`
             INSERT INTO employeeImages (
                 uuid, employeeId, name, path, orderIndex, position, type, createdDate
             ) VALUES (
@@ -237,62 +237,62 @@ const createEmployee = async (employee, images, tempImages, token) => {
             )
         `)
 
-      if (rawImages?.result) {
-        const allImages = rawImages.files.map((item) => {
-          return {
-            ...item,
-            type: 'raw'
-          }
-        })
-        allImages.forEach((imageData) => {
-          const info = imagesQuery.run({
-            uuid: uuid,
-            employeeId: newEmployeeId,
-            name: imageData.name,
-            path: imageData.path,
-            orderIndex: imageData?.orderIndex,
-            position: imageData?.position,
-            type: imageData?.type,
-            createdDate: new Date().toISOString()
+        if (rawImages?.result) {
+          const allImages = rawImages.files.map((item) => {
+            return {
+              ...item,
+              type: 'raw'
+            }
           })
+          allImages.forEach((imageData) => {
+            const info = imagesQuery.run({
+              uuid: uuid,
+              employeeId: newEmployeeId,
+              name: imageData.name,
+              path: imageData.path,
+              orderIndex: imageData?.orderIndex,
+              position: imageData?.position,
+              type: imageData?.type,
+              createdDate: new Date().toISOString()
+            })
 
-          return info.lastInsertRowid
-        })
-      }
-      log.info('Raw images saved ')
-
-      if (reportImages.result) {
-        let allImages = reportImages.files.map((item) => {
-          return {
-            ...item,
-            type: 'selected'
-          }
-        })
-        allImages.forEach((imageData) => {
-          const info = imagesQuery.run({
-            uuid: uuid,
-            employeeId: newEmployeeId,
-            name: imageData.name,
-            path: imageData.path,
-            orderIndex: imageData?.orderIndex,
-            position: imageData?.position,
-            type: imageData?.type,
-            createdDate: new Date().toISOString()
+            return info.lastInsertRowid
           })
+        }
+        log.info('Raw images saved ')
 
-          return info.lastInsertRowid
-        })
-        log.info('Selected images saved ')
+        if (reportImages.result) {
+          let allImages = reportImages.files.map((item) => {
+            return {
+              ...item,
+              type: 'selected'
+            }
+          })
+          allImages.forEach((imageData) => {
+            const info = imagesQuery.run({
+              uuid: uuid,
+              employeeId: newEmployeeId,
+              name: imageData.name,
+              path: imageData.path,
+              orderIndex: imageData?.orderIndex,
+              position: imageData?.position,
+              type: imageData?.type,
+              createdDate: new Date().toISOString()
+            })
+
+            return info.lastInsertRowid
+          })
+          log.info('Selected images saved ')
+        }
+      })
+
+      await transaction() // Commit the transaction
+      log.info('Transaction completed successfully.', employee?.uuid)
+      // Execute the transaction
+      return {
+        result: true
       }
-    })
-
-    await transaction() // Commit the transaction
-    console.log('Transaction completed successfully.', employee?.uuid)
-    // Execute the transaction
-    return {
-      result: true
     }
-  }
     return {
       result: false
     }
@@ -359,106 +359,124 @@ function copyAndRenameImage(currentFilePath, destinationFolder, newFileName) {
 }
 
 const updateEmployeeImages = async (images, destinationFolder, employee) => {
+  const filesToDeleteAfterSuccess = []
+  const filesCreatedToCleanupOnError = []
+
   try {
-    const deleteImages = images?.filter((it) => it.deleted && it.id)
-    if (deleteImages?.length > 0) {
+    // ---- УСТГАХ ГЭЖ БУЙ ЗУРГУУДЫН МЭДЭЭЛЛИЙГ САНГААС УНШИХ ----
+    const deleteImages = images?.filter((it) => it.deleted && it.id) || []
+    let oldImageFiles = []
+
+    if (deleteImages.length > 0) {
       const placeholders = deleteImages.map(() => '?').join(',')
-      const query = `SELECT * FROM employeeImages WHERE id IN (${placeholders})`
+      const query = `SELECT path FROM employeeImages WHERE id IN (${placeholders})`
       const stmt = db.prepare(query)
-      const oldImages = stmt.all(...deleteImages.map((item) => item.id))
-
-      await Promise.all(
-        oldImages.map((img) =>
-          fileDelete(img.path).catch((err) => {
-            log.info('Error deleting image file during update::')
-            if (err instanceof Error) {
-              log.info(err.message)
-              log.info(err.stack)
-            }
-          })
-        )
-      )
-
-      const deleteStmt = db.prepare(`DELETE FROM employeeImages WHERE id = @id`)
-      deleteImages.forEach((img) => {
-        deleteStmt.run({ id: img.id })
-      })
+      const rows = stmt.all(...deleteImages.map((item) => item.id))
+      oldImageFiles = rows.map((row) => row.path).filter(Boolean)
     }
 
-    const activeImages = images.filter((img) => !img.deleted)
+    // ---- ШИНЭ ЗУРГУУДЫГ АСИНХРОНООР ДИСК РҮҮ ХУУЛАХ ----
+    const activeImages = images.filter((img) => !img.deleted) || []
 
-    //shine zurag copy hiine
     const imageChanges = activeImages.map(async (img) => {
       if (!img.path) {
         return { ...img, path: '' }
       }
+      // Хэрэв шинээр нэмэгдэж байгаа эсвэл өөрчлөгдсөн зураг бол (жишээ нь түр хавтсанд байгаа бол) хуулна
+      // Хэрэв аль хэдийн хуулагдсан зураг бол хэвээр нь үлдээнэ
+
       const newPath = await copyAndRenameImage(
         img.path,
         destinationFolder,
         `${img.name.replaceAll(' ', '_')}_${img.orderIndex - 1}.png`
       )
-      return {
-        ...img,
-        path: newPath
-      }
+      filesCreatedToCleanupOnError.push(newPath) // Алдаа гарвал цэвэрлэхийн тулд хадгална
+      return { ...img, path: newPath }
     })
 
     const newImages = await Promise.all(imageChanges)
 
-    const insertEmployeeImage = db.prepare(`INSERT INTO employeeImages (
-        uuid, employeeId, name, path, orderIndex, position, type, createdDate
-      ) VALUES (
-        @uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate
-      )`)
-    const updateEmployeeImage = db.prepare(`UPDATE employeeImages SET
-        path = @path, name = @name, position = @position, orderIndex = @orderIndex, type = @type
-      WHERE id = @id`)
-
-    newImages?.forEach((it) => {
-      if (it?.id != null) {
-        const existingImage = db.prepare(`SELECT * FROM employeeImages WHERE id = @id`).get({
-          id: it.id
-        })
-
-        if (existingImage?.path && existingImage.path !== it.path) {
-          fileDelete(existingImage.path).catch((err) => {
-            log.info('Error deleting replaced image file during update::')
-            if (err instanceof Error) {
-              log.info(err.message)
-              log.info(err.stack)
-            }
-          })
+    // Өөрчлөгдөх гэж буй (UPDATE хийгдэх) зургуудын хуучин файлыг олох
+    for (const it of newImages) {
+      if (it.id != null) {
+        const existing = db.prepare(`SELECT path FROM employeeImages WHERE id = ?`).get(it.id)
+        if (existing?.path && existing.path !== it.path) {
+          filesToDeleteAfterSuccess.push(existing.path)
         }
+      }
+    }
 
-        updateEmployeeImage.run({
-          ...it,
-          name: resolveImageName(it?.path, it?.name),
-          type: 'selected'
-        })
-        return
+    // ---- ЦЭВЭР СИНХРОН ӨГӨГДЛИЙН САНГИЙН ТРАНЗАКЦ ----
+    const runDatabaseUpdates = db.transaction((delImgs, newImgs) => {
+      // А. Хуучин зургуудыг сангаас устгах
+      if (delImgs.length > 0) {
+        const deleteStmt = db.prepare(`DELETE FROM employeeImages WHERE id = ?`)
+        delImgs.forEach((img) => deleteStmt.run(img.id))
       }
 
-      insertEmployeeImage.run({
-        uuid: employee?.uuid,
-        employeeId: employee?.id,
-        name: resolveImageName(it?.path, it?.name),
-        path: it?.path,
-        orderIndex: it?.orderIndex,
-        position: it?.position,
-        type: 'selected',
-        createdDate: new Date().toISOString()
+      // Б. Шинэ зургуудыг засах болон нэмэх бэлтгэл
+      const insertEmployeeImage = db.prepare(`
+        INSERT INTO employeeImages (uuid, employeeId, name, path, orderIndex, position, type, createdDate)
+        VALUES (@uuid, @employeeId, @name, @path, @orderIndex, @position, @type, @createdDate)
+      `)
+
+      const updateEmployeeImage = db.prepare(`
+        UPDATE employeeImages
+        SET path = @path, name = @name, position = @position, orderIndex = @orderIndex, type = @type
+        WHERE id = @id
+      `)
+
+      newImgs.forEach((it) => {
+        const finalName = resolveImageName(it?.path, it?.name)
+        if (it?.id != null) {
+          // UPDATE үйлдэл
+          updateEmployeeImage.run({
+            ...it,
+            name: finalName,
+            type: 'selected'
+          })
+        } else {
+          // INSERT үйлдэл
+          insertEmployeeImage.run({
+            uuid: employee?.uuid,
+            employeeId: employee?.id,
+            name: finalName,
+            path: it?.path,
+            orderIndex: it?.orderIndex,
+            position: it?.position,
+            type: 'selected',
+            createdDate: new Date().toISOString()
+          })
+        }
       })
     })
 
-    return {
-      result: true
-    }
+    // Transactions ажиллуулах
+    runDatabaseUpdates(deleteImages, newImages)
+
+    // А. Бүртгэл нь устсан зургуудын файлыг устгах
+    // Б. Шинэ зургийн зам солигдсон бол хуучин файлыг устгах
+    const allFilesToDelete = [...oldImageFiles, ...filesToDeleteAfterSuccess]
+
+    allFilesToDelete.forEach((filePath) => {
+      fileDelete(filePath).catch((err) => {
+        log.info(`Error deleting file ${filePath}: ${err.message}`)
+      })
+    })
+
+    return { result: true }
   } catch (err) {
     log.info('Update employee images error:::')
     if (err instanceof Error) {
       log.info(err.message)
       log.info(err.stack)
     }
+
+    // Хэрэв өгөгдлийн сан дээр алдаа гарч унасан бол диск дээр шинээр үүсгэсэн зургуудыг цэвэрлэж устгана
+    filesCreatedToCleanupOnError.forEach((filePath) => {
+      fileDelete(filePath).catch(() => {})
+    })
+
     return {
       result: false,
       message: 'Алдаа гарлаа'
@@ -624,10 +642,10 @@ const updateEmployee = async ({ id, summary, images }) => {
   try {
     const nowDate = new Date().toISOString()
     const employee = db.prepare(`SELECT * FROM employee WHERE id = @id`).get({ id })
-    const udpateEmployee = db.prepare(`UPDATE
+    const updateEmployee = db.prepare(`UPDATE
         employee SET summary = @summary, updatedAt = @updatedAt WHERE id = @id`)
 
-    udpateEmployee.run({
+    updateEmployee.run({
       summary,
       updatedAt: nowDate,
       id
@@ -710,8 +728,55 @@ const getEmployee = async (id) => {
   }
 }
 
-const deleteEmployee = (id) => {
+const deleteEmployee = async (id) => {
   try {
+    const employee = db.prepare(`SELECT * FROM employee WHERE id = @id`).get({ id })
+    if (!employee) {
+      return {
+        result: false,
+        message: 'Ажилтан олдсонгүй'
+      }
+    }
+
+    const images = db
+      .prepare(`SELECT * FROM employeeImages WHERE employeeId = @employeeId`)
+      .all({ employeeId: id })
+
+    // Delete associated image files
+    await Promise.all(
+      images.map((img) =>
+        fileDelete(img.path).catch((err) => {
+          log.info('Error deleting image file for employee deletion::')
+          if (err instanceof Error) {
+            log.info(err.message)
+            log.info(err.stack)
+          }
+        })
+      )
+    )
+
+    // Delete video file if exists
+    if (employee.videoPath) {
+      await fileDelete(employee.videoPath).catch((err) => {
+        log.info('Error deleting video file for employee deletion::')
+        if (err instanceof Error) {
+          log.info(err.message)
+          log.info(err.stack)
+        }
+      })
+    }
+
+    // Delete the employee folder
+    if (employee.folderPath && fs.existsSync(employee.folderPath)) {
+      await fs.promises.rm(employee.folderPath, { recursive: true, force: true }).catch((err) => {
+        log.info('Error deleting employee folder::')
+        if (err instanceof Error) {
+          log.info(err.message)
+          log.info(err.stack)
+        }
+      })
+    }
+
     db.prepare('DELETE FROM employeeImages WHERE employeeId = ?').run(id)
     db.prepare('DELETE FROM employee WHERE id = ?').run(id)
     return {
