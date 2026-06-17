@@ -49,7 +49,7 @@ const ItemImage = ({
               orderIndex: selectedSlot,
               position: selectedSlot,
               name: slotData?.name,
-              type: 'selected',
+              type: item?.type,
               deleted: false,
               edited: true
             })
@@ -79,7 +79,7 @@ const ItemImage = ({
                 orderIndex: i,
                 position: i,
                 name: slotData?.name,
-                type: 'selected',
+                type: item?.type,
                 deleted: false,
                 edited: true
               })

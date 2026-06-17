@@ -157,12 +157,27 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
 
   // Add item
   const addImage = (newPath) => {
-    const images = [...(newData?.images || [])]
-    images.push({
-      path: newPath
-    })
+    const images = [...(newData?.images || []), { path: newPath, type: 'raw' }]
+    const tempImages = [...slots]
+    const emptyIndex = tempImages.findIndex((item) => !item?.path)
+
+    if (emptyIndex > -1) {
+      const slotData = defaultSlots.find((s) => s.orderIndex === tempImages[emptyIndex].orderIndex)
+      tempImages[emptyIndex] = {
+        ...tempImages[emptyIndex],
+        path: newPath,
+        orderIndex: tempImages[emptyIndex].orderIndex,
+        position: tempImages[emptyIndex].orderIndex,
+        name: slotData?.name,
+        type: tempImages[emptyIndex].type || type,
+        deleted: false,
+        edited: true
+      }
+    }
+
     changeNewData({
-      images
+      images,
+      tempImages
     })
   }
 
@@ -176,6 +191,7 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
         return {
           ...item,
           position: item.orderIndex,
+          type: item.type || type,
           path: undefined
         }
       }
@@ -190,9 +206,11 @@ const MediaInformation = ({ prevStep = () => {}, type = 'upper' }) => {
   // Swap items between two slots
   const moveItem = (fromIndex, toIndex) => {
     let images = [...slots]
-    const temp = slots[fromIndex].path
+    const temp = slots[fromIndex].videoPath
     images[toIndex].path = temp
+    images[toIndex].type = images[toIndex].type || type
     images[fromIndex].path = undefined
+    images[fromIndex].type = images[fromIndex].type || type
     changeNewData({
       tempImages: images
     })
