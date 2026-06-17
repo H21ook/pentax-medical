@@ -13,6 +13,7 @@ asarUnpack:
   - '**/node_modules/ffmpeg-static/**'
 win:
   executableName: Pentax
+  icon: resources/icon.png
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
