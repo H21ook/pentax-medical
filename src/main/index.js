@@ -117,7 +117,7 @@ app.whenReady().then(() => {
         message: 'Програмын тухай',
         detail: `Энэхүү програм нь Pentax дурангийн эмч нарт зориулагдсан болно.
 
-  Хувилбар: v1.0.11
+  Хувилбар: v${app.getVersion()}
       Node: v${process.versions.node}
       Chrome: v${process.versions.chrome}
       Electron: v${process.versions.electron}
